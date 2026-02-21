@@ -7,86 +7,100 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Noto+Sans+TC:wght@400;700;900&display=swap');
-        :root { --custom-gray: #7B7B7B; }
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; height: 100vh; width: 100vw; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        :root { --custom-gray: #4b5563; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; height: 100vh; width: 100vw; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .digital-clock { font-family: 'JetBrains Mono', monospace; }
         .level-header-input { font-size: clamp(1.8rem, 2.5vw, 2.5rem); font-weight: 900; }
-        .level-1-time { font-size: clamp(4rem, 8vw, 7.5rem); line-height: 1.2; font-weight: 700; }
-        .exam-row-text { font-size: clamp(1.3rem, 1.8vw, 2rem); font-weight: 800; line-height: 1.3; display: flex; align-items: center; }
+        .level-1-time { font-size: clamp(4.5rem, 9vw, 9.5rem); line-height: 1; font-weight: 700; }
+        .exam-row-text { font-size: clamp(1.5rem, 2.2vw, 2.8rem); font-weight: 800; line-height: 1.2; display: flex; align-items: center; }
         .text-custom-gray { color: var(--custom-gray); }
-        .main-container { height: 96vh; width: 98vw; display: flex; gap: 1.5rem; max-width: 1920px; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .main-container { height: 96vh; width: 98vw; display: flex; gap: 1rem; max-width: 1920px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .status-inner-wrapper { display: grid; grid-template-rows: 1fr auto 1fr; height: 100%; width: 100%; }
-        .exam-status-grid { display: grid; grid-template-columns: 140px 1fr 240px; align-items: center; gap: 1.5rem; height: 100%; }
-        .time-select { appearance: none; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #475569; cursor: pointer; padding: 1px 2px; text-align: center; font-size: 0.9rem; }
+        
+        /* 狀態區內部垂直置中邏輯 */
+        .status-inner-wrapper { display: flex; flex-direction: column; justify-content: space-around; height: 100%; width: 100%; }
+        .exam-status-grid { display: grid; grid-template-columns: 160px 1fr 280px; align-items: center; gap: 1rem; height: 100%; }
+        
+        .time-select { appearance: none; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #1e293b; cursor: pointer; padding: 0px 2px; text-align: center; font-size: 1.1rem; }
         .time-select:focus { outline: none; color: #2563eb; }
-        .time-picker-box { background-color: #f1f5f9; padding: 0.1rem 0.2rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
-        .compact-table td { padding: 0.3rem 0 !important; vertical-align: middle; }
-        .exam-input-name { font-size: 1.15rem; font-weight: 700; }
-        .delete-btn { font-size: 0.7rem; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+        .time-picker-box { background-color: #ffffff; padding: 1px 3px; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
+        .exam-input-name { font-size: 1.25rem; font-weight: 700; line-height: 1.1; }
+        .delete-btn { font-size: 0.8rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+
+        /* 交錯行對比 */
+        tbody tr:nth-child(even) { background-color: #f8fafc; }
     </style>
 </head>
-<body class="p-2 md:p-4">
+<body class="p-2 md:p-3">
     <main class="main-container">
-        <!-- 左側：展示區 -->
-        <section class="w-1/2 flex flex-col gap-4 h-full">
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex items-center justify-center shrink-0 h-[15%]">
-                <input type="text" id="main-title" value="113學年度學科能力測驗" class="level-header-input text-slate-800 w-full bg-transparent outline-none border-none text-center">
+        <!-- 左側：展示區 (60%) -->
+        <section class="w-[60%] flex flex-col gap-3 h-full">
+            <!-- 標題區 -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-300 flex items-center justify-center shrink-0 h-[16%]">
+                <input type="text" id="main-title" value="113學年度學科能力測驗" class="level-header-input text-slate-900 w-full bg-transparent outline-none border-none text-center">
             </div>
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center flex-[1.5]">
-                <div id="current-date" class="text-xl md:text-2xl text-custom-gray mb-4 font-medium">----年--月--日 星期-</div>
+            
+            <!-- 時間顯示區 -->
+            <div class="bg-white rounded-3xl p-12 shadow-sm border border-slate-300 flex flex-col justify-center items-center text-center shrink-0 h-[44%]">
+                <div id="current-date" class="text-xl md:text-3xl text-slate-600 mb-2 font-bold">----年--月--日 星期-</div>
                 <div id="current-time" class="level-1-time text-slate-900 tracking-tighter digital-clock">00:00:00</div>
-                <div class="mt-6 flex items-center text-sm text-custom-gray font-bold">
-                    <span class="flex h-2.5 w-2.5 rounded-full bg-green-500 mr-2 animate-pulse"></span>系統時間同步中
+                <div class="mt-4 flex items-center text-sm text-slate-600 font-black">
+                    <span class="flex h-3 w-3 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>系統時間同步中
                 </div>
             </div>
-            <div class="bg-white rounded-3xl px-10 shadow-sm border border-slate-200 flex flex-col flex-1">
+
+            <!-- 狀態區 -->
+            <div class="bg-white rounded-3xl px-8 py-0 shadow-sm border border-slate-300 flex flex-col flex-grow overflow-hidden">
                 <div class="status-inner-wrapper">
-                    <div class="exam-status-grid">
-                        <span id="status-label" class="exam-row-text px-3 py-1 rounded-xl justify-center w-full">休息中</span>
-                        <div id="current-exam-title" class="exam-row-text text-slate-800 truncate px-2">目前無考試</div>
-                        <div id="current-exam-time" class="exam-row-text text-custom-gray digital-clock justify-end">--:-- ~ --:--</div>
+                    <div class="exam-status-grid py-1">
+                        <span id="status-label" class="exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full border">休息中</span>
+                        <div id="current-exam-title" class="exam-row-text text-slate-900 truncate px-4">目前無考試</div>
+                        <div id="current-exam-time" class="exam-row-text text-slate-600 digital-clock justify-end">--:-- ~ --:--</div>
                     </div>
-                    <div class="border-t border-slate-100 w-full"></div>
-                    <div class="exam-status-grid">
-                        <span class="exam-row-text text-custom-gray px-3 py-1 bg-slate-100 rounded-xl justify-center w-full">下一科</span>
-                        <div id="next-exam-title" class="exam-row-text text-slate-600 truncate px-2">尚未排定</div>
-                        <div id="next-exam-time" class="exam-row-text text-custom-gray digital-clock justify-end">--:-- ~ --:--</div>
+                    <div class="border-t border-slate-200 w-full"></div>
+                    <div class="exam-status-grid py-1">
+                        <span class="exam-row-text text-slate-600 px-4 py-1.5 bg-slate-100 rounded-2xl justify-center w-full border border-slate-200">下一科</span>
+                        <div id="next-exam-title" class="exam-row-text text-slate-700 truncate px-4">尚未排定</div>
+                        <div id="next-exam-time" class="exam-row-text text-slate-500 digital-clock justify-end">--:-- ~ --:--</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 右側：排程管理 -->
-        <section class="w-1/2 flex flex-col bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden h-full">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 class="text-2xl font-black text-slate-800">考程設定</h3>
+        <!-- 右側：排程管理 (40%) -->
+        <section class="w-[40%] flex flex-col bg-white rounded-3xl shadow-sm border border-slate-300 overflow-hidden h-full">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="text-xl font-black text-slate-800">考程設定與編輯</h3>
                 <div class="flex gap-2">
-                    <button onclick="sortExams()" class="px-3 py-1.5 text-custom-gray bg-white border border-slate-200 rounded-xl hover:bg-slate-100 font-bold text-xs shadow-sm">自動排序</button>
-                    <button onclick="addExam()" class="px-4 py-1.5 bg-slate-800 text-white rounded-xl hover:bg-slate-700 font-bold text-xs shadow-sm">新增科目</button>
+                    <button onclick="sortExams()" class="px-3 py-1.5 text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 font-bold text-xs shadow-sm">排序</button>
+                    <button onclick="addExam()" class="px-4 py-1.5 bg-slate-800 text-white rounded-xl hover:bg-slate-700 font-bold text-xs shadow-sm">+ 新增</button>
                 </div>
             </div>
             <div class="flex-1 overflow-y-auto custom-scrollbar">
                 <table class="w-full text-left table-fixed">
-                    <thead class="sticky top-0 bg-white shadow-sm z-10">
-                        <tr class="text-custom-gray border-b border-slate-100">
-                            <th class="px-6 py-4 font-black w-[48%] text-xs">考試科目</th>
-                            <th class="px-2 py-4 font-black text-center w-[30%] text-xs">時間範圍</th>
-                            <th class="px-2 py-4 font-black text-center w-[10%] text-xs">鐘聲</th>
-                            <th class="px-4 py-4 font-black text-center w-[12%] text-xs">操作</th>
+                    <thead class="sticky top-0 bg-slate-100 shadow-sm z-10">
+                        <tr class="text-slate-700 border-b border-slate-200">
+                            <th class="px-4 py-2 font-black w-[40%] text-[13px]">科目名稱</th>
+                            <th class="px-2 py-2 font-black text-center w-[36%] text-[13px]">時間範圍</th>
+                            <th class="px-1 py-2 font-black text-center w-[12%] text-[13px]">響鈴</th>
+                            <th class="px-2 py-2 font-black text-center w-[12%] text-[13px]">操作</th>
                         </tr>
                     </thead>
-                    <tbody id="exam-list" class="divide-y divide-slate-50"></tbody>
+                    <tbody id="exam-list" class="divide-y divide-slate-100"></tbody>
                 </table>
-                <div id="empty-state" class="p-16 text-center text-custom-gray hidden font-bold">目前無考程</div>
+                <div id="empty-state" class="p-10 text-center text-slate-500 hidden font-bold text-lg">目前無考程</div>
             </div>
-            <div class="p-5 bg-slate-50 border-t border-slate-100">
-                <div class="text-[11px] text-custom-gray font-bold mb-2 px-1">音檔網址 (MP3 URL)</div>
-                <div class="flex gap-3">
-                    <input id="sound-url" type="text" class="flex-1 text-xs p-2.5 rounded-xl border border-slate-200 outline-none focus:border-blue-400 bg-white shadow-inner">
-                    <button onclick="testBell()" class="px-5 py-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 font-bold text-sm shadow-sm transition">測試播放</button>
+            <!-- 自訂鈴聲設定區塊 -->
+            <div class="p-2 px-4 bg-slate-50 border-t border-slate-200">
+                <div class="text-sm text-slate-700 font-black mb-1 px-1">自訂鈴聲設定 (MP3網址)</div>
+                <div class="flex gap-2">
+                    <input id="sound-url" type="text" class="w-[70%] text-sm p-2 rounded-xl border border-slate-200 outline-none focus:border-blue-500 bg-white shadow-inner" placeholder="請輸入 MP3 網址">
+                    <div class="flex flex-1 gap-1">
+                        <button onclick="testBell()" class="flex-1 px-1 py-2 bg-slate-700 text-white rounded-xl hover:bg-slate-800 font-bold text-xs shadow-sm transition">測試</button>
+                        <button onclick="stopBell()" class="flex-1 px-1 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold text-xs shadow-sm transition">暫停</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -103,7 +117,6 @@
         const DEFAULT_SOUND = "https://williamlee8612.github.io/上課鐘聲.mp3";
         const $ = (id) => document.getElementById(id);
         
-        // 修正後的秒數轉換函數
         const toSec = (t) => {
             const [h, m, s = 0] = t.split(':').map(Number);
             return h * 3600 + m * 60 + s;
@@ -148,10 +161,15 @@
             }
 
             const lbl = $('status-label');
-            lbl.innerText = cur ? "考試中" : "休息中";
-            lbl.className = `exam-row-text px-3 py-1 rounded-xl justify-center w-full ${cur ? 'text-red-600 bg-red-50' : 'text-blue-600 bg-blue-50'}`;
+            if (cur) {
+                lbl.innerText = "考試中";
+                lbl.className = `exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full transition-all text-red-700 bg-red-50 border-red-200 border shadow-sm`;
+            } else {
+                lbl.innerText = "休息中";
+                lbl.className = `exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full transition-all text-blue-700 bg-blue-50 border-blue-200 border shadow-sm`;
+            }
             
-            $('current-exam-title').innerText = cur ? cur.name : "目前無考試";
+            $('current-exam-title').innerText = cur ? cur.name : "目前無考試項目";
             $('current-exam-time').innerText = cur ? `${cur.start} ~ ${cur.end}` : "--:-- ~ --:--";
             $('next-exam-title').innerText = nxt ? nxt.name : "今日考程結束";
             $('next-exam-time').innerText = nxt ? `${nxt.start} ~ ${nxt.end}` : "--:-- ~ --:--";
@@ -165,22 +183,33 @@
             exams.forEach(e => {
                 const conflict = exams.some(o => o.id !== e.id && (toSec(e.start) < toSec(o.end) && toSec(e.end) > toSec(o.start)));
                 const tr = document.createElement('tr');
-                tr.className = `group hover:bg-slate-50 transition ${conflict ? 'bg-red-50' : ''}`;
+                tr.className = `group hover:bg-blue-50/50 transition ${conflict ? 'bg-red-50' : ''}`;
+                
+                // 構建警告標籤的 HTML
+                const warningTag = conflict 
+                    ? `<span class="ml-2 flex-shrink-0 bg-red-600 text-white text-[12px] px-2 py-0.5 rounded-md font-black animate-pulse shadow-md">時間重疊！</span>` 
+                    : '';
+
                 tr.innerHTML = `
-                    <td class="px-6 py-2">
-                        <input type="text" value="${e.name}" onchange="updateE(${e.id},'name',this.value)" class="bg-transparent exam-input-name text-slate-700 w-full outline-none focus:text-blue-600 truncate">
-                        ${conflict ? '<div class="text-[10px] text-red-500 font-bold">⚠️ 時間重疊</div>' : ''}
-                    </td>
-                    <td class="px-2 py-2 text-center">
-                        <div class="flex items-center justify-center space-x-1">
-                            ${timePicker(e.id, e.start, 'start')} <span class="text-slate-300">~</span> ${timePicker(e.id, e.end, 'end')}
+                    <td class="px-4 py-2">
+                        <div class="flex items-center w-full">
+                            <input type="text" value="${e.name}" 
+                                onchange="updateE(${e.id},'name',this.value)" 
+                                class="bg-transparent exam-input-name text-slate-800 flex-grow outline-none focus:text-blue-700 truncate min-w-0"
+                            >
+                            ${warningTag}
                         </div>
                     </td>
                     <td class="px-2 py-2 text-center">
-                        <input type="checkbox" ${e.bell ? 'checked' : ''} onchange="updateE(${e.id},'bell',this.checked)" class="w-4 h-4 text-blue-600 cursor-pointer">
+                        <div class="flex items-center justify-center gap-x-0.5">
+                            ${timePicker(e.id, e.start, 'start')} <span class="text-slate-400 font-bold">-</span> ${timePicker(e.id, e.end, 'end')}
+                        </div>
                     </td>
-                    <td class="px-4 py-2 text-center">
-                        <button onclick="delE(${e.id})" class="delete-btn mx-auto text-slate-300 hover:text-red-500 border border-slate-200 bg-white transition-all font-bold">✕</button>
+                    <td class="px-1 py-2 text-center">
+                        <input type="checkbox" ${e.bell ? 'checked' : ''} onchange="updateE(${e.id},'bell',this.checked)" class="w-5 h-5 text-blue-600 cursor-pointer accent-blue-600">
+                    </td>
+                    <td class="px-2 py-2 text-center">
+                        <button onclick="delE(${e.id})" class="delete-btn mx-auto text-slate-400 hover:text-red-600 border border-slate-200 bg-white transition-all font-bold shadow-sm">✕</button>
                     </td>`;
                 list.appendChild(tr);
             });
@@ -193,9 +222,9 @@
                 return `<option value="${v}" ${v === sel ? 'selected' : ''}>${v}</option>`;
             }).join('');
             return `
-                <div class="inline-flex items-center space-x-1 time-picker-box">
+                <div class="inline-flex items-center time-picker-box hover:border-blue-400 transition-colors">
                     <select class="time-select" onchange="updateT(${id},'${field}','h',this.value)">${opt(24, h)}</select>
-                    <span class="text-slate-400 font-bold">:</span>
+                    <span class="text-slate-400 font-bold text-xs">:</span>
                     <select class="time-select" onchange="updateT(${id},'${field}','m',this.value)">${opt(60, m)}</select>
                 </div>`;
         }
@@ -209,23 +238,18 @@
 
         function updateE(id, f, v) { exams.find(x => x.id === id)[f] = v; renderExams(); }
         function delE(id) { exams = exams.filter(e => e.id !== id); renderExams(); }
-        function addExam() { exams.push({ id: Date.now(), name: '新項目', start: '08:00', end: '09:00', bell: true }); renderExams(); }
+        function addExam() { exams.push({ id: Date.now(), name: '新考科', start: '08:00', end: '09:00', bell: true }); renderExams(); }
         function sortExams() { exams.sort((a, b) => a.start.localeCompare(b.start)); renderExams(); }
         function playSound() { 
             const a = $('bell-audio'); a.src = $('sound-url').value || DEFAULT_SOUND;
             a.currentTime = 0; a.play().catch(()=>{}); 
         }
         function testBell() { playSound(); }
+        function stopBell() { 
+            const a = $('bell-audio'); 
+            a.pause(); 
+            a.currentTime = 0; 
+        }
     </script>
 </body>
 </html>
-
-<!--
-【使用須知與版權聲明】
-本系統係為輔助考場計時開發之工具，歡迎大家在遵守以下規則的前提下使用：
-個人與非營利使用：歡迎在校園、補習班等非營利考場免費使用。
-禁止商業販售：請勿將本程式碼或其修改版本進行轉售或任何商業獲利行為。
-保留原作者資訊：若需修改程式碼或轉載，請保留原作者與原始出處說明。
-免責聲明：本工具僅供輔助參考，使用前請務必核對時間，如因硬體或網路問題導致計時偏差，開發者不負賠償責任。
-感謝您的配合與支持！
--->
