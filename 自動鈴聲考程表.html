@@ -6,148 +6,149 @@
     <title>自動鈴聲考程表</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 載入字型：JetBrains Mono 用於數位時鐘，Noto Sans TC 用於一般文字 */
+        /* [樣式] 載入外部字型：數位時鐘用 JetBrains Mono，一般文字用 Noto Sans TC */
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Noto+Sans+TC:wght@400;700;900&display=swap');
         
         :root { --custom-gray: #4b5563; }
+
+        /* [樣式] 基礎頁面設定與版面置中 */
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; height: 100vh; width: 100vw; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        
+        /* [樣式] 時鐘專用字型與字級縮放 (響應式設計) */
         .digital-clock { font-family: 'JetBrains Mono', monospace; }
-
-        /* 左側響應式字級控制：優化下限與上限，防止窄屏切字 */
-        .level-header-input { font-size: clamp(1.5rem, 3.2vw, 2.8rem); font-weight: 900; }
-        .level-1-time { font-size: clamp(4.5rem, 10.5vw, 11rem); line-height: 1; font-weight: 700; letter-spacing: -0.05em; }
-        .level-date-text { font-size: clamp(1.4rem, 2.6vw, 2.8rem); font-weight: 700; }
+        .level-header-input { font-size: clamp(1.8rem, 2.5vw, 2.5rem); font-weight: 900; }
+        .level-1-time { font-size: clamp(4.5rem, 9vw, 9.5rem); line-height: 1; font-weight: 700; }
+        .exam-row-text { font-size: clamp(1.5rem, 2.2vw, 2.8rem); font-weight: 800; line-height: 1.2; display: flex; align-items: center; }
         
-        /* 狀態列文字控制：微調確保在窄容器內不溢出 */
-        .exam-row-text-status { font-size: clamp(1.6rem, 2.2vw, 2.4rem); font-weight: 900; line-height: 1.2; }
-        .exam-row-text-title { font-size: clamp(1.6rem, 2.2vw, 2.4rem); font-weight: 800; line-height: 1.2; }
-        .exam-row-text-time { font-size: clamp(1.4rem, 1.8vw, 2rem); font-weight: 700; line-height: 1.2; }
-
-        /* 容器佈局：增加 Gap 提升空隙感 */
-        .main-container { height: 94vh; width: 97vw; display: flex; gap: 1.5rem; max-width: 1920px; }
+        /* [樣式] 佈局容器：左展示區與右管理區 */
+        .main-container { height: 96vh; width: 98vw; display: flex; gap: 1rem; max-width: 1920px; }
         
-        /* 捲軸美化 */
+        /* [樣式] 自定義捲軸樣式 */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* 排程與展示結構優化：確保垂直方向的平衡感 */
-        .status-inner-wrapper { display: flex; flex-direction: column; justify-content: space-evenly; height: 100%; width: 100%; }
-        .exam-status-grid { display: grid; grid-template-columns: minmax(140px, 180px) 1fr minmax(200px, 280px); align-items: center; gap: 1.5rem; height: 100%; }
+        /* [樣式] 左側狀態區垂直排列與 Grid 網格設定 */
+        .status-inner-wrapper { display: flex; flex-direction: column; justify-content: space-around; height: 100%; width: 100%; }
+        .exam-status-grid { display: grid; grid-template-columns: 160px 1fr 280px; align-items: center; gap: 1rem; height: 100%; }
         
-        /* 右側輸入區樣式 */
-        .time-select { appearance: none; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #1e293b; cursor: pointer; padding: 2px 4px; text-align: center; font-size: 1.2rem; }
-        .time-picker-box { background-color: #ffffff; padding: 4px 6px; border-radius: 0.5rem; border: 1px solid #e2e8f0; transition: border 0.2s; }
-        .time-picker-box:hover { border-color: #94a3b8; }
-        .exam-input-name { font-size: 1.4rem; font-weight: 800; line-height: 1; padding: 4px 0; }
-        .delete-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+        /* [樣式] 右側時間選擇器與管理元件 */
+        .time-select { appearance: none; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #1e293b; cursor: pointer; padding: 0px 2px; text-align: center; font-size: 1.1rem; }
+        .time-select:focus { outline: none; color: #2563eb; }
+        .time-picker-box { background-color: #ffffff; padding: 1px 3px; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
+        .exam-input-name { font-size: 1.25rem; font-weight: 700; line-height: 1.1; }
+        .delete-btn { font-size: 0.8rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
 
-        /* 表格交互效果 */
+        /* [樣式] 管理列表交錯行底色 */
         tbody tr:nth-child(even) { background-color: #f8fafc; }
-        tr:hover { background-color: #f1f5f9 !important; }
     </style>
 </head>
-<body class="p-3 md:p-5">
+<body class="p-2 md:p-3">
     <main class="main-container">
-        <!-- [區段] 左側：大螢幕展示區 (60%) -->
-        <section class="w-[60%] flex flex-col gap-4 h-full">
-            <!-- 標題輸入區：增加 Padding 確保垂直空隙 -->
-            <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 flex items-center justify-center shrink-0 h-[15%]">
-                <input type="text" id="main-title" value="113學年度學科能力測驗" class="level-header-input text-slate-900 w-full bg-transparent outline-none border-none text-center" placeholder="請輸入標題">
+        <!-- [HTML區段] 左側：大螢幕即時展示區 (寬度佔 60%) -->
+        <section class="w-[60%] flex flex-col gap-3 h-full">
+            <!-- 頂部標題輸入框 (可點擊修改) -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-300 flex items-center justify-center shrink-0 h-[16%]">
+                <input type="text" id="main-title" value="114學年度 九年級第一次模擬考" class="level-header-input text-slate-900 w-full bg-transparent outline-none border-none text-center">
             </div>
             
-            <!-- 即時時間區：優化內部元素間距 -->
-            <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center shrink-0 h-[45%]">
-                <div id="current-date" class="level-date-text text-slate-500 mb-4">----年--月--日 星期-</div>
-                <div id="current-time" class="level-1-time text-slate-900 digital-clock">00:00:00</div>
-                <div class="mt-8 flex items-center text-xl text-slate-400 font-black">
-                    <span class="flex h-4 w-4 rounded-full bg-emerald-500 mr-3 animate-pulse"></span>系統正常運作
+            <!-- 中間日期與大時鐘顯示區 -->
+            <div class="bg-white rounded-3xl p-12 shadow-sm border border-slate-300 flex flex-col justify-center items-center text-center shrink-0 h-[44%]">
+                <div id="current-date" class="text-xl md:text-3xl text-slate-600 mb-2 font-bold">----年--月--日 星期-</div>
+                <div id="current-time" class="level-1-time text-slate-900 tracking-tighter digital-clock">00:00:00</div>
+                <div class="mt-4 flex items-center text-sm text-slate-600 font-black">
+                    <span class="flex h-3 w-3 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>系統時間同步中
                 </div>
             </div>
 
-            <!-- 考程狀態區：加大 Padding 避免內容壓迫 -->
-            <div class="bg-white rounded-[2rem] px-10 py-2 shadow-sm border border-slate-200 flex flex-col flex-grow overflow-hidden">
+            <!-- 底部目前與下一科考程狀態區 -->
+            <div class="bg-white rounded-3xl px-8 py-0 shadow-sm border border-slate-300 flex flex-col flex-grow overflow-hidden">
                 <div class="status-inner-wrapper">
-                    <!-- 當前科目 -->
-                    <div class="exam-status-grid py-4">
-                        <span id="status-label" class="exam-row-text-status px-4 py-3 rounded-2xl border text-center transition-all shadow-sm">休息中</span>
-                        <div id="current-exam-title" class="exam-row-text-title text-slate-900 truncate px-4">目前無考試</div>
-                        <div id="current-exam-time" class="exam-row-text-time text-slate-600 digital-clock text-right font-bold">--:-- ~ --:--</div>
+                    <!-- 當前考試狀態 -->
+                    <div class="exam-status-grid py-1">
+                        <span id="status-label" class="exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full border">休息中</span>
+                        <div id="current-exam-title" class="exam-row-text text-slate-900 truncate px-4">目前無考試</div>
+                        <div id="current-exam-time" class="exam-row-text text-slate-600 digital-clock justify-end">--:-- ~ --:--</div>
                     </div>
-                    <div class="border-t-2 border-slate-50 w-full"></div>
-                    <!-- 下一科目 -->
-                    <div class="exam-status-grid py-4">
-                        <span class="exam-row-text-status text-slate-500 px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100 text-center">下一科</span>
-                        <div id="next-exam-title" class="exam-row-text-title text-slate-600 truncate px-4">尚未排定</div>
-                        <div id="next-exam-time" class="exam-row-text-time text-slate-400 digital-clock text-right font-bold">--:-- ~ --:--</div>
+                    <div class="border-t border-slate-200 w-full"></div>
+                    <!-- 下一個預定考試 -->
+                    <div class="exam-status-grid py-1">
+                        <span class="exam-row-text text-slate-600 px-4 py-1.5 bg-slate-100 rounded-2xl justify-center w-full border border-slate-200">下一科</span>
+                        <div id="next-exam-title" class="exam-row-text text-slate-700 truncate px-4">尚未排定</div>
+                        <div id="next-exam-time" class="exam-row-text text-slate-500 digital-clock justify-end">--:-- ~ --:--</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- [區段] 右側：管理後台 (40%) -->
-        <section class="w-[40%] flex flex-col bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden h-full">
-            <!-- 標題控制列 -->
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 class="text-xl font-black text-slate-800 tracking-tight">考程時間表</h3>
+        <!-- [HTML區段] 右側：考程管理後台 (寬度佔 40%) -->
+        <section class="w-[40%] flex flex-col bg-white rounded-3xl shadow-sm border border-slate-300 overflow-hidden h-full">
+            <!-- 管理台頂部功能按鈕 -->
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="text-xl font-black text-slate-800">考試時間表</h3>
                 <div class="flex gap-2">
-                    <button onclick="sortExams()" class="px-4 py-2 text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 font-bold text-xs shadow-sm transition-all">排序</button>
-                    <button onclick="addExam()" class="px-5 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 font-bold text-xs shadow-sm transition-all">+ 新增</button>
+                    <button onclick="sortExams()" class="px-3 py-1.5 text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 font-bold text-xs shadow-sm">排序</button>
+                    <button onclick="addExam()" class="px-4 py-1.5 bg-slate-800 text-white rounded-xl hover:bg-slate-700 font-bold text-xs shadow-sm">新增</button>
                 </div>
             </div>
-            <!-- 考程列表 -->
+            <!-- 考程清單表格 -->
             <div class="flex-1 overflow-y-auto custom-scrollbar">
                 <table class="w-full text-left table-fixed">
-                    <thead class="sticky top-0 bg-slate-50/90 backdrop-blur-sm z-10">
-                        <tr class="text-slate-500 border-b border-slate-100 text-[12px] font-black uppercase tracking-widest">
-                            <th class="px-5 py-3 w-[38%]">科目名稱</th>
-                            <th class="px-2 py-3 w-[38%] text-center">起訖時間</th>
-                            <th class="px-1 py-3 w-[12%] text-center">響鈴</th>
-                            <th class="px-2 py-3 w-[12%] text-center">操作</th>
+                    <thead class="sticky top-0 bg-slate-100 shadow-sm z-10">
+                        <tr class="text-slate-700 border-b border-slate-200">
+                            <th class="px-4 py-2 font-black w-[40%] text-[13px]">科目名稱</th>
+                            <th class="px-2 py-2 font-black text-center w-[36%] text-[13px]">時間範圍</th>
+                            <th class="px-1 py-2 font-black text-center w-[12%] text-[13px]">響鈴</th>
+                            <th class="px-2 py-2 font-black text-center w-[12%] text-[13px]">操作</th>
                         </tr>
                     </thead>
-                    <tbody id="exam-list" class="divide-y divide-slate-50"></tbody>
+                    <tbody id="exam-list" class="divide-y divide-slate-100"></tbody>
                 </table>
-                <div id="empty-state" class="p-12 text-center text-slate-300 hidden font-bold">目前無排定考程</div>
+                <div id="empty-state" class="p-10 text-center text-slate-500 hidden font-bold text-lg">目前無考程</div>
             </div>
-            <!-- 音樂設定區 -->
-            <div class="p-5 bg-slate-50/50 border-t border-slate-100">
-                <div class="text-[12px] text-slate-500 font-black mb-2 uppercase tracking-wider">自訂鈴聲 (MP3 URL)</div>
+            <!-- 音效網址設定區域 -->
+            <div class="p-2 px-4 bg-slate-50 border-t border-slate-200">
+                <div class="text-sm text-slate-700 font-black mb-1 px-1">自訂鈴聲設定 (MP3網址)</div>
                 <div class="flex gap-2">
-                    <input id="sound-url" type="text" class="flex-grow text-sm p-3 rounded-xl border border-slate-200 outline-none focus:border-blue-400 bg-white shadow-inner transition-all">
-                    <button onclick="testBell()" class="px-4 py-2 bg-slate-800 text-white rounded-xl hover:bg-slate-900 font-bold text-xs transition-all">測試</button>
-                    <button onclick="stopBell()" class="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 font-bold text-xs transition-all">停止</button>
+                    <input id="sound-url" type="text" class="w-[70%] text-sm p-2 rounded-xl border border-slate-200 outline-none focus:border-blue-500 bg-white shadow-inner" placeholder="請輸入 MP3 網址">
+                    <div class="flex flex-1 gap-1">
+                        <button onclick="testBell()" class="flex-1 px-1 py-2 bg-slate-700 text-white rounded-xl hover:bg-slate-800 font-bold text-xs shadow-sm transition">測試</button>
+                        <button onclick="stopBell()" class="flex-1 px-1 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold text-xs shadow-sm transition">暫停</button>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- 隱藏的音訊播放元件 -->
     <audio id="bell-audio" preload="auto"></audio>
 
     <script>
-        /* [邏輯] 初始化資料與變數 */
+        /* [JS邏輯] 預設資料設定與初始化變數 */
         let exams = [
-            { id: 1, name: '預備鈴', start: '08:00', end: '08:10', bell: true },
-            { id: 2, name: '國文科', start: '09:20', end: '11:00', bell: true }
+            { id: 1, name: '預備鐘', start: '08:00', end: '08:10', bell: true },
+            { id: 2, name: '英文科', start: '08:10', end: '09:00', bell: true }
         ];
         
         const DEFAULT_SOUND = "https://williamlee8612.github.io/上課鐘聲.mp3";
         const $ = (id) => document.getElementById(id);
+        
+        /* [JS邏輯] 時間字串轉換為總秒數 (用於比對時間) */
         const toSec = (t) => {
             const [h, m, s = 0] = t.split(':').map(Number);
             return h * 3600 + m * 60 + s;
         };
 
-        /* [邏輯] 系統初始化 */
+        /* [JS邏輯] 頁面載入初始化 */
         window.onload = () => {
             $('sound-url').value = DEFAULT_SOUND;
             $('bell-audio').src = DEFAULT_SOUND;
             renderExams();
-            setInterval(tick, 1000);
+            setInterval(tick, 1000); // 啟動每秒計時器
             tick();
         };
 
-        /* [邏輯] 每秒計時與狀態更新 */
+        /* [JS邏輯] 每秒計時處理程序：更新時鐘與偵測響鈴 */
         function tick() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -157,16 +158,16 @@
             $('current-date').innerText = now.toLocaleDateString('zh-TW', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
             $('current-time').innerText = `${h}:${m}:${s}`;
 
-            // 整分偵測播放鈴聲
+            // 僅在秒數為 00 時檢查是否符合考程起訖時間並播放鈴聲
             if (s === "00") {
                 const nowShort = `${h}:${m}`;
                 if (exams.some(e => e.bell && (e.start === nowShort || e.end === nowShort))) playSound();
             }
-            updateDisplayStatus(h, m, s);
+            updateStatus(h, m, s);
         }
 
-        /* [邏輯] 左側展示狀態判定 */
-        function updateDisplayStatus(h, m, s) {
+        /* [JS邏輯] 判斷目前考試狀態 (休息/考試中/下一科) */
+        function updateStatus(h, m, s) {
             const nowTotal = toSec(`${h}:${m}:${s}`);
             const sorted = [...exams].sort((a, b) => a.start.localeCompare(b.start));
             let cur = null, nxt = null;
@@ -180,49 +181,63 @@
                 }
             }
 
+            // 更新展示區文字與顏色樣式
             const lbl = $('status-label');
-            lbl.innerText = cur ? "考試中" : "休息中";
-            lbl.className = `exam-row-text-status px-5 py-3 rounded-2xl w-full border text-center transition-all duration-500 font-black shadow-sm ${cur ? 'text-red-700 bg-red-50 border-red-200' : 'text-blue-700 bg-blue-50 border-blue-200'}`;
+            if (cur) {
+                lbl.innerText = "考試中";
+                lbl.className = `exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full transition-all text-red-700 bg-red-50 border-red-200 border shadow-sm`;
+            } else {
+                lbl.innerText = "休息中";
+                lbl.className = `exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full transition-all text-blue-700 bg-blue-50 border-blue-200 border shadow-sm`;
+            }
             
-            $('current-exam-title').innerText = cur ? cur.name : "目前無考試";
+            $('current-exam-title').innerText = cur ? cur.name : "目前無考試項目";
             $('current-exam-time').innerText = cur ? `${cur.start} ~ ${cur.end}` : "--:-- ~ --:--";
             $('next-exam-title').innerText = nxt ? nxt.name : "今日考程結束";
             $('next-exam-time').innerText = nxt ? `${nxt.start} ~ ${nxt.end}` : "--:-- ~ --:--";
         }
 
-        /* [邏輯] 列表渲染 */
+        /* [JS邏輯] 重新渲染右側管理台考程清單 */
         function renderExams() {
             const list = $('exam-list');
             list.innerHTML = '';
             $('empty-state').classList.toggle('hidden', exams.length > 0);
 
             exams.forEach(e => {
-                const isConflict = exams.some(o => o.id !== e.id && (toSec(e.start) < toSec(o.end) && toSec(e.end) > toSec(o.start)));
+                const conflict = exams.some(o => o.id !== e.id && (toSec(e.start) < toSec(o.end) && toSec(e.end) > toSec(o.start)));
                 const tr = document.createElement('tr');
-                tr.className = `transition-all ${isConflict ? 'bg-red-50/50' : ''}`;
+                tr.className = `group hover:bg-blue-50/50 transition ${conflict ? 'bg-red-50' : ''}`;
                 
+                const warningTag = conflict 
+                    ? `<span class="ml-2 flex-shrink-0 bg-red-600 text-white text-[12px] px-2 py-0.5 rounded-md font-black animate-pulse shadow-md">時間重疊！</span>` 
+                    : '';
+
                 tr.innerHTML = `
-                    <td class="px-5 py-2.5">
-                        <div class="flex items-center">
-                            <input type="text" value="${e.name}" onchange="updateE(${e.id},'name',this.value)" 
-                                class="bg-transparent exam-input-name text-slate-800 w-full outline-none focus:text-blue-600 truncate font-bold">
-                            ${isConflict ? '<span class="ml-2 text-[10px] bg-red-600 text-white px-2 py-0.5 rounded-full animate-pulse shadow-sm">時間重疊</span>' : ''}
+                    <td class="px-4 py-2">
+                        <div class="flex items-center w-full">
+                            <input type="text" value="${e.name}" 
+                                onchange="updateE(${e.id},'name',this.value)" 
+                                class="bg-transparent exam-input-name text-slate-800 flex-grow outline-none focus:text-blue-700 truncate min-w-0"
+                            >
+                            ${warningTag}
                         </div>
                     </td>
-                    <td class="px-2 py-2.5 text-center">
-                        <div class="flex items-center justify-center gap-1 font-bold">${timePicker(e.id, e.start, 'start')} <span class="text-slate-300">-</span> ${timePicker(e.id, e.end, 'end')}</div>
+                    <td class="px-2 py-2 text-center">
+                        <div class="flex items-center justify-center gap-x-0.5">
+                            ${timePicker(e.id, e.start, 'start')} <span class="text-slate-400 font-bold">-</span> ${timePicker(e.id, e.end, 'end')}
+                        </div>
                     </td>
-                    <td class="px-1 py-2.5 text-center">
-                        <input type="checkbox" ${e.bell ? 'checked' : ''} onchange="updateE(${e.id},'bell',this.checked)" class="w-6 h-6 accent-slate-900 cursor-pointer">
+                    <td class="px-1 py-2 text-center">
+                        <input type="checkbox" ${e.bell ? 'checked' : ''} onchange="updateE(${e.id},'bell',this.checked)" class="w-5 h-5 text-blue-600 cursor-pointer accent-blue-600">
                     </td>
-                    <td class="px-2 py-2.5 text-center">
-                        <button onclick="delE(${e.id})" class="delete-btn mx-auto text-slate-300 hover:text-red-500 hover:bg-white transition-all border border-transparent hover:border-slate-100 shadow-none hover:shadow-sm">✕</button>
+                    <td class="px-2 py-2 text-center">
+                        <button onclick="delE(${e.id})" class="delete-btn mx-auto text-slate-400 hover:text-red-600 border border-slate-200 bg-white transition-all font-bold shadow-sm">✕</button>
                     </td>`;
                 list.appendChild(tr);
             });
         }
 
-        /* [邏輯] 時間選擇器元件 */
+        /* [JS邏輯] 產生時間選擇下拉選單元件 */
         function timePicker(id, val, field) {
             const [h, m] = val.split(':');
             const opt = (max, sel) => Array.from({length: max}, (_, i) => {
@@ -230,32 +245,38 @@
                 return `<option value="${v}" ${v === sel ? 'selected' : ''}>${v}</option>`;
             }).join('');
             return `
-                <div class="inline-flex items-center time-picker-box">
+                <div class="inline-flex items-center time-picker-box hover:border-blue-400 transition-colors">
                     <select class="time-select" onchange="updateT(${id},'${field}','h',this.value)">${opt(24, h)}</select>
-                    <span class="text-slate-300">:</span>
+                    <span class="text-slate-400 font-bold text-xs">:</span>
                     <select class="time-select" onchange="updateT(${id},'${field}','m',this.value)">${opt(60, m)}</select>
                 </div>`;
         }
 
-        /* [邏輯] 資料操作功能 */
+        /* [JS邏輯] 處理時間選單變動同步至資料陣列 */
         function updateT(id, f, p, v) {
             const e = exams.find(x => x.id === id);
             let [h, m] = e[f].split(':');
             p === 'h' ? h = v : m = v;
             updateE(id, f, `${h}:${m}`);
         }
+
+        /* [JS邏輯] 更新單筆資料、刪除、新增與排序考程功能 */
         function updateE(id, f, v) { exams.find(x => x.id === id)[f] = v; renderExams(); }
         function delE(id) { exams = exams.filter(e => e.id !== id); renderExams(); }
-        function addExam() { exams.push({ id: Date.now(), name: '新項目', start: '12:00', end: '13:00', bell: true }); renderExams(); }
+        function addExam() { exams.push({ id: Date.now(), name: '新考科', start: '08:00', end: '09:00', bell: true }); renderExams(); }
         function sortExams() { exams.sort((a, b) => a.start.localeCompare(b.start)); renderExams(); }
-
-        /* [邏輯] 音訊控制 */
+        
+        /* [JS邏輯] 音訊播放與測試控制功能 */
         function playSound() { 
             const a = $('bell-audio'); a.src = $('sound-url').value || DEFAULT_SOUND;
-            a.currentTime = 0; a.play().catch(() => console.log("等待使用者互動以播放音效")); 
+            a.currentTime = 0; a.play().catch(()=>{}); 
         }
         function testBell() { playSound(); }
-        function stopBell() { const a = $('bell-audio'); a.pause(); a.currentTime = 0; }
+        function stopBell() { 
+            const a = $('bell-audio'); 
+            a.pause(); 
+            a.currentTime = 0; 
+        }
     </script>
 </body>
 </html>
