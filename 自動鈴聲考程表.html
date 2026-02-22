@@ -17,7 +17,8 @@
         /* [樣式] 時鐘專用字型與字級縮放 (響應式設計) */
         .digital-clock { font-family: 'JetBrains Mono', monospace; }
         .level-header-input { font-size: clamp(1.8rem, 2.5vw, 2.5rem); font-weight: 900; }
-        .level-1-time { font-size: clamp(4.5rem, 9vw, 9.5rem); line-height: 1; font-weight: 700; }
+        /* 調整：將時鐘字級上限與下限放大，保持自適應 */
+        .level-1-time { font-size: clamp(5rem, 11vw, 12rem); line-height: 1; font-weight: 700; }
         .exam-row-text { font-size: clamp(1.5rem, 2.2vw, 2.8rem); font-weight: 800; line-height: 1.2; display: flex; align-items: center; }
         
         /* [樣式] 佈局容器：左展示區與右管理區 */
@@ -54,9 +55,11 @@
             
             <!-- 中間日期與大時鐘顯示區 -->
             <div class="bg-white rounded-3xl p-12 shadow-sm border border-slate-300 flex flex-col justify-center items-center text-center shrink-0 h-[44%]">
-                <div id="current-date" class="text-xl md:text-3xl text-slate-600 mb-2 font-bold">----年--月--日 星期-</div>
+                <!-- 調整：增加日期與時間的間距 mb-4 -->
+                <div id="current-date" class="text-xl md:text-3xl text-slate-600 mb-4 font-bold">----年--月--日 星期-</div>
                 <div id="current-time" class="level-1-time text-slate-900 tracking-tighter digital-clock">00:00:00</div>
-                <div class="mt-4 flex items-center text-sm text-slate-600 font-black">
+                <!-- 調整：增加時間與狀態的間距 mt-8 -->
+                <div class="mt-8 flex items-center text-sm text-slate-600 font-black">
                     <span class="flex h-3 w-3 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>系統時間同步中
                 </div>
             </div>
@@ -191,7 +194,7 @@
                 lbl.className = `exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full transition-all text-blue-700 bg-blue-50 border-blue-200 border shadow-sm`;
             }
             
-            $('current-exam-title').innerText = cur ? cur.name : "目前無考試項目";
+            $('current-exam-title').innerText = cur ? cur.name : "目前無考試";
             $('current-exam-time').innerText = cur ? `${cur.start} ~ ${cur.end}` : "--:-- ~ --:--";
             $('next-exam-title').innerText = nxt ? nxt.name : "今日考程結束";
             $('next-exam-time').innerText = nxt ? `${nxt.start} ~ ${nxt.end}` : "--:-- ~ --:--";
