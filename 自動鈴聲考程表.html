@@ -50,7 +50,7 @@
         <section class="w-[60%] flex flex-col gap-3 h-full">
             <!-- 頂部標題輸入框 (可點擊修改) -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-300 flex items-center justify-center shrink-0 h-[16%]">
-                <input type="text" id="main-title" value="114學年度 九年級第一次模擬考" class="level-header-input text-slate-900 w-full bg-transparent outline-none border-none text-center">
+                <input type="text" id="main-title" value="114學年度 九年級第一次模擬考" oninput="saveAllData()" class="level-header-input text-slate-900 w-full bg-transparent outline-none border-none text-center">
             </div>
             
             <!-- 中間日期與大時鐘顯示區 -->
@@ -113,7 +113,7 @@
             <div class="p-2 px-4 bg-slate-50 border-t border-slate-200">
                 <div class="text-sm text-slate-700 font-black mb-1 px-1">自訂鈴聲設定 (MP3網址)</div>
                 <div class="flex gap-2">
-                    <input id="sound-url" type="text" class="w-[70%] text-sm p-2 rounded-xl border border-slate-200 outline-none focus:border-blue-500 bg-white shadow-inner" placeholder="請輸入 MP3 網址">
+                    <input id="sound-url" type="text" oninput="saveAllData()" class="w-[70%] text-sm p-2 rounded-xl border border-slate-200 outline-none focus:border-blue-500 bg-white shadow-inner" placeholder="請輸入 MP3 網址">
                     <div class="flex flex-1 gap-1">
                         <button onclick="testBell()" class="flex-1 px-1 py-2 bg-slate-700 text-white rounded-xl hover:bg-slate-800 font-bold text-xs shadow-sm transition">測試</button>
                         <button onclick="stopBell()" class="flex-1 px-1 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold text-xs shadow-sm transition">暫停</button>
@@ -142,10 +142,33 @@
             return h * 3600 + m * 60 + s;
         };
 
+        /* [JS邏輯] LocalStorage 儲存功能 */
+        function saveAllData() {
+            const data = {
+                mainTitle: $('main-title').value,
+                soundUrl: $('sound-url').value,
+                exams: exams
+            };
+            localStorage.setItem('examSystemData', JSON.stringify(data));
+        }
+
+        /* [JS邏輯] LocalStorage 載入功能 */
+        function loadAllData() {
+            const savedData = localStorage.getItem('examSystemData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (data.mainTitle) $('main-title').value = data.mainTitle;
+                if (data.soundUrl) $('sound-url').value = data.soundUrl;
+                if (data.exams) exams = data.exams;
+            } else {
+                $('sound-url').value = DEFAULT_SOUND;
+            }
+        }
+
         /* [JS邏輯] 頁面載入初始化 */
         window.onload = () => {
-            $('sound-url').value = DEFAULT_SOUND;
-            $('bell-audio').src = DEFAULT_SOUND;
+            loadAllData(); // 優先從 LocalStorage 載入資料
+            $('bell-audio').src = $('sound-url').value || DEFAULT_SOUND;
             renderExams();
             setInterval(tick, 1000); // 啟動每秒計時器
             tick();
@@ -264,10 +287,26 @@
         }
 
         /* [JS邏輯] 更新單筆資料、刪除、新增與排序考程功能 */
-        function updateE(id, f, v) { exams.find(x => x.id === id)[f] = v; renderExams(); }
-        function delE(id) { exams = exams.filter(e => e.id !== id); renderExams(); }
-        function addExam() { exams.push({ id: Date.now(), name: '新考科', start: '08:00', end: '09:00', bell: true }); renderExams(); }
-        function sortExams() { exams.sort((a, b) => a.start.localeCompare(b.start)); renderExams(); }
+        function updateE(id, f, v) { 
+            exams.find(x => x.id === id)[f] = v; 
+            renderExams(); 
+            saveAllData(); // 資料異動後儲存
+        }
+        function delE(id) { 
+            exams = exams.filter(e => e.id !== id); 
+            renderExams(); 
+            saveAllData(); // 資料異動後儲存
+        }
+        function addExam() { 
+            exams.push({ id: Date.now(), name: '新考科', start: '08:00', end: '09:00', bell: true }); 
+            renderExams(); 
+            saveAllData(); // 資料異動後儲存
+        }
+        function sortExams() { 
+            exams.sort((a, b) => a.start.localeCompare(b.start)); 
+            renderExams(); 
+            saveAllData(); // 資料異動後儲存
+        }
         
         /* [JS邏輯] 音訊播放與測試控制功能 */
         function playSound() { 
