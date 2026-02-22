@@ -11,15 +11,15 @@
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; height: 100vh; width: 100vw; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .digital-clock { font-family: 'JetBrains Mono', monospace; }
         
-        /* 左側字級極大化與 Padding 壓縮 */
-        .level-header-input { font-size: clamp(2.5rem, 4vw, 3.8rem); font-weight: 900; }
-        .level-1-time { font-size: clamp(6rem, 12vw, 13rem); line-height: 0.9; font-weight: 700; }
-        .level-date-text { font-size: clamp(2rem, 3.5vw, 4rem); font-weight: 700; }
+        /* 左側字級：取中間平衡點 */
+        .level-header-input { font-size: clamp(2.2rem, 3.5vw, 3.2rem); font-weight: 900; }
+        .level-1-time { font-size: clamp(5.5rem, 11vw, 11.5rem); line-height: 0.95; font-weight: 700; letter-spacing: -0.05em; }
+        .level-date-text { font-size: clamp(1.8rem, 2.8vw, 3.2rem); font-weight: 700; }
         
-        /* 狀態列文字放大 */
-        .exam-row-text-status { font-size: clamp(2rem, 3vw, 3.5rem); font-weight: 900; line-height: 1; }
-        .exam-row-text-title { font-size: clamp(2rem, 3vw, 3.5rem); font-weight: 800; line-height: 1; }
-        .exam-row-text-time { font-size: clamp(1.8rem, 2.8vw, 3rem); font-weight: 700; line-height: 1; }
+        /* 狀態列文字微調 */
+        .exam-row-text-status { font-size: clamp(1.8rem, 2.5vw, 2.8rem); font-weight: 900; line-height: 1; }
+        .exam-row-text-title { font-size: clamp(1.8rem, 2.5vw, 2.8rem); font-weight: 800; line-height: 1; }
+        .exam-row-text-time { font-size: clamp(1.6rem, 2.2vw, 2.5rem); font-weight: 700; line-height: 1; }
 
         .text-custom-gray { color: var(--custom-gray); }
         .main-container { height: 96vh; width: 98vw; display: flex; gap: 1rem; max-width: 1920px; }
@@ -27,18 +27,16 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* 狀態區內部垂直置中邏輯 */
         .status-inner-wrapper { display: flex; flex-direction: column; justify-content: space-around; height: 100%; width: 100%; }
-        .exam-status-grid { display: grid; grid-template-columns: 220px 1fr 320px; align-items: center; gap: 1.5rem; height: 100%; }
+        .exam-status-grid { display: grid; grid-template-columns: 200px 1fr 300px; align-items: center; gap: 1.25rem; height: 100%; }
         
-        /* 右側項目字級放大與 Padding 最小化 */
+        /* 右側項目維持緊湊設定 */
         .time-select { appearance: none; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #1e293b; cursor: pointer; padding: 0px 2px; text-align: center; font-size: 1.25rem; }
         .time-select:focus { outline: none; color: #2563eb; }
         .time-picker-box { background-color: #ffffff; padding: 2px 4px; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
         .exam-input-name { font-size: 1.5rem; font-weight: 800; line-height: 1; padding: 2px 0; }
         .delete-btn { font-size: 1rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
 
-        /* 交錯行對比 */
         tbody tr:nth-child(even) { background-color: #f8fafc; }
     </style>
 </head>
@@ -46,19 +44,22 @@
     <main class="main-container">
         <!-- 左側：展示區 (60%) -->
         <section class="w-[60%] flex flex-col gap-3 h-full">
-            <div class="bg-white rounded-3xl p-2 shadow-sm border border-slate-300 flex items-center justify-center shrink-0 h-[16%]">
+            <!-- 標題區 -->
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-300 flex items-center justify-center shrink-0 h-[16%]">
                 <input type="text" id="main-title" value="113學年度學科能力測驗" class="level-header-input text-slate-900 w-full bg-transparent outline-none border-none text-center">
             </div>
             
-            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-300 flex flex-col justify-center items-center text-center shrink-0 h-[44%]">
+            <!-- 時間顯示區 -->
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-300 flex flex-col justify-center items-center text-center shrink-0 h-[44%]">
                 <div id="current-date" class="level-date-text text-slate-600 mb-2">----年--月--日 星期-</div>
-                <div id="current-time" class="level-1-time text-slate-900 tracking-tighter digital-clock">00:00:00</div>
+                <div id="current-time" class="level-1-time text-slate-900 digital-clock">00:00:00</div>
                 <div class="mt-4 flex items-center text-xl text-slate-500 font-black">
                     <span class="flex h-5 w-5 rounded-full bg-emerald-500 mr-3 animate-pulse"></span>系統時間同步中
                 </div>
             </div>
 
-            <div class="bg-white rounded-3xl px-6 py-0 shadow-sm border border-slate-300 flex flex-col flex-grow overflow-hidden">
+            <!-- 狀態區 -->
+            <div class="bg-white rounded-3xl px-8 py-0 shadow-sm border border-slate-300 flex flex-col flex-grow overflow-hidden">
                 <div class="status-inner-wrapper">
                     <div class="exam-status-grid py-2">
                         <span id="status-label" class="exam-row-text-status px-2 py-2 rounded-2xl justify-center w-full border text-center">休息中</span>
