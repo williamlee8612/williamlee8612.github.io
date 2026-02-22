@@ -10,9 +10,17 @@
         :root { --custom-gray: #4b5563; }
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; height: 100vh; width: 100vw; margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .digital-clock { font-family: 'JetBrains Mono', monospace; }
-        .level-header-input { font-size: clamp(1.8rem, 2.5vw, 2.5rem); font-weight: 900; }
-        .level-1-time { font-size: clamp(4.5rem, 9vw, 9.5rem); line-height: 1; font-weight: 700; }
-        .exam-row-text { font-size: clamp(1.5rem, 2.2vw, 2.8rem); font-weight: 800; line-height: 1.2; display: flex; align-items: center; }
+        
+        /* 左側字級極大化與 Padding 壓縮 */
+        .level-header-input { font-size: clamp(2.5rem, 4vw, 3.8rem); font-weight: 900; }
+        .level-1-time { font-size: clamp(6rem, 12vw, 13rem); line-height: 0.9; font-weight: 700; }
+        .level-date-text { font-size: clamp(2rem, 3.5vw, 4rem); font-weight: 700; }
+        
+        /* 狀態列文字放大 */
+        .exam-row-text-status { font-size: clamp(2rem, 3vw, 3.5rem); font-weight: 900; line-height: 1; }
+        .exam-row-text-title { font-size: clamp(2rem, 3vw, 3.5rem); font-weight: 800; line-height: 1; }
+        .exam-row-text-time { font-size: clamp(1.8rem, 2.8vw, 3rem); font-weight: 700; line-height: 1; }
+
         .text-custom-gray { color: var(--custom-gray); }
         .main-container { height: 96vh; width: 98vw; display: flex; gap: 1rem; max-width: 1920px; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -21,13 +29,14 @@
         
         /* 狀態區內部垂直置中邏輯 */
         .status-inner-wrapper { display: flex; flex-direction: column; justify-content: space-around; height: 100%; width: 100%; }
-        .exam-status-grid { display: grid; grid-template-columns: 160px 1fr 280px; align-items: center; gap: 1rem; height: 100%; }
+        .exam-status-grid { display: grid; grid-template-columns: 220px 1fr 320px; align-items: center; gap: 1.5rem; height: 100%; }
         
-        .time-select { appearance: none; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #1e293b; cursor: pointer; padding: 0px 2px; text-align: center; font-size: 1.1rem; }
+        /* 右側項目字級放大與 Padding 最小化 */
+        .time-select { appearance: none; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-weight: bold; color: #1e293b; cursor: pointer; padding: 0px 2px; text-align: center; font-size: 1.25rem; }
         .time-select:focus { outline: none; color: #2563eb; }
-        .time-picker-box { background-color: #ffffff; padding: 1px 3px; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
-        .exam-input-name { font-size: 1.25rem; font-weight: 700; line-height: 1.1; }
-        .delete-btn { font-size: 0.8rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+        .time-picker-box { background-color: #ffffff; padding: 2px 4px; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
+        .exam-input-name { font-size: 1.5rem; font-weight: 800; line-height: 1; padding: 2px 0; }
+        .delete-btn { font-size: 1rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
 
         /* 交錯行對比 */
         tbody tr:nth-child(even) { background-color: #f8fafc; }
@@ -37,33 +46,30 @@
     <main class="main-container">
         <!-- 左側：展示區 (60%) -->
         <section class="w-[60%] flex flex-col gap-3 h-full">
-            <!-- 標題區 -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-300 flex items-center justify-center shrink-0 h-[16%]">
+            <div class="bg-white rounded-3xl p-2 shadow-sm border border-slate-300 flex items-center justify-center shrink-0 h-[16%]">
                 <input type="text" id="main-title" value="113學年度學科能力測驗" class="level-header-input text-slate-900 w-full bg-transparent outline-none border-none text-center">
             </div>
             
-            <!-- 時間顯示區 -->
-            <div class="bg-white rounded-3xl p-12 shadow-sm border border-slate-300 flex flex-col justify-center items-center text-center shrink-0 h-[44%]">
-                <div id="current-date" class="text-xl md:text-3xl text-slate-600 mb-2 font-bold">----年--月--日 星期-</div>
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-300 flex flex-col justify-center items-center text-center shrink-0 h-[44%]">
+                <div id="current-date" class="level-date-text text-slate-600 mb-2">----年--月--日 星期-</div>
                 <div id="current-time" class="level-1-time text-slate-900 tracking-tighter digital-clock">00:00:00</div>
-                <div class="mt-4 flex items-center text-sm text-slate-600 font-black">
-                    <span class="flex h-3 w-3 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>系統時間同步中
+                <div class="mt-4 flex items-center text-xl text-slate-500 font-black">
+                    <span class="flex h-5 w-5 rounded-full bg-emerald-500 mr-3 animate-pulse"></span>系統時間同步中
                 </div>
             </div>
 
-            <!-- 狀態區 -->
-            <div class="bg-white rounded-3xl px-8 py-0 shadow-sm border border-slate-300 flex flex-col flex-grow overflow-hidden">
+            <div class="bg-white rounded-3xl px-6 py-0 shadow-sm border border-slate-300 flex flex-col flex-grow overflow-hidden">
                 <div class="status-inner-wrapper">
-                    <div class="exam-status-grid py-1">
-                        <span id="status-label" class="exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full border">休息中</span>
-                        <div id="current-exam-title" class="exam-row-text text-slate-900 truncate px-4">目前無考試</div>
-                        <div id="current-exam-time" class="exam-row-text text-slate-600 digital-clock justify-end">--:-- ~ --:--</div>
+                    <div class="exam-status-grid py-2">
+                        <span id="status-label" class="exam-row-text-status px-2 py-2 rounded-2xl justify-center w-full border text-center">休息中</span>
+                        <div id="current-exam-title" class="exam-row-text-title text-slate-900 truncate px-2">目前無考試</div>
+                        <div id="current-exam-time" class="exam-row-text-time text-slate-600 digital-clock justify-end text-right">--:-- ~ --:--</div>
                     </div>
-                    <div class="border-t border-slate-200 w-full"></div>
-                    <div class="exam-status-grid py-1">
-                        <span class="exam-row-text text-slate-600 px-4 py-1.5 bg-slate-100 rounded-2xl justify-center w-full border border-slate-200">下一科</span>
-                        <div id="next-exam-title" class="exam-row-text text-slate-700 truncate px-4">尚未排定</div>
-                        <div id="next-exam-time" class="exam-row-text text-slate-500 digital-clock justify-end">--:-- ~ --:--</div>
+                    <div class="border-t-2 border-slate-200 w-full"></div>
+                    <div class="exam-status-grid py-2">
+                        <span class="exam-row-text-status text-slate-600 px-2 py-2 bg-slate-100 rounded-2xl justify-center w-full border border-slate-200 text-center">下一科</span>
+                        <div id="next-exam-title" class="exam-row-text-title text-slate-700 truncate px-2">尚未排定</div>
+                        <div id="next-exam-time" class="exam-row-text-time text-slate-500 digital-clock justify-end text-right">--:-- ~ --:--</div>
                     </div>
                 </div>
             </div>
@@ -82,8 +88,8 @@
                 <table class="w-full text-left table-fixed">
                     <thead class="sticky top-0 bg-slate-100 shadow-sm z-10">
                         <tr class="text-slate-700 border-b border-slate-200">
-                            <th class="px-4 py-2 font-black w-[40%] text-[13px]">科目名稱</th>
-                            <th class="px-2 py-2 font-black text-center w-[36%] text-[13px]">時間範圍</th>
+                            <th class="px-4 py-2 font-black w-[38%] text-[13px]">科目名稱</th>
+                            <th class="px-2 py-2 font-black text-center w-[38%] text-[13px]">時間範圍</th>
                             <th class="px-1 py-2 font-black text-center w-[12%] text-[13px]">響鈴</th>
                             <th class="px-2 py-2 font-black text-center w-[12%] text-[13px]">操作</th>
                         </tr>
@@ -92,7 +98,6 @@
                 </table>
                 <div id="empty-state" class="p-10 text-center text-slate-500 hidden font-bold text-lg">目前無考程</div>
             </div>
-            <!-- 自訂鈴聲設定區塊 -->
             <div class="p-2 px-4 bg-slate-50 border-t border-slate-200">
                 <div class="text-sm text-slate-700 font-black mb-1 px-1">自訂鈴聲設定 (MP3網址)</div>
                 <div class="flex gap-2">
@@ -163,10 +168,10 @@
             const lbl = $('status-label');
             if (cur) {
                 lbl.innerText = "考試中";
-                lbl.className = `exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full transition-all text-red-700 bg-red-50 border-red-200 border shadow-sm`;
+                lbl.className = `exam-row-text-status px-2 py-2 rounded-2xl justify-center w-full transition-all text-red-700 bg-red-50 border-red-200 border shadow-sm text-center`;
             } else {
                 lbl.innerText = "休息中";
-                lbl.className = `exam-row-text px-4 py-1.5 rounded-2xl justify-center w-full transition-all text-blue-700 bg-blue-50 border-blue-200 border shadow-sm`;
+                lbl.className = `exam-row-text-status px-2 py-2 rounded-2xl justify-center w-full transition-all text-blue-700 bg-blue-50 border-blue-200 border shadow-sm text-center`;
             }
             
             $('current-exam-title').innerText = cur ? cur.name : "目前無考試項目";
@@ -185,13 +190,12 @@
                 const tr = document.createElement('tr');
                 tr.className = `group hover:bg-blue-50/50 transition ${conflict ? 'bg-red-50' : ''}`;
                 
-                // 構建警告標籤的 HTML
                 const warningTag = conflict 
-                    ? `<span class="ml-2 flex-shrink-0 bg-red-600 text-white text-[12px] px-2 py-0.5 rounded-md font-black animate-pulse shadow-md">時間重疊！</span>` 
+                    ? `<span class="ml-1 flex-shrink-0 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-md font-black animate-pulse shadow-md">重疊</span>` 
                     : '';
 
                 tr.innerHTML = `
-                    <td class="px-4 py-2">
+                    <td class="px-4 py-1">
                         <div class="flex items-center w-full">
                             <input type="text" value="${e.name}" 
                                 onchange="updateE(${e.id},'name',this.value)" 
@@ -200,15 +204,15 @@
                             ${warningTag}
                         </div>
                     </td>
-                    <td class="px-2 py-2 text-center">
+                    <td class="px-2 py-1 text-center">
                         <div class="flex items-center justify-center gap-x-0.5">
                             ${timePicker(e.id, e.start, 'start')} <span class="text-slate-400 font-bold">-</span> ${timePicker(e.id, e.end, 'end')}
                         </div>
                     </td>
-                    <td class="px-1 py-2 text-center">
-                        <input type="checkbox" ${e.bell ? 'checked' : ''} onchange="updateE(${e.id},'bell',this.checked)" class="w-5 h-5 text-blue-600 cursor-pointer accent-blue-600">
+                    <td class="px-1 py-1 text-center">
+                        <input type="checkbox" ${e.bell ? 'checked' : ''} onchange="updateE(${e.id},'bell',this.checked)" class="w-6 h-6 text-blue-600 cursor-pointer accent-blue-600">
                     </td>
-                    <td class="px-2 py-2 text-center">
+                    <td class="px-2 py-1 text-center">
                         <button onclick="delE(${e.id})" class="delete-btn mx-auto text-slate-400 hover:text-red-600 border border-slate-200 bg-white transition-all font-bold shadow-sm">✕</button>
                     </td>`;
                 list.appendChild(tr);
@@ -224,7 +228,7 @@
             return `
                 <div class="inline-flex items-center time-picker-box hover:border-blue-400 transition-colors">
                     <select class="time-select" onchange="updateT(${id},'${field}','h',this.value)">${opt(24, h)}</select>
-                    <span class="text-slate-400 font-bold text-xs">:</span>
+                    <span class="text-slate-400 font-bold text-sm">:</span>
                     <select class="time-select" onchange="updateT(${id},'${field}','m',this.value)">${opt(60, m)}</select>
                 </div>`;
         }
