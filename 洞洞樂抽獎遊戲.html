@@ -2,448 +2,157 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>洞洞樂抽獎</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>洞洞樂抽獎遊戲</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            background-color: #e0e0e0; 
-            font-family: 'Microsoft JhengHei', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* 設定頁面容器：開放捲動 */
-        #setup-screen {
-            max-width: 1200px;
-            max-height: 90vh;
-            overflow-y: auto;
-            scrollbar-width: thin;
-        }
-
-        /* 全版面容器 */
-        .game-full-container {
-            width: 100vw;
-            height: 100vh;
-            background-color: #e0e0e0;
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* 獎項內容輸入區高度調整 */
-        .setup-scroll-right {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        /* 洞洞格區域：自適應間距 */
-        .poke-grid {
-            display: grid;
-            gap: clamp(1px, 0.4vw, 4px);
-            flex-grow: 1;
-            padding: clamp(5px, 1vw, 15px);
-            background-color: transparent; 
-            z-index: 1;
-        }
-
-        .hole {
-            position: relative;
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .paper-cover {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-            background: rgba(255, 255, 255, 0.35); 
-            transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1); 
-            box-shadow: inset 0 0 15px rgba(255,255,255,0.1);
-            backdrop-filter: blur(1px); 
-        }
-
-        .cover-number {
-            font-size: clamp(0.6rem, 1vw, 0.85rem);
-            font-weight: bold;
-            opacity: 0.7;
-            position: absolute;
-            top: 2px;
-            left: 4px;
-        }
-
-        .cover-name, .prize-content {
-            font-weight: 900;
-            text-align: center;
-            line-height: 1.1;
-            padding: 4px;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            width: 90%;
-        }
-
-        .hole.poked .paper-cover {
-            transform: scale(1.5) rotate(15deg);
-            opacity: 0;
-            pointer-events: none;
-            filter: blur(15px);
-        }
-
-        .prize-content {
-            z-index: 1;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(255, 255, 255, 0.45); 
-            opacity: 0;
-            transform: scale(0.85);
-            transition: all 0.6s ease-out 0.2s; 
-            text-shadow: 0 0 10px rgba(255,255,255,0.8);
-        }
-
-        .hole.poked .prize-content {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .toolbar-btn {
-            background-color: rgba(0,0,0,0.6);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .toolbar-btn:hover {
-            background-color: rgba(255,255,255,0.3);
-        }
-
-        /* 導入視窗 */
-        #import-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
+        body { font-family: 'Microsoft JhengHei', sans-serif; overflow: hidden; }
+        #setup-screen { max-width: 1200px; max-height: 95vh; overflow-y: auto; width: 95%; }
+        .game-full-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-size: cover !important; background-position: center !important; position: relative; }
+        .tight-table td, .tight-table th { padding: 4px 8px !important; line-height: 1.25 !important; }
+        .poke-grid { display: grid; gap: 1px; padding: 10px; flex-grow: 1; width: 100%; height: 100%; overflow: hidden; box-sizing: border-box; }
+        .hole { position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-sizing: border-box; }
+        .paper-cover { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; background: rgba(255,255,255,0.3); transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1); backdrop-filter: blur(1px); user-select: none; }
+        .cover-name, .prize-content { font-weight: 900; text-align: center; line-height: 1.1; padding: 4px; word-wrap: break-word; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; width: 90%; user-select: none; }
+        .hole.poked .paper-cover { transform: scale(1.4) rotate(10deg); opacity: 0; pointer-events: none; filter: blur(10px); }
+        .prize-content { z-index: 1; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.45); opacity: 0; transform: scale(0.9); transition: all 0.5s ease-out 0.15s; text-shadow: 0 0 8px rgba(255,255,255,0.8); }
+        .hole.poked .prize-content { opacity: 1; transform: scale(1); }
+        .toolbar-btn { background: rgba(0,0,0,0.7); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; transition: 0.2s; }
+        .toolbar-btn:hover { background: rgba(255,255,255,0.2); }
+        #import-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .section-title { font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
     </style>
 </head>
-<body>
+<body class="bg-gray-200 flex items-center justify-center">
 
-    <!-- 設定介面 -->
-    <div id="setup-screen" class="bg-white w-full p-8 rounded-2xl shadow-2xl my-8 mx-4">
-        <h1 class="text-3xl font-black text-center mb-6 text-red-600 border-b-2 pb-3">洞洞樂設定</h1>
-        
+    <div id="setup-screen" class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl">
+        <h1 class="text-2xl font-black text-center mb-8 text-red-600 border-b-2 pb-3">洞洞樂抽獎設定</h1>
         <div class="flex flex-col md:flex-row gap-8">
-            <!-- 左側欄位：設定參數 -->
             <div class="w-full md:w-5/12 space-y-6">
-                <!-- 1. 格數設定 -->
-                <div class="p-5 bg-gray-50 rounded-xl border border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">🧩 1. 格數設定</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">橫向 (1~10)</label>
-                            <select id="grid-cols" class="w-full border-2 p-2 rounded-lg bg-white" onchange="generateInputFields()">
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                                <option value="4">4</option><option value="5">5</option><option value="6" selected>6</option>
-                                <option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">縱向 (1~10)</label>
-                            <select id="grid-rows" class="w-full border-2 p-2 rounded-lg bg-white" onchange="generateInputFields()">
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                                <option value="4">4</option><option value="5" selected>5</option>
-                                <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-                            </select>
-                        </div>
+                <div>
+                    <h2 class="section-title">🧩 1. 格數設定</h2>
+                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 grid grid-cols-2 gap-3 text-sm">
+                        <div><label class="text-gray-500 mb-1 block">橫向 (1~6)</label><select id="grid-cols" class="w-full border p-2 rounded-lg" onchange="generateInputFields()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option></select></div>
+                        <div><label class="text-gray-500 mb-1 block">縱向 (1~5)</label><select id="grid-rows" class="w-full border p-2 rounded-lg" onchange="generateInputFields()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
                     </div>
                 </div>
-
-                <!-- 2. 多媒體設定 -->
-                <div class="p-5 bg-gray-50 rounded-xl border border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">🎬 2. 多媒體與色彩</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs font-bold text-gray-400 block uppercase mb-1">背景底圖 URL</label>
-                            <input type="text" id="bg-url" class="w-full border-2 p-2 rounded-lg text-sm" value="https://png.pngtree.com/thumb_back/fh260/background/20241112/pngtree-christmas-greetings-background-with-blank-room-image_16562583.jpg">
+                <div>
+                    <h2 class="section-title">🎬 2. 多媒體與色彩自訂</h2>
+                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3 text-[11px] font-bold text-gray-400">
+                        <div>底圖 URL<input type="text" id="bg-url" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="https://png.pngtree.com/thumb_back/fh260/background/20241112/pngtree-christmas-greetings-background-with-blank-room-image_16562583.jpg"></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>戳前顏色<input type="text" id="color-before" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="#000000"></div>
+                            <div>戳後顏色<input type="text" id="color-after" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="#000000"></div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">戳前文字顏色 (Hex)</label>
-                                <input type="text" id="color-before" class="w-full border-2 p-2 rounded-lg text-sm" value="#000000">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">戳後文字顏色 (Hex)</label>
-                                <input type="text" id="color-after" class="w-full border-2 p-2 rounded-lg text-sm" value="#000000">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">背景音樂 URL</label>
-                                <input type="text" id="music-url" class="w-full border-2 p-2 rounded-lg text-sm" value="https://audio-previews.elements.envatousercontent.com/files/364408739/preview.mp3">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">戳破音效 URL</label>
-                                <input type="text" id="poke-sound-url" class="w-full border-2 p-2 rounded-lg text-sm" value="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3">
-                            </div>
-                        </div>
+                        <div>背景音樂<input type="text" id="music-url" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="https://audio-previews.elements.envatousercontent.com/files/364408739/preview.mp3"></div>
+                        <div>音效 URL<input type="text" id="poke-sound-url" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></div>
                     </div>
                 </div>
-
-                <div class="pt-4">
-                    <button onclick="startGame()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-5 px-8 rounded-2xl text-2xl shadow-xl transform transition hover:-translate-y-1 active:scale-95">
-                        開始抽獎 🚀
-                    </button>
-                </div>
+                <button onclick="startGame()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl text-xl shadow-lg transition active:scale-95">開始抽獎 🚀</button>
             </div>
-
-            <!-- 右側欄位：獎項輸入 -->
-            <div class="w-full md:w-7/12">
-                <div class="h-full flex flex-col">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">🎁 3. 獎項內容清單</h2>
-                        <button onclick="openImportModal()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">📋 批次導入</button>
-                    </div>
-                    <div class="setup-scroll-right border-2 rounded-xl bg-white overflow-hidden shadow-inner">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="sticky top-0 bg-gray-100 text-sm z-10 shadow-sm">
-                                <tr>
-                                    <th class="p-3 border-b w-16 text-center">編號</th>
-                                    <th class="p-3 border-b">顯示文字 (封面)</th>
-                                    <th class="p-3 border-b">獎項名聲 (內容)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="prize-inputs" class="text-sm"></tbody>
-                        </table>
-                    </div>
+            <div class="w-full md:w-7/12 flex flex-col">
+                <div class="flex justify-between items-center mb-2"><h2 class="section-title">🎁 3. 獎項內容清單</h2><button onclick="openImportModal()" class="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700">📋 批次導入</button></div>
+                <div class="border rounded-xl bg-white overflow-y-auto max-h-[550px] shadow-inner border-gray-200">
+                    <table class="w-full text-left border-collapse tight-table text-[13px]"><thead class="sticky top-0 bg-gray-100 text-[12px] z-10 shadow-sm"><tr><th class="border-b w-12 text-center">編號</th><th class="border-b">顯示名稱</th><th class="border-b">獎項名稱</th></tr></thead><tbody id="prize-inputs"></tbody></table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 批次導入 Modal -->
-    <div id="import-modal" class="p-4">
-        <div class="bg-white p-6 rounded-xl w-full max-w-lg shadow-2xl">
-            <h3 class="text-xl font-bold mb-2 text-gray-800">批次導入資料</h3>
-            <p class="text-sm text-gray-500 mb-4">請從 Excel 複製「顯示文字」與「中獎名稱」兩欄並直接貼上於下方：</p>
-            <textarea id="import-data" class="w-full h-64 border-2 rounded-lg p-3 text-sm font-mono mb-4 focus:border-blue-500 outline-none" placeholder="範例：&#10;第一格	大獎一萬元&#10;第二格	銘謝惠顧"></textarea>
-            <div class="flex justify-end gap-3">
-                <button onclick="closeImportModal()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">取消</button>
-                <button onclick="processImport()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">確認導入</button>
-            </div>
-        </div>
-    </div>
+    <div id="import-modal"><div class="bg-white p-6 rounded-xl w-full max-w-lg shadow-2xl"><h3 class="text-xl font-bold mb-2">批次導入資料</h3><textarea id="import-data" class="w-full h-64 border rounded-lg p-3 text-sm font-mono mb-4 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="範例：第1格	獎項名稱"></textarea><div class="flex justify-end gap-3 text-sm"><button onclick="closeImportModal()" class="px-4 py-2 bg-gray-200 rounded">取消</button><button onclick="processImport()" class="px-4 py-2 bg-blue-600 text-white rounded">確認導入</button></div></div></div>
 
-    <!-- 遊戲介面 -->
     <div id="game-screen" class="hidden game-full-container">
-        <!-- 工具列 -->
-        <div class="bg-black bg-opacity-50 p-3 flex justify-end items-center gap-4 z-50 border-b border-white border-opacity-10 backdrop-blur-md">
+        <div class="h-14 bg-black/70 flex justify-end items-center px-4 gap-3 z-50 backdrop-blur-md">
             <button onclick="backToSetup()" class="toolbar-btn">⚙️ 設定</button>
             <button onclick="restartGame()" class="toolbar-btn">🔄 重新</button>
             <button id="toggle-music" onclick="toggleMusic()" class="toolbar-btn">🔊 音樂</button>
         </div>
-
-        <!-- 格子區域 -->
         <div id="game-grid" class="poke-grid"></div>
-
-        <!-- 音效標籤 -->
-        <audio id="bg-audio" loop></audio>
-        <audio id="drum-audio"></audio>
+        <audio id="bg-audio" loop></audio><audio id="drum-audio"></audio>
     </div>
 
     <script>
-        let isMuted = false;
-        let currentPool = []; 
+        let isMuted = false, currentPool = [];
+        const $ = id => document.getElementById(id);
 
         function generateInputFields() {
-            const cols = parseInt(document.getElementById('grid-cols').value);
-            const rows = parseInt(document.getElementById('grid-rows').value);
-            const count = cols * rows;
-            const container = document.getElementById('prize-inputs');
-            container.innerHTML = '';
-
-            for (let i = 1; i <= count; i++) {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-blue-50 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-2 border-b text-center font-bold bg-gray-50 text-gray-400 text-sm">${i}</td>
-                    <td class="p-2 border-b"><input type="text" class="display-name w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition" placeholder="例如：${i} 號"></td>
-                    <td class="p-2 border-b"><input type="text" class="prize-name w-full p-2 border rounded-lg focus:ring-2 focus:ring-green-300 outline-none transition" placeholder="例如：大獎！"></td>
-                `;
-                container.appendChild(tr);
-            }
+            const count = parseInt($('grid-cols').value) * parseInt($('grid-rows').value);
+            $('prize-inputs').innerHTML = Array.from({length: count}, (_, i) => `
+                <tr class="hover:bg-blue-50"><td class="text-center font-bold bg-gray-50 text-gray-400">${i+1}</td>
+                <td><input type="text" class="display-name w-full border rounded p-1 outline-none" placeholder="${i+1}"></td>
+                <td><input type="text" class="prize-name w-full border rounded p-1 outline-none" placeholder="獎項內容"></td></tr>
+            `).join('');
         }
 
-        // 導入功能
-        function openImportModal() { document.getElementById('import-modal').style.display = 'flex'; }
-        function closeImportModal() { document.getElementById('import-modal').style.display = 'none'; }
+        function openImportModal() { $('import-modal').style.display = 'flex'; }
+        function closeImportModal() { $('import-modal').style.display = 'none'; }
         
         function processImport() {
-            const data = document.getElementById('import-data').value;
-            const lines = data.split('\n').filter(l => l.trim() !== "");
-            const displays = document.querySelectorAll('.display-name');
-            const prizes = document.querySelectorAll('.prize-name');
-
+            const lines = $('import-data').value.split('\n').filter(l => l.trim());
+            const displays = document.querySelectorAll('.display-name'), prizes = document.querySelectorAll('.prize-name');
             lines.forEach((line, i) => {
-                if (i < displays.length) {
-                    const parts = line.split(/\t| {2,}/); // 依據 Tab 或 雙空格拆分
-                    if (parts.length >= 2) {
-                        displays[i].value = parts[0].trim();
-                        prizes[i].value = parts[1].trim();
-                    } else {
-                        prizes[i].value = parts[0].trim();
-                    }
-                }
+                if (i >= displays.length) return;
+                const parts = line.split(/\t| {2,}/);
+                displays[i].value = parts[0]?.trim() || "";
+                prizes[i].value = parts[1]?.trim() || "";
             });
             closeImportModal();
-            document.getElementById('import-data').value = "";
         }
 
         function startGame() {
-            const displayInputs = document.querySelectorAll('.display-name');
-            const prizeInputs = document.querySelectorAll('.prize-name');
-            
-            let rawPool = [];
-            displayInputs.forEach((input, index) => {
-                rawPool.push({
-                    displayName: input.value || (index + 1).toString(),
-                    prizeName: prizeInputs[index].value || "銘謝惠顧"
-                });
-            });
-
-            currentPool = rawPool.sort(() => Math.random() - 0.5);
-            document.getElementById('setup-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
+            const displays = document.querySelectorAll('.display-name'), prizes = document.querySelectorAll('.prize-name');
+            currentPool = Array.from(displays, (input, i) => ({
+                displayName: input.value || (i + 1).toString(),
+                prizeName: prizes[i].value || "銘謝惠顧"
+            })).sort(() => Math.random() - 0.5);
+            $('setup-screen').classList.add('hidden');
+            $('game-screen').classList.remove('hidden');
             setTimeout(initDisplay, 50);
         }
 
-        function restartGame() {
-            currentPool = currentPool.sort(() => Math.random() - 0.5);
-            initDisplay();
-        }
+        function restartGame() { currentPool.sort(() => Math.random() - 0.5); initDisplay(); }
 
         function initDisplay() {
-            const cols = parseInt(document.getElementById('grid-cols').value);
-            const rows = parseInt(document.getElementById('grid-rows').value);
-            const bgUrl = document.getElementById('bg-url').value.trim();
-            const musicUrl = document.getElementById('music-url').value.trim();
-            const pokeSoundUrl = document.getElementById('poke-sound-url').value.trim();
-            const gameContainer = document.getElementById('game-screen');
-
-            if (bgUrl !== "") {
-                gameContainer.style.background = `url('${bgUrl}')`;
-                gameContainer.style.backgroundSize = "cover";
-                gameContainer.style.backgroundPosition = "center";
-            } else {
-                gameContainer.style.background = "#e0e0e0";
-            }
-
-            const drum = document.getElementById('drum-audio');
-            if (pokeSoundUrl !== "") drum.src = pokeSoundUrl;
-
-            const audio = document.getElementById('bg-audio');
-            if (musicUrl !== "") {
-                if (audio.src !== musicUrl) audio.src = musicUrl;
-                audio.loop = true;
-                if (!isMuted) audio.play().catch(e => console.log("Waiting for user interaction"));
-            } else {
-                audio.pause();
-                audio.src = "";
-            }
-
-            renderGrid(cols, rows, currentPool);
+            const bgUrl = $('bg-url').value.trim();
+            $('game-screen').style.background = bgUrl ? `url('${bgUrl}')` : "#e0e0e0";
+            $('drum-audio').src = $('poke-sound-url').value.trim();
+            const audio = $('bg-audio');
+            audio.src = $('music-url').value.trim();
+            if (!isMuted) audio.play().catch(() => {});
+            renderGrid();
         }
 
-        function renderGrid(cols, rows, dataList) {
-            const grid = document.getElementById('game-grid');
-            const colorBefore = document.getElementById('color-before').value || '#000000';
-            const colorAfter = document.getElementById('color-after').value || '#000000';
-
+        function renderGrid() {
+            const cols = parseInt($('grid-cols').value), rows = parseInt($('grid-rows').value);
+            const grid = $('game-grid'), cB = $('color-before').value, cA = $('color-after').value;
             grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-            grid.innerHTML = '';
+            const fSize = `min(${(85/cols)}vw, ${(40/rows)}vh, 2.5rem)`;
+            
+            grid.innerHTML = currentPool.map(item => `
+                <div class="hole" onclick="poke(this)">
+                    <div class="paper-cover" style="color:${cB}"><span class="cover-name" style="font-size:${fSize}">${item.displayName}</span></div>
+                    <div class="prize-content" style="font-size:${fSize};color:${cA}">${item.prizeName}</div>
+                </div>
+            `).join('');
+        }
 
-            // 動態自適應字體：綜合考慮欄位寬度與高度比例
-            const fontSize = `clamp(0.7rem, ${ (85 / cols) }vw, ${ (45 / rows) }vh)`;
-
-            dataList.forEach((item, index) => {
-                const hole = document.createElement('div');
-                hole.className = 'hole';
-                
-                hole.innerHTML = `
-                    <div class="paper-cover" style="color: ${colorBefore}">
-                        <span class="cover-number">${index + 1}</span>
-                        <span class="cover-name" style="font-size: ${fontSize}">${item.displayName}</span>
-                    </div>
-                    <div class="prize-content" style="font-size: ${fontSize}; color: ${colorAfter}">${item.prizeName}</div>
-                `;
-                
-                hole.onclick = function() {
-                    if (!this.classList.contains('poked')) {
-                        if (!isMuted) {
-                            const drum = document.getElementById('drum-audio');
-                            drum.currentTime = 0;
-                            drum.play();
-                        }
-                        this.classList.add('poked');
-                    }
-                };
-                grid.appendChild(hole);
-            });
+        function poke(el) {
+            if (el.classList.contains('poked')) return;
+            if (!isMuted) { const d = $('drum-audio'); d.currentTime = 0; d.play(); }
+            el.classList.add('poked');
         }
 
         function toggleMusic() {
-            const audio = document.getElementById('bg-audio');
-            const btn = document.getElementById('toggle-music');
             isMuted = !isMuted;
-            if (isMuted) {
-                audio.pause();
-                btn.innerText = "🔇 靜音";
-            } else {
-                audio.play().catch(() => {});
-                btn.innerText = "🔊 開啟";
-            }
+            const a = $('bg-audio');
+            isMuted ? a.pause() : a.play().catch(() => {});
+            $('toggle-music').innerText = isMuted ? "🔇 靜音" : "🔊 音樂";
         }
 
-        function backToSetup() {
-            document.getElementById('bg-audio').pause();
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('setup-screen').classList.remove('hidden');
-        }
-
+        function backToSetup() { $('bg-audio').pause(); $('game-screen').classList.add('hidden'); $('setup-screen').classList.remove('hidden'); }
         window.onload = generateInputFields;
+        window.onresize = () => { if (!$('game-screen').classList.contains('hidden')) renderGrid(); };
     </script>
 </body>
 </html>
