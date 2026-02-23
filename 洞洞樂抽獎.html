@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>洞洞樂抽獎遊戲</title>
+    <title>洞洞樂抽獎</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -163,7 +163,7 @@
 
     <!-- 設定介面 -->
     <div id="setup-screen" class="bg-white w-full p-8 rounded-2xl shadow-2xl my-8 mx-4">
-        <h1 class="text-3xl font-black text-center mb-6 text-red-600 border-b-2 pb-3">洞洞樂機設定面板</h1>
+        <h1 class="text-3xl font-black text-center mb-6 text-red-600 border-b-2 pb-3">洞洞樂設定</h1>
         
         <div class="flex flex-col md:flex-row gap-8">
             <!-- 左側欄位：設定參數 -->
@@ -201,11 +201,11 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">戳前文字 (Hex)</label>
+                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">戳前文字顏色 (Hex)</label>
                                 <input type="text" id="color-before" class="w-full border-2 p-2 rounded-lg text-sm" value="#000000">
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">戳後文字 (Hex)</label>
+                                <label class="text-[10px] font-bold text-gray-400 block uppercase mb-1">戳後文字顏色 (Hex)</label>
                                 <input type="text" id="color-after" class="w-full border-2 p-2 rounded-lg text-sm" value="#000000">
                             </div>
                         </div>
@@ -242,7 +242,7 @@
                                 <tr>
                                     <th class="p-3 border-b w-16 text-center">編號</th>
                                     <th class="p-3 border-b">顯示文字 (封面)</th>
-                                    <th class="p-3 border-b">得獎名稱 (內容)</th>
+                                    <th class="p-3 border-b">獎項名聲 (內容)</th>
                                 </tr>
                             </thead>
                             <tbody id="prize-inputs" class="text-sm"></tbody>
@@ -270,9 +270,9 @@
     <div id="game-screen" class="hidden game-full-container">
         <!-- 工具列 -->
         <div class="bg-black bg-opacity-50 p-3 flex justify-end items-center gap-4 z-50 border-b border-white border-opacity-10 backdrop-blur-md">
-            <button onclick="backToSetup()" class="toolbar-btn">⚙️ 返回設定</button>
-            <button onclick="restartGame()" class="toolbar-btn">🔄 重新隨機</button>
-            <button id="toggle-music" onclick="toggleMusic()" class="toolbar-btn">🔊 背景音樂</button>
+            <button onclick="backToSetup()" class="toolbar-btn">⚙️ 設定</button>
+            <button onclick="restartGame()" class="toolbar-btn">🔄 重新</button>
+            <button id="toggle-music" onclick="toggleMusic()" class="toolbar-btn">🔊 音樂</button>
         </div>
 
         <!-- 格子區域 -->
@@ -430,10 +430,10 @@
             isMuted = !isMuted;
             if (isMuted) {
                 audio.pause();
-                btn.innerText = "🔇 靜音中";
+                btn.innerText = "🔇 靜音";
             } else {
                 audio.play().catch(() => {});
-                btn.innerText = "🔊 音樂開啟";
+                btn.innerText = "🔊 開啟";
             }
         }
 
