@@ -4,155 +4,219 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>洞洞樂抽獎遊戲</title>
+    <!-- 引用 Tailwind CSS 進行快速 UI 佈局 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; overflow: hidden; }
-        #setup-screen { max-width: 1200px; max-height: 95vh; overflow-y: auto; width: 95%; }
-        .game-full-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-size: cover !important; background-position: center !important; position: relative; }
-        .tight-table td, .tight-table th { padding: 4px 8px !important; line-height: 1.25 !important; }
-        .poke-grid { display: grid; gap: 1px; padding: 10px; flex-grow: 1; width: 100%; height: 100%; overflow: hidden; box-sizing: border-box; }
-        .hole { position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-sizing: border-box; }
-        .paper-cover { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; background: rgba(255,255,255,0.3); transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1); backdrop-filter: blur(1px); user-select: none; }
-        .cover-name, .prize-content { font-weight: 900; text-align: center; line-height: 1.1; padding: 4px; word-wrap: break-word; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; width: 90%; user-select: none; }
-        .hole.poked .paper-cover { transform: scale(1.4) rotate(10deg); opacity: 0; pointer-events: none; filter: blur(10px); }
-        .prize-content { z-index: 1; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.45); opacity: 0; transform: scale(0.9); transition: all 0.5s ease-out 0.15s; text-shadow: 0 0 8px rgba(255,255,255,0.8); }
+        /* 全域字體設定與平滑背景過渡 */
+        body { font-family: 'Microsoft JhengHei', sans-serif; transition: background 0.3s; }
+        
+        /* 遊戲畫面容器：滿版且禁止捲動 */
+        .game-full-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-size: cover !important; background-position: center !important; }
+        
+        /* 抽獎格線佈局：使用 Grid 自動分配空間 */
+        .poke-grid { display: grid; gap: 2px; padding: 10px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
+        
+        /* 單個格子樣式 */
+        .hole { position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; }
+        
+        /* 格子內容物通用設定（紙張與獎項） */
+        .paper-cover, .prize-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 900; line-height: 1.2; padding: 5px; word-break: break-all; }
+        
+        /* 戳洞前的覆蓋紙張：處理毛玻璃效果與動畫過渡 */
+        .paper-cover { z-index: 2; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); backdrop-filter: blur(1px); }
+        
+        /* 戳破後的紙張動畫：放大、旋轉、消失 */
+        .hole.poked .paper-cover { transform: scale(1.5) rotate(15deg); opacity: 0; pointer-events: none; }
+        
+        /* 獎項內容：初始隱藏並縮小，戳破後顯示 */
+        .prize-content { z-index: 1; opacity: 0; transform: scale(0.8); transition: all 0.4s ease-out 0.1s; }
         .hole.poked .prize-content { opacity: 1; transform: scale(1); }
-        .toolbar-btn { background: rgba(0,0,0,0.7); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; transition: 0.2s; }
-        .toolbar-btn:hover { background: rgba(255,255,255,0.2); }
-        #import-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        .section-title { font-size: 1.125rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        /* 遊戲中上方工具列按鈕樣式 */
+        .toolbar-btn { background: rgba(0,0,0,0.4); color: white; padding: 6px 12px; border-radius: 99px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); transition: 0.2s; white-space: nowrap; }
+        
+        /* 批次導入彈窗遮罩 */
+        #import-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        
+        /* 設定頁面表格輸入框樣式 */
+        .tight-table input { width: 100%; border-radius: 4px; padding: 2px 6px; border: 1px solid #ddd; outline: none; }
+        .tight-table input:focus { border-color: #ef4444; }
     </style>
 </head>
-<body class="bg-gray-200 flex items-center justify-center">
+<body class="bg-gray-100 min-h-screen">
 
-    <div id="setup-screen" class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl">
-        <h1 class="text-2xl font-black text-center mb-8 text-red-600 border-b-2 pb-3">洞洞樂抽獎設定</h1>
-        <div class="flex flex-col md:flex-row gap-8">
-            <div class="w-full md:w-5/12 space-y-6">
-                <div>
-                    <h2 class="section-title">🧩 1. 格數設定</h2>
-                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 grid grid-cols-2 gap-3 text-sm">
-                        <div><label class="text-gray-500 mb-1 block">橫向 (1~6)</label><select id="grid-cols" class="w-full border p-2 rounded-lg" onchange="generateInputFields()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option></select></div>
-                        <div><label class="text-gray-500 mb-1 block">縱向 (1~5)</label><select id="grid-rows" class="w-full border p-2 rounded-lg" onchange="generateInputFields()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
+    <!-- [設定介面]：抽獎前的參數配置區域 -->
+    <div id="setup-screen" class="max-w-6xl w-[95%] mx-auto my-8 bg-white p-6 md:p-8 rounded-3xl shadow-2xl border border-gray-100">
+        <h1 class="text-3xl font-black text-center mb-8 text-red-600 tracking-tight">洞洞樂抽獎系統</h1>
+        
+        <div class="flex flex-col md:flex-row gap-8 items-stretch">
+            <!-- [左側配置欄]：格數、顏色、媒體 URL 設定 -->
+            <div id="left-config" class="w-full md:w-5/12 space-y-6">
+                <!-- 區塊 1: 網格尺寸 -->
+                <section>
+                    <h2 class="font-bold text-gray-700 mb-2 flex items-center gap-2">🧩 1. 格數設定</h2>
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 grid grid-cols-2 gap-4 text-sm">
+                        <div><label class="text-gray-400 block mb-1">橫向 (1~6)</label><select id="grid-cols" class="w-full border p-2 rounded-xl" onchange="initSetup()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option></select></div>
+                        <div><label class="text-gray-400 block mb-1">縱向 (1~5)</label><select id="grid-rows" class="w-full border p-2 rounded-xl" onchange="initSetup()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
                     </div>
-                </div>
-                <div>
-                    <h2 class="section-title">🎬 2. 多媒體與色彩自訂</h2>
-                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3 text-[11px] font-bold text-gray-400">
-                        <div>底圖 URL<input type="text" id="bg-url" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="https://img.freepik.com/premium-vector/red-chinese-new-year-background_317810-3835.jpg?semt=ais_hybrid&w=740&q=80"></div>
+                </section>
+                <!-- 區塊 2: 樣式與多媒體 -->
+                <section>
+                    <h2 class="font-bold text-gray-700 mb-2 flex items-center gap-2">🎬 2. 視覺與音效設定</h2>
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                        <div>背景圖 URL<input type="text" id="bg-url" class="w-full border p-2 rounded-xl text-black font-normal mt-1" value="https://img.freepik.com/premium-vector/red-chinese-new-year-background_317810-3835.jpg?w=1000"></div>
                         <div class="grid grid-cols-2 gap-2">
-                            <div>戳前顏色<input type="text" id="color-before" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="#FFDF00"></div>
-                            <div>戳後顏色<input type="text" id="color-after" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="#FFDF00"></div>
+                            <div>戳洞前文字顏色<input type="text" id="color-before" class="w-full border p-2 rounded-xl text-black font-normal mt-1" value="rgb(255,223,0)"></div>
+                            <div>戳洞後文字顏色<input type="text" id="color-after" class="w-full border p-2 rounded-xl text-black font-normal mt-1" value="rgb(255,223,0)"></div>
                         </div>
-                        <div>背景音樂<input type="text" id="music-url" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="https://cdn.pixabay.com/audio/2026/01/14/audio_3265c1aace.mp3"></div>
-                        <div>音效 URL<input type="text" id="poke-sound-url" class="w-full border p-2 rounded-lg text-black font-normal mt-1" value="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></div>
+                        <div>戳洞前格子底色/透明度<input type="text" id="bg-before" class="w-full border p-2 rounded-xl text-black font-normal mt-1" value="rgba(255, 255, 255, 0.5)"></div>
+                        <div>戳洞後格子底色/透明度<input type="text" id="bg-after" class="w-full border p-2 rounded-xl text-black font-normal mt-1" value="rgba(255, 255, 255, 0.5)"></div>
+                        <div>背景音樂網址<input type="text" id="music-url" class="w-full border p-2 rounded-xl text-black font-normal mt-1" value="https://cdn.pixabay.com/audio/2026/01/14/audio_3265c1aace.mp3"></div>
+                        <div>戳破音效網址<input type="text" id="poke-sound-url" class="w-full border p-2 rounded-xl text-black font-normal mt-1" value="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></div>
                     </div>
-                </div>
-                <button onclick="startGame()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl text-xl shadow-lg transition active:scale-95">開始抽獎 🚀</button>
+                </section>
             </div>
+
+            <!-- [右側清單欄]：個別獎項內容編輯 -->
             <div class="w-full md:w-7/12 flex flex-col">
-                <div class="flex justify-between items-center mb-2"><h2 class="section-title">🎁 3. 獎項內容清單</h2><button onclick="openImportModal()" class="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700">📋 批次導入</button></div>
-                <div class="border rounded-xl bg-white overflow-y-auto max-h-[550px] shadow-inner border-gray-200">
-                    <table class="w-full text-left border-collapse tight-table text-[13px]"><thead class="sticky top-0 bg-gray-100 text-[12px] z-10 shadow-sm"><tr><th class="border-b w-12 text-center">編號</th><th class="border-b">顯示名稱</th><th class="border-b">獎項名稱</th></tr></thead><tbody id="prize-inputs"></tbody></table>
+                <div class="flex justify-between items-center mb-2"><h2 class="font-bold text-gray-700">🎁 3. 獎項內容</h2><button onclick="toggleModal(true)" class="text-blue-600 text-xs font-bold hover:underline">批次導入</button></div>
+                <div id="scroll-container" class="border border-gray-200 rounded-2xl bg-white overflow-y-auto flex-1 shadow-inner" style="min-height: 350px;">
+                    <table class="w-full text-left border-collapse tight-table text-sm">
+                        <thead class="sticky top-0 bg-gray-100 z-10"><tr><th class="p-2 border-b w-12 text-center text-gray-400">編號</th><th class="p-2 border-b">顯示名稱</th><th class="p-2 border-b">獎項名稱</th></tr></thead>
+                        <tbody id="prize-list"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="import-modal"><div class="bg-white p-6 rounded-xl w-full max-w-lg shadow-2xl"><h3 class="text-xl font-bold mb-2">批次導入資料</h3><textarea id="import-data" class="w-full h-64 border rounded-lg p-3 text-sm font-mono mb-4 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="範例：第1格	獎項名稱"></textarea><div class="flex justify-end gap-3 text-sm"><button onclick="closeImportModal()" class="px-4 py-2 bg-gray-200 rounded">取消</button><button onclick="processImport()" class="px-4 py-2 bg-blue-600 text-white rounded">確認導入</button></div></div></div>
-
-    <div id="game-screen" class="hidden game-full-container">
-        <div class="h-14 bg-black/70 flex justify-end items-center px-4 gap-3 z-50 backdrop-blur-md">
-            <button onclick="backToSetup()" class="toolbar-btn">⚙️ 設定</button>
-            <button onclick="restartGame()" class="toolbar-btn">🔄 重新</button>
-            <button id="toggle-music" onclick="toggleMusic()" class="toolbar-btn">🔊 音樂</button>
+        <!-- 開始抽獎按鈕 -->
+        <div class="mt-10 flex justify-center border-t pt-8">
+            <button onclick="startGame()" class="w-full md:w-2/3 bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-2xl text-2xl shadow-xl transition active:scale-95 transform">開始抽獎 🚀</button>
         </div>
-        <div id="game-grid" class="poke-grid"></div>
-        <audio id="bg-audio" loop></audio><audio id="drum-audio"></audio>
     </div>
+
+    <!-- [導入視窗]：支援貼上 Excel 分頁符號格式的數據 -->
+    <div id="import-modal" class="p-4">
+        <div class="bg-white p-6 rounded-3xl w-full max-w-lg">
+            <h3 class="text-xl font-bold mb-4">批次導入(可Excel貼上)</h3>
+            <textarea id="import-input" class="w-full h-64 border rounded-2xl p-4 text-sm font-mono mb-4 focus:ring-2 focus:ring-red-500" placeholder="例如：
+01	大獎IPHONE
+02	銘謝惠顧"></textarea>
+            <div class="flex justify-end gap-3"><button onclick="toggleModal(false)" class="px-6 py-2 bg-gray-100 rounded-xl">取消</button><button onclick="doImport()" class="px-6 py-2 bg-red-600 text-white rounded-xl">確認</button></div>
+        </div>
+    </div>
+
+    <!-- [遊戲主畫面]：正式抽獎時顯示 -->
+    <div id="game-screen" class="hidden game-full-container">
+        <!-- 上方工具列 -->
+        <div class="h-10 flex justify-end items-center px-4 gap-2 z-50">
+            <button onclick="exitGame()" class="toolbar-btn">⚙️ 設定</button>
+            <button onclick="initGameView()" class="toolbar-btn">🔄 重新</button>
+            <button id="music-btn" onclick="toggleMusic()" class="toolbar-btn">🔊 音樂</button>
+        </div>
+        <!-- 洞洞樂動態網格容器 -->
+        <div id="grid" class="poke-grid"></div>
+    </div>
+
+    <!-- 音效播放元件 -->
+    <audio id="audio-bg" loop></audio>
+    <audio id="audio-poke"></audio>
 
     <script>
-        let isMuted = false, currentPool = [];
-        const $ = id => document.getElementById(id);
+        const $ = s => document.getElementById(s);
+        let prizes = [], muted = false;
 
-        function generateInputFields() {
-            const count = parseInt($('grid-cols').value) * parseInt($('grid-rows').value);
-            $('prize-inputs').innerHTML = Array.from({length: count}, (_, i) => `
-                <tr class="hover:bg-blue-50"><td class="text-center font-bold bg-gray-50 text-gray-400">${i+1}</td>
-                <td><input type="text" class="display-name w-full border rounded p-1 outline-none" placeholder="${i+1}"></td>
-                <td><input type="text" class="prize-name w-full border rounded p-1 outline-none" placeholder="獎項內容"></td></tr>
+        /* 初始化設定介面：生成對應數量的獎項輸入列，並調整滾動區高度 */
+        function initSetup() {
+            const r = +$('grid-rows').value, c = +$('grid-cols').value;
+            $('prize-list').innerHTML = Array.from({length: r * c}, (_, i) => `
+                <tr class="border-b last:border-0"><td class="p-2 text-center text-gray-400 font-mono">${i+1}</td>
+                <td class="p-1"><input type="text" class="d-n" placeholder="${i+1}"></td>
+                <td class="p-1"><input type="text" class="p-n" placeholder="獎項內容"></td></tr>
             `).join('');
+            
+            // 在桌面端同步左右兩側高度，確保右側出現捲軸
+            setTimeout(() => {
+                if(window.innerWidth >= 768) $('scroll-container').style.height = ($('left-config').offsetHeight - 40) + 'px';
+            }, 10);
         }
 
-        function openImportModal() { $('import-modal').style.display = 'flex'; }
-        function closeImportModal() { $('import-modal').style.display = 'none'; }
-        
-        function processImport() {
-            const lines = $('import-data').value.split('\n').filter(l => l.trim());
-            const displays = document.querySelectorAll('.display-name'), prizes = document.querySelectorAll('.prize-name');
-            lines.forEach((line, i) => {
-                if (i >= displays.length) return;
-                const parts = line.split(/\t| {2,}/);
-                displays[i].value = parts[0]?.trim() || "";
-                prizes[i].value = parts[1]?.trim() || "";
-            });
-            closeImportModal();
+        /* 控制批次導入視窗的顯示/隱藏 */
+        const toggleModal = v => $('import-modal').style.display = v ? 'flex' : 'none';
+
+        /* 執行資料導入：解析 Textarea 中的文字並填入對應的 Input */
+        function doImport() {
+            const lines = $('import-input').value.split('\n').filter(l => l.trim());
+            const dn = document.querySelectorAll('.d-n'), pn = document.querySelectorAll('.p-n');
+            lines.forEach((l, i) => { if(dn[i]){ const p = l.split(/\t| {2,}/); dn[i].value = p[0]||''; pn[i].value = p[1]||''; }});
+            toggleModal(false);
         }
 
+        /* 切換至遊戲模式：收集資料、亂數排序、切換視窗 */
         function startGame() {
-            const displays = document.querySelectorAll('.display-name'), prizes = document.querySelectorAll('.prize-name');
-            currentPool = Array.from(displays, (input, i) => ({
-                displayName: input.value || (i + 1).toString(),
-                prizeName: prizes[i].value || "銘謝惠顧"
-            })).sort(() => Math.random() - 0.5);
+            prizes = Array.from(document.querySelectorAll('.d-n'), (el, i) => ({
+                d: el.value || (i+1).toString(),
+                p: document.querySelectorAll('.p-n')[i].value || "銘謝惠顧"
+            })).sort(() => Math.random() - 0.5); // 將獎項清單隨機打亂
+            
             $('setup-screen').classList.add('hidden');
             $('game-screen').classList.remove('hidden');
-            setTimeout(initDisplay, 50);
+            document.body.style.overflow = 'hidden'; // 鎖定視窗防止捲動
+            initGameView();
         }
 
-        function restartGame() { currentPool.sort(() => Math.random() - 0.5); initDisplay(); }
-
-        function initDisplay() {
-            const bgUrl = $('bg-url').value.trim();
-            $('game-screen').style.background = bgUrl ? `url('${bgUrl}')` : "#e0e0e0";
-            $('drum-audio').src = $('poke-sound-url').value.trim();
-            const audio = $('bg-audio');
-            audio.src = $('music-url').value.trim();
-            if (!isMuted) audio.play().catch(() => {});
+        /* 初始化遊戲視覺：設定背景、準備音效、啟動渲染 */
+        function initGameView() {
+            const bg = $('bg-url').value;
+            $('game-screen').style.background = bg ? `url(${bg}) center/cover` : '#333';
+            $('audio-bg').src = $('music-url').value;
+            $('audio-poke').src = $('poke-sound-url').value;
+            if(!muted) $('audio-bg').play().catch(()=>{});
             renderGrid();
         }
 
+        /* 渲染格線系統：動態計算字體與 CSS Grid 佈局 */
         function renderGrid() {
-            const cols = parseInt($('grid-cols').value), rows = parseInt($('grid-rows').value);
-            const grid = $('game-grid'), cB = $('color-before').value, cA = $('color-after').value;
-            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-            const fSize = `min(${(85/cols)}vw, ${(40/rows)}vh, 2.5rem)`;
+            const r = +$('grid-rows').value, c = +$('grid-cols').value, g = $('grid');
+            const cb = $('color-before').value, ca = $('color-after').value, bb = $('bg-before').value, ba = $('bg-after').value;
+            g.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
+            g.style.gridTemplateRows = `repeat(${r}, 1fr)`;
             
-            grid.innerHTML = currentPool.map(item => `
+            // 自適應字體大小計算公式：根據剩餘寬度或高度取最小值，確保文字不超出格子
+            const f = `min(${(85/c)}vw, ${(45/r)}vh, 2.5rem)`;
+            g.innerHTML = prizes.map(i => `
                 <div class="hole" onclick="poke(this)">
-                    <div class="paper-cover" style="color:${cB}"><span class="cover-name" style="font-size:${fSize}">${item.displayName}</span></div>
-                    <div class="prize-content" style="font-size:${fSize};color:${cA}">${item.prizeName}</div>
+                    <div class="paper-cover" style="color:${cb};background:${bb};font-size:${f}">${i.d}</div>
+                    <div class="prize-content" style="color:${ca};background:${ba};font-size:${f}">${i.p}</div>
                 </div>
             `).join('');
         }
 
+        /* 戳破格子事件：播放音效並觸發動畫類別 */
         function poke(el) {
-            if (el.classList.contains('poked')) return;
-            if (!isMuted) { const d = $('drum-audio'); d.currentTime = 0; d.play(); }
+            if(el.classList.contains('poked')) return;
+            if(!muted) { $('audio-poke').currentTime = 0; $('audio-poke').play(); }
             el.classList.add('poked');
         }
 
+        /* 音樂開關切換 */
         function toggleMusic() {
-            isMuted = !isMuted;
-            const a = $('bg-audio');
-            isMuted ? a.pause() : a.play().catch(() => {});
-            $('toggle-music').innerText = isMuted ? "🔇 靜音" : "🔊 音樂";
+            muted = !muted;
+            muted ? $('audio-bg').pause() : $('audio-bg').play();
+            $('music-btn').innerText = muted ? "🔇 靜音" : "🔊 音樂";
         }
 
-        function backToSetup() { $('bg-audio').pause(); $('game-screen').classList.add('hidden'); $('setup-screen').classList.remove('hidden'); }
-        window.onload = generateInputFields;
-        window.onresize = () => { if (!$('game-screen').classList.contains('hidden')) renderGrid(); };
+        /* 退出遊戲模式回到設定介面 */
+        function exitGame() {
+            $('audio-bg').pause();
+            $('game-screen').classList.add('hidden');
+            $('setup-screen').classList.remove('hidden');
+            document.body.style.overflow = 'auto'; // 恢復視窗捲動功能
+        }
+
+        // 初始化掛載與視窗大小改變時重繪
+        window.onload = initSetup;
+        window.onresize = () => { if(!$('game-screen').classList.contains('hidden')) renderGrid(); };
     </script>
 </body>
 </html>
