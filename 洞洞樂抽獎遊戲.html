@@ -10,8 +10,17 @@
         /* 全域字體設定與平滑背景過渡 */
         body { font-family: 'Microsoft JhengHei', sans-serif; transition: background 0.3s; }
         
-        /* 遊戲畫面容器：滿版且禁止捲動 */
-        .game-full-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background-size: cover !important; background-position: center !important; }
+        /* 遊戲畫面容器：滿版呈現，使用 cover 確保圖片比例不變形且填滿畫面 */
+        .game-full-container { 
+            width: 100vw; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            background-size: cover !important; 
+            background-position: center !important; 
+            background-repeat: no-repeat !important;
+        }
         
         /* 抽獎格線佈局：使用 Grid 自動分配空間 */
         .poke-grid { display: grid; gap: 2px; padding: 10px; flex-grow: 1; overflow: hidden; box-sizing: border-box; }
@@ -52,7 +61,7 @@
         <div class="flex flex-col md:flex-row gap-8 items-stretch">
             <!-- [左側配置欄]：格數、顏色、媒體 URL 設定 -->
             <div id="left-config" class="w-full md:w-5/12 space-y-6">
-                <!-- 區塊 1: 網格尺寸 -->
+                <!-- 區塊 1: 網格尺寸設定 -->
                 <section>
                     <h2 class="font-bold text-gray-700 mb-2 flex items-center gap-2">🧩 1. 格數設定</h2>
                     <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 grid grid-cols-2 gap-4 text-sm">
@@ -60,7 +69,7 @@
                         <div><label class="text-gray-400 block mb-1">縱向 (1~5)</label><select id="grid-rows" class="w-full border p-2 rounded-xl" onchange="initSetup()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></div>
                     </div>
                 </section>
-                <!-- 區塊 2: 樣式與多媒體 -->
+                <!-- 區塊 2: 視覺與音效細節 -->
                 <section>
                     <h2 class="font-bold text-gray-700 mb-2 flex items-center gap-2">🎬 2. 視覺與音效設定</h2>
                     <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
@@ -75,7 +84,7 @@
                 </section>
             </div>
 
-            <!-- [右側清單欄]：個別獎項內容編輯 -->
+            <!-- [右側清單欄]：個別獎項內容編輯與批次導入 -->
             <div class="w-full md:w-7/12 flex flex-col">
                 <div class="flex justify-between items-center mb-2"><h2 class="font-bold text-gray-700">🎁 3. 獎項內容</h2><button onclick="toggleModal(true)" class="text-blue-600 text-xs font-bold hover:underline">批次導入</button></div>
                 <div id="scroll-container" class="border border-gray-200 rounded-2xl bg-white overflow-y-auto flex-1 shadow-inner" style="min-height: 350px;">
@@ -87,13 +96,13 @@
             </div>
         </div>
 
-        <!-- 開始抽獎按鈕 -->
+        <!-- 遊戲啟動按鈕 -->
         <div class="mt-10 flex justify-center border-t pt-8">
             <button onclick="startGame()" class="w-full md:w-2/3 bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-2xl text-2xl shadow-xl transition active:scale-95 transform">開始抽獎 🚀</button>
         </div>
     </div>
 
-    <!-- [導入視窗]：支援貼上 Excel 分頁符號格式的數據 -->
+    <!-- [導入視窗]：支援文字批次填寫 -->
     <div id="import-modal" class="p-4">
         <div class="bg-white p-6 rounded-3xl w-full max-w-lg">
             <h3 class="text-xl font-bold mb-4">批次導入(可Excel貼上)</h3>
@@ -104,19 +113,20 @@
         </div>
     </div>
 
-    <!-- [遊戲主畫面]：正式抽獎時顯示 -->
+    <!-- [遊戲主畫面]：正式抽獎介面 -->
     <div id="game-screen" class="hidden game-full-container">
-        <!-- 上方工具列 -->
+        <!-- 上方工具列：包含設定、重新開始與音效開關 -->
         <div class="h-10 flex justify-end items-center px-4 gap-2 z-50">
             <button onclick="exitGame()" class="toolbar-btn">⚙️ 設定</button>
-            <button onclick="initGameView()" class="toolbar-btn">🔄 重新</button>
+            <!-- 重新遊戲按鈕：觸發亂數重新洗牌 -->
+            <button onclick="restartGame()" class="toolbar-btn">🔄 重新</button>
             <button id="music-btn" onclick="toggleMusic()" class="toolbar-btn">🔊 音樂</button>
         </div>
-        <!-- 洞洞樂動態網格容器 -->
+        <!-- 洞洞樂網格容器 -->
         <div id="grid" class="poke-grid"></div>
     </div>
 
-    <!-- 音效播放元件 -->
+    <!-- 音頻播放器 -->
     <audio id="audio-bg" loop></audio>
     <audio id="audio-poke"></audio>
 
@@ -124,7 +134,7 @@
         const $ = s => document.getElementById(s);
         let prizes = [], muted = false;
 
-        /* 初始化設定介面：生成對應數量的獎項輸入列，並調整滾動區高度 */
+        /* 初始化設定介面：生成表格行數並同步左右高度 */
         function initSetup() {
             const r = +$('grid-rows').value, c = +$('grid-cols').value;
             $('prize-list').innerHTML = Array.from({length: r * c}, (_, i) => `
@@ -133,16 +143,15 @@
                 <td class="p-1"><input type="text" class="p-n" placeholder="獎項內容"></td></tr>
             `).join('');
             
-            // 在桌面端同步左右兩側高度，確保右側出現捲軸
             setTimeout(() => {
                 if(window.innerWidth >= 768) $('scroll-container').style.height = ($('left-config').offsetHeight - 40) + 'px';
             }, 10);
         }
 
-        /* 控制批次導入視窗的顯示/隱藏 */
+        /* 開關彈窗 */
         const toggleModal = v => $('import-modal').style.display = v ? 'flex' : 'none';
 
-        /* 執行資料導入：解析 Textarea 中的文字並填入對應的 Input */
+        /* 處理批次導入資料 */
         function doImport() {
             const lines = $('import-input').value.split('\n').filter(l => l.trim());
             const dn = document.querySelectorAll('.d-n'), pn = document.querySelectorAll('.p-n');
@@ -150,37 +159,43 @@
             toggleModal(false);
         }
 
-        /* 切換至遊戲模式：收集資料、亂數排序、切換視窗 */
+        /* 啟動抽獎：讀取所有 Input 並進行初始亂數排序 */
         function startGame() {
             prizes = Array.from(document.querySelectorAll('.d-n'), (el, i) => ({
                 d: el.value || (i+1).toString(),
                 p: document.querySelectorAll('.p-n')[i].value || "銘謝惠顧"
-            })).sort(() => Math.random() - 0.5); // 將獎項清單隨機打亂
+            })).sort(() => Math.random() - 0.5); 
             
             $('setup-screen').classList.add('hidden');
             $('game-screen').classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // 鎖定視窗防止捲動
+            document.body.style.overflow = 'hidden'; 
             initGameView();
         }
 
-        /* 初始化遊戲視覺：設定背景、準備音效、啟動渲染 */
+        /* 重新開始遊戲：直接進行亂數重新排序並刷新畫面 */
+        function restartGame() {
+            prizes.sort(() => Math.random() - 0.5);
+            initGameView();
+        }
+
+        /* 遊戲畫面初始化：處理滿版背景、音效與網格渲染 */
         function initGameView() {
             const bg = $('bg-url').value;
-            $('game-screen').style.background = bg ? `url(${bg}) center/cover` : '#333';
+            // 若無背景圖，則使用淡灰色 (#f3f4f6) 作為底色
+            $('game-screen').style.background = bg ? `url(${bg}) center/cover no-repeat` : '#f3f4f6';
             $('audio-bg').src = $('music-url').value;
             $('audio-poke').src = $('poke-sound-url').value;
             if(!muted) $('audio-bg').play().catch(()=>{});
             renderGrid();
         }
 
-        /* 渲染格線系統：動態計算字體與 CSS Grid 佈局 */
+        /* 網格渲染：根據格數與螢幕尺寸計算字體大小 */
         function renderGrid() {
             const r = +$('grid-rows').value, c = +$('grid-cols').value, g = $('grid');
             const cb = $('color-before').value, ca = $('color-after').value, bb = $('bg-before').value, ba = $('bg-after').value;
             g.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
             g.style.gridTemplateRows = `repeat(${r}, 1fr)`;
             
-            // 自適應字體大小計算公式：根據剩餘寬度或高度取最小值，確保文字不超出格子
             const f = `min(${(85/c)}vw, ${(45/r)}vh, 2.5rem)`;
             g.innerHTML = prizes.map(i => `
                 <div class="hole" onclick="poke(this)">
@@ -190,29 +205,29 @@
             `).join('');
         }
 
-        /* 戳破格子事件：播放音效並觸發動畫類別 */
+        /* 執行戳破動作 */
         function poke(el) {
             if(el.classList.contains('poked')) return;
             if(!muted) { $('audio-poke').currentTime = 0; $('audio-poke').play(); }
             el.classList.add('poked');
         }
 
-        /* 音樂開關切換 */
+        /* 音樂切換 */
         function toggleMusic() {
             muted = !muted;
             muted ? $('audio-bg').pause() : $('audio-bg').play();
             $('music-btn').innerText = muted ? "🔇 靜音" : "🔊 音樂";
         }
 
-        /* 退出遊戲模式回到設定介面 */
+        /* 返回設定畫面 */
         function exitGame() {
             $('audio-bg').pause();
             $('game-screen').classList.add('hidden');
             $('setup-screen').classList.remove('hidden');
-            document.body.style.overflow = 'auto'; // 恢復視窗捲動功能
+            document.body.style.overflow = 'auto'; 
         }
 
-        // 初始化掛載與視窗大小改變時重繪
+        // 初始化
         window.onload = initSetup;
         window.onresize = () => { if(!$('game-screen').classList.contains('hidden')) renderGrid(); };
     </script>
