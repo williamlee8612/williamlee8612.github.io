@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>承智教育 | 讀卡成績系統</title>
+    
+    <!-- 1. CSS 框架: Bootstrap 5.3 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 2. 圖示庫: FontAwesome 6.4 CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- 3. 原生內部 CSS (獨立模組，嚴禁使用 :root 全域變數) -->
+    <style>
+        /* 全局基底設定 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #F1F5F9;
+            color: #1E293B;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* ── 四、版面架構：Header Bar (.header-bar) ── */
+        .header-bar {
+            background-color: #1E468A;
+            color: #FFFFFF;
+            height: 60px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-title-box {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-status-area {
+            font-size: 14px;
+            color: #E2E8F0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 主容器 */
+        .main-container {
+            flex: 1;
+            padding: 24px 16px;
+        }
+
+        /* ── 三、獨立模組：閱卷控制台卡片 (.omr-control-card) ── */
+        .omr-control-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .omr-step-block {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .omr-step-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .omr-section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1E468A;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 140px;
+        }
+
+        /* 答案預覽框 */
+        .omr-preview-box {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: #1E293B;
+            word-break: break-all;
+            flex: 1;
+        }
+
+        /* 五、表單元件 (.custom-input, .custom-file-input) */
+        .custom-input {
+            width: 90px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1E293B;
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .custom-input:focus {
+            border-color: #1E468A;
+            box-shadow: 0 0 0 3px rgba(30, 70, 138, 0.15);
+        }
+
+        .custom-file-input {
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .custom-file-input::-webkit-file-upload-button {
+            background-color: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1E293B;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 10px;
+        }
+
+        .custom-file-input::-webkit-file-upload-button:hover {
+            background-color: #E2E8F0;
+        }
+
+        .counter-badge {
+            font-size: 14px;
+            font-weight: 700;
+            color: #10B981;
+        }
+
+        /* ── 五、按鈕規範 (.btn-custom-primary / .btn-custom-secondary) ── */
+        .btn-custom-primary {
+            background-color: #1E468A;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #163467;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(30, 70, 138, 0.2);
+            color: #FFFFFF;
+        }
+
+        .btn-custom-primary:disabled {
+            background-color: #94A3B8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-custom-secondary {
+            background-color: #FFFFFF;
+            color: #1E293B;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-custom-secondary:hover {
+            background-color: #F8FAFC;
+            border-color: #94A3B8;
+        }
+
+        /* ── 三、獨立模組：成績報表表格 (.omr-table-card, .omr-data-table) ── */
+        .omr-table-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .table-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .table-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1E293B;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .omr-data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .omr-data-table th {
+            background-color: #F8FAFC;
+            color: #64748B;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px 16px;
+            border-bottom: 2px solid #E2E8F0;
+            text-align: left;
+        }
+
+        .omr-data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 14px;
+            color: #1E293B;
+        }
+
+        .omr-data-table tr:hover {
+            background-color: #F8FAFC;
+        }
+
+        .txt-font-mono {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            letter-spacing: 1px;
+            word-break: break-all;
+        }
+
+        .txt-student-id {
+            color: #1E468A;
+            font-weight: 700;
+        }
+
+        .txt-raw-answers {
+            color: #334155;
+        }
+
+        .txt-report-mode {
+            color: #64748B;
+            font-weight: 700;
+        }
+
+        .txt-score-highlight {
+            color: #EF4444;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .txt-center { text-align: center; }
+
+        /* 隱藏緩衝 Canvas */
+        #grayBufferCanvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- 四、版面架構：Header Bar -->
+    <header class="header-bar">
+        <div class="header-title-box">
+            <i class="fa-solid fa-file-circle-check"></i>
+            <span>承智教育 | 讀卡成績系統</span>
+        </div>
+        <div class="header-status-area">
+            <i class="fa-solid fa-circle-check text-success"></i>
+            <span>閱卷引擎就緒</span>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="main-container container-fluid">
+        
+        <!-- 閱卷控制台 -->
+        <div class="omr-control-card">
+            <div class="omr-step-block">
+                
+                <!-- 步驟 1 -->
+                <div class="omr-step-row">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="omr-section-title"><i class="fa-solid fa-1"></i> 考試題數：</span>
+                        <input type="number" id="totalQuestionsInput" class="custom-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                        <span class="text-secondary fw-semibold">題</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 ms-md-4">
+                        <span class="omr-section-title"><i class="fa-solid fa-hashtag"></i> 學號前綴 (2碼)：</span>
+                        <input type="text" id="idPrefixInput" class="custom-input" maxlength="2" placeholder="00" value="00" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 flex-grow-1 ms-md-4">
+                        <span class="omr-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> 答案卡上傳：</span>
+                        <input type="file" id="answerKeyInput" class="custom-file-input" accept="image/*">
+                        <span id="ansStatusTxt" class="fw-bold text-secondary" style="font-size: 13px;">(等待上傳標準答案卡)</span>
+                    </div>
+                </div>
+
+                <!-- 答案預覽 -->
+                <div class="omr-step-row" id="answerPreviewRow" style="display: none; border-top: 1px dashed #E2E8F0; padding-top: 12px;">
+                    <span class="omr-section-title" style="color: #10B981;"><i class="fa-solid fa-bullseye"></i> 標準答案預覽：</span>
+                    <div id="answerKeyPreview" class="omr-preview-box">尚未讀取標準答案</div>
+                </div>
+
+                <!-- 步驟 2 & 步驟 3 -->
+                <div class="omr-step-row justify-content-between" style="border-top: 1px solid #E2E8F0; padding-top: 16px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="omr-section-title"><i class="fa-solid fa-2"></i> 批量作答卡：</span>
+                        <input type="file" id="studentFileInput" class="custom-file-input" accept="image/*" multiple disabled>
+                        <span id="importCounter" class="counter-badge" style="display: none;">已成功匯入：0 筆</span>
+                    </div>
+
+                    <button id="btnExport" class="btn-custom-primary" onclick="匯出成績單CSV()" disabled>
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>步驟 3：匯出成績報表 (CSV)</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 成績報表表格區 -->
+        <div class="omr-table-card">
+            <div class="table-card-header">
+                <div class="table-card-title">
+                    <i class="fa-solid fa-table-list text-primary"></i>
+                    <span>學生閱卷計分報表</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="omr-data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%; text-align: center;">序號</th>
+                            <th style="width: 14%;">學生學號</th>
+                            <th style="width: 32%;">原始作答明細</th>
+                            <th style="width: 32%;">成績單模式 (對: - / 錯: 原作答)</th>
+                            <th style="width: 14%; text-align: center;">答對題數 / 總題數</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultTableBody">
+                        <tr>
+                            <td colspan="5" class="txt-center text-secondary py-5">
+                                <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
+                                請先上傳「標準答案卡」，再批次上傳「學生作答卡」開始閱卷。
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 緩衝 Canvas -->
+    <canvas id="grayBufferCanvas"></canvas>
+
+    <!-- 載入 OpenCV.js -->
+    <script async src="https://docs.opencv.org/4.5.4/opencv.js" type="text/javascript"></script>
+
+    <script>
+    const 標準寬 = 1000;
+    const 標準高 = 1414;
+
+    let 標準答案字串 = ""; 
+    let 全域成績資料庫 = []; 
+    let 學生卡流水序號 = 0; 
+
+    const 辨識門檻設定 = {
+        學號門檻百分比: 0.45,  
+        答案門檻百分比: 0.70,   
+        印刷框線基礎白點數: 43  
+    };
+
+    const OMR完美比例 = {
+        "學號左": { "起始X": 0.162, "結束X": 0.465, "上排Y": 0.094, "下排Y": 0.127 },
+        "學號右": { "起始X": 0.624, "結束X": 0.925, "上排Y": 0.094, "下排Y": 0.127 },
+        "作答區": {
+            "直欄題號X": [0.087, 0.317, 0.547, 0.777],
+            "第一題Y": 0.178,
+            "最後一題Y": 0.958,
+            "選項相對位移X": [0, 0.038, 0.076, 0.114, 0.153]
+        }
+    };
+
+    document.getElementById('answerKeyInput').addEventListener('change', function(e) {
+        if (e.target.files.length === 0) return;
+        document.getElementById('ansStatusTxt').innerText = '(正在讀取分析中...)';
+        
+        const 檔案 = e.target.files[0];
+        const 讀取器 = new FileReader();
+        讀取器.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                let 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value) || 100;
+                let 識別結果 = 核心閱卷處理流程(img, 檔案.name, 目標題數);
+                
+                if (識別結果) {
+                    標準答案字串 = 識別結果.answers; 
+                    document.getElementById('answerPreviewRow').style.display = 'flex';
+                    document.getElementById('answerKeyPreview').innerText = 標準答案字串;
+                    document.getElementById('ansStatusTxt').innerText = '✓ 標準答案讀取成功';
+                    document.getElementById('ansStatusTxt').style.color = '#10B981';
+                    document.getElementById('studentFileInput').disabled = false; 
+                } else {
+                    document.getElementById('ansStatusTxt').innerText = '✕ 定位失敗，請確認影像品質';
+                    document.getElementById('ansStatusTxt').style.color = '#EF4444';
+                }
+            };
+            img.src = event.target.result;
+        };
+        讀取器.readAsDataURL(檔案);
+    });
+
+    document.getElementById('studentFileInput').addEventListener('change', async function(e) {
+        const 檔案列表 = e.target.files;
+        if (檔案列表.length === 0) return;
+        
+        document.getElementById('resultTableBody').innerHTML = ""; 
+        全域成績資料庫 = []; 
+        學生卡流水序號 = 0;  
+        
+        let 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value) || 100;
+        const 計數器 = document.getElementById('importCounter');
+        計數器.style.display = 'inline';
+        計數器.innerText = `正在批改：0 / ${檔案列表.length} 筆`;
+        計數器.style.color = '#F59E0B'; 
+        
+        for (let i = 0; i < 檔案列表.length; i++) {
+            const 檔案 = 檔案列表[i];
+            await 閱卷單張學生卡(檔案, 目標題數);
+            計數器.innerText = `正在批改：${i + 1} / ${檔案列表.length} 筆`;
+        }
+        
+        計數器.innerText = `已成功匯入批改：${檔案列表.length} 筆`;
+        計數器.style.color = '#10B981'; 
+        
+        if (全域成績資料庫.length > 0) document.getElementById('btnExport').disabled = false;
+    });
+
+    function 閱卷單張學生卡(file, totalQ) {
+        return new Promise((resolve) => {
+            const 讀取器 = new FileReader();
+            讀取器.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    let 學生作答 = 核心閱卷處理流程(img, file.name, totalQ);
+                    學生卡流水序號++; 
+                    
+                    if (學生作答) {
+                        let 答對題數 = 0;
+                        let 成績單模式陣列 = [];
+
+                        for (let q = 0; q < totalQ; q++) {
+                            let 學生單題答案 = 學生作答.answers[q];
+                            let 標準單題答案 = 標準答案字串[q];
+
+                            if (學生單題答案 !== '#' && 學生單題答案 !== '*' && 學生單題答案 === 標準單題答案) {
+                                答對題數++;
+                                成績單模式陣列.push("-"); 
+                            } else {
+                                成績單模式陣列.push(學生單題答案); 
+                            }
+                        }
+                        
+                        let 前綴碼 = document.getElementById('idPrefixInput').value.padStart(2, '0');
+                        學生作答.studentID = 前綴碼 + 學生作答.studentID; 
+
+                        學生作答.serialNo = 學生卡流水序號; 
+                        學生作答.reportModeString = 成績單模式陣列.join(""); 
+                        學生作答.scoreString = `${答對題數} / ${totalQ}`;
+                        學生作答.correctCount = 答對題數;
+                        學生作答.totalCount = totalQ;
+                        
+                        全域成績資料庫.push(學生作答);
+                        新增列到成績表格(學生作答);
+                    } else {
+                        新增錯誤列到成績表格(學生卡流水序號);
+                    }
+                    resolve();
+                };
+                img.src = event.target.result;
+            };
+            讀取器.readAsDataURL(file);
+        });
+    }
+
+    /* 灰階前置脫色函數 */
+    function 強制瀏覽器底層轉灰階(imgElement) {
+        const bufferCanvas = document.getElementById('grayBufferCanvas');
+        const ctx = bufferCanvas.getContext('2d');
+        
+        bufferCanvas.width = imgElement.width;
+        bufferCanvas.height = imgElement.height;
+        
+        ctx.drawImage(imgElement, 0, 0);
+        
+        const imgData = ctx.getImageData(0, 0, bufferCanvas.width, bufferCanvas.height);
+        const data = imgData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            data[i]     = gray; 
+            data[i + 1] = gray; 
+            data[i + 2] = gray; 
+        }
+        
+        ctx.putImageData(imgData, 0, 0);
+        return bufferCanvas;
+    }
+
+    /* 核心閱卷邏輯 */
+    function 核心閱卷處理流程(imgElement, fileName, totalQ) {
+        try {
+            const 灰階畫布 = 強制瀏覽器底層轉灰階(imgElement);
+            
+            const src = cv.imread(灰階畫布);
+            const 灰階 = new cv.Mat();
+            cv.cvtColor(src, 灰階, cv.COLOR_RGBA2GRAY); 
+
+            const 模糊 = new cv.Mat(); const 二值化 = new cv.Mat();
+            cv.GaussianBlur(灰階, 模糊, new cv.Size(5, 5), 0);
+            cv.threshold(模糊, 二值化, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+            
+            const 輪廓集 = new cv.MatVector(); const 層級 = new cv.Mat();
+            cv.findContours(二值化, 輪廓集, 層級, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+            
+            let 最大面積 = 0; let 外框輪廓 = null;
+            for (let i = 0; i < 輪廓集.size(); ++i) {
+                let 輪廓 = 輪廓集.get(i); let 面積 = cv.contourArea(輪廓);
+                if (面積 > 最大面積) {
+                    let 周長 = cv.arcLength(輪廓, true); let 近似 = new cv.Mat();
+                    cv.approxPolyDP(輪廓, 近似, 0.02 * 周長, true);
+                    if (近似.rows === 4) { 最大面積 = 面積; if (外框輪廓) 外框輪廓.delete(); 外框輪廓 = 近似.clone(); }
+                    近似.delete();
+                }
+            }
+            
+            if (!外框輪廓) {
+                src.delete(); 灰階.delete(); 模糊.delete(); 二值化.delete(); 輪廓集.delete(); 層級.delete();
+                return null;
+            }
+            
+            const 頂點 = [];
+            for (let i = 0; i < 4; i++) { 頂點.push({ x: 外框輪廓.data32S[i * 2], y: 外框輪廓.data32S[i * 2 + 1] }); }
+            頂點.sort((a, b) => a.y - b.y);
+            const 上兩點 = [頂點[0], 頂點[1]].sort((a, b) => a.x - b.x);
+            const 下兩點 = [頂點[2], 頂點[3]].sort((a, b) => a.x - b.x);
+            
+            const 來源座標 = cv.matFromArray(4, 1, cv.CV_32FC2, [上兩點[0].x, 上兩點[0].y, 上兩點[1].x, 上兩點[1].y, 下兩點[1].x, 下兩點[1].y, 下兩點[0].x, 下兩點[0].y]);
+            const 目標座標 = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, 標準寬, 0, 標準寬, 標準高, 0, 標準高]);
+            const M = cv.getPerspectiveTransform(來源座標, 目標座標);
+            
+            const 校正後二值化影像 = new cv.Mat();
+            cv.warpPerspective(二值化, 校正後二值化影像, M, new cv.Size(標準寬, 標準高));
+            
+            const 參數 = OMR完美比例;
+            const 總像素 = 14 * 14;
+            
+            let 學號碼陣列 = ["#", "#", "#", "#"];
+            let 左X步 = (參數.學號左.結束X - 參數.學號左.起始X) * 標準寬 / 9;
+            
+            let 碼1 = []; for(let i=0; i<10; i++) {
+                let cx = Math.round(參數.學號左.起始X * 標準寬 + i * 左X步);
+                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號左.上排Y * 標準高) - 7, 14, 14));
+                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+                if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼1.push(i);
+            }
+            if (碼1.length === 1) 學號碼陣列[0] = 碼1[0];
+            if (碼1.length > 1) 學號碼陣列[0] = "*";
+
+            let 碼2 = []; for(let i=0; i<10; i++) {
+                let cx = Math.round(參數.學號左.起始X * 標準寬 + i * 左X步);
+                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號左.下排Y * 標準高) - 7, 14, 14));
+                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+                if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼2.push(i);
+            }
+            if (碼2.length === 1) 學號碼陣列[1] = 碼2[0];
+            if (碼2.length > 1) 學號碼陣列[1] = "*";
+
+            let 右X步 = (參數.學號右.結束X - 參數.學號右.起始X) * 標準寬 / 9;
+            let 碼3 = []; for(let i=0; i<10; i++) {
+                let cx = Math.round(參數.學號右.起始X * 標準寬 + i * 右X步);
+                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號右.上排Y * 標準高) - 7, 14, 14));
+                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+                if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼3.push(i);
+            }
+            if (碼3.length === 1) 學號碼陣列[2] = 碼3[0];
+            if (碼3.length > 1) 學號碼陣列[2] = "*";
+
+            let 碼4 = []; for(let i=0; i<10; i++) {
+                let cx = Math.round(參數.學號右.起始X * 標準寬 + i * 右X步);
+                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號右.下排Y * 標準高) - 7, 14, 14));
+                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+                if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼4.push(i);
+            }
+            if (碼4.length === 1) 學號碼陣列[3] = 碼4[0];
+            if (碼4.length > 1) 學號碼陣列[3] = "*";
+
+            let 最終學號字串 = 學號碼陣列.join("");
+
+            const 題目Y步 = (參數.作答區.最後一題Y - 參數.作答區.第一題Y) * 標準高 / 24;
+            const 選項代號 = ["", "A", "B", "C", "D"];
+            let 答案字串陣列 = [];
+            let 累計題數 = 0;
+
+            for(let 欄=0; 欄<4; 欄++) {
+                let 題號X = 參數.作答區.直欄題號X[欄] * 標準寬;
+                for(let 題=0; 題<25; 題++) {
+                    累計題數++;
+                    if (累計題數 > totalQ) break; 
+                    
+                    let cy = Math.round(參數.作答區.第一題Y * 標準高 + 題 * 題目Y步);
+                    let 本題答案暫存 = [];
+                    
+                    for(let 選=1; 選<=4; 選++) {
+                        let cx = Math.round(題號X + 參數.作答區.選項相對位移X[選] * 標準寬);
+                        let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, cy - 7, 14, 14));
+                        let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+                        
+                        if (實質填滿 >= 辨識門檻設定.答案門檻百分比) {
+                            本題答案暫存.push(選項代號[選]);
+                        }
+                    }
+                    
+                    if (本題答案暫存.length === 0) {
+                        答案字串陣列.push("#");
+                    } else if (本題答案暫存.length === 1) {
+                        答案字串陣列.push(本題答案暫存[0]);
+                    } else {
+                        答案字串陣列.push("*"); 
+                    }
+                }
+                if (累計題數 > totalQ) break;
+            }
+
+            src.delete(); 灰階.delete(); 模糊.delete(); 二值化.delete(); 輪廓集.delete(); 層級.delete();
+            來源座標.delete(); 目標座標.delete(); M.delete(); 外框輪廓.delete(); 校正後二值化影像.delete();
+
+            return {
+                fileName: fileName,
+                studentID: 最終學號字串,
+                answers: 答案字串陣列.join("")
+            };
+        } catch(err) {
+            console.error(err);
+            return null;
+        }
+    }
+
+    function 新增列到成績表格(data) {
+        const tableBody = document.getElementById('resultTableBody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="txt-center"><b>${data.serialNo}</b></td>
+            <td><span class="txt-font-mono txt-student-id">${data.studentID}</span></td>
+            <td><span class="txt-font-mono txt-raw-answers">${data.answers}</span></td>
+            <td><span class="txt-font-mono txt-report-mode">${data.reportModeString}</span></td>
+            <td class="txt-center"><span class="txt-font-mono txt-score-highlight">${data.scoreString}</span></td>
+        `;
+        tableBody.appendChild(tr);
+    }
+
+    function 新增錯誤列到成績表格(serialNo) {
+        const tableBody = document.getElementById('resultTableBody');
+        const tr = document.createElement('tr');
+        tr.style.backgroundColor = "#FEF2F2";
+        tr.innerHTML = `
+            <td class="txt-center"><b>${serialNo}</b></td>
+            <td style="color:#EF4444; font-weight:bold;"><i class="fa-solid fa-triangle-exclamation me-1"></i>辨識失敗</td>
+            <td colspan="3" style="color:#94A3B8; font-style:italic;">影像邊界定位異常。請確認考卷四周黑框完整且無嚴重反光。</td>
+        `;
+        tableBody.appendChild(tr);
+    }
+
+    function 匯出成績單CSV() {
+        if (全域成績資料庫.length === 0) return;
+        
+        let csvContent = "\uFEFF"; 
+        csvContent += "序號,原始檔名,學生學號,原始作答明細,成績單對照模式,答對題數,總題數\n";
+        
+        全域成績資料庫.forEach(row => {
+            csvContent += `${row.serialNo},"${row.fileName}","${row.studentID}","${row.answers}","${row.reportModeString}",${row.correctCount},${row.totalCount}\n`;
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        
+        link.setAttribute("href", url);
+        link.setAttribute("download", `承智教育_讀卡成績單_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        
+        link.click();
+        document.body.removeChild(link);
+    }
+    </script>
+</body>
+</html>
