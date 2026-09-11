@@ -1,4 +1,4 @@
-# 承智教育 CHANGE_EDUCATION
+# 承智教育 CHANGE EDUCATION
 
 傳承智慧 作育英才 攜手共進 開創未來
 誠摯邀請 承智教育 Change your future
