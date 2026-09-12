@@ -1,4 +1,4 @@
-【補習班管理系統 - 專案開發規範】
+【補習班管理系統 - 專案開發規範】  
 架構：GitHub Pages (前端網頁) + GAS Web App (API 後端) + Google Sheets (多資料庫)。
 
 一、 視覺與版面規範 (Visual & Layout)
