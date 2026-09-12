@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>承智教育 | 模擬考考程系統</title>
     
-    <!-- 1. CSS 框架: Bootstrap 5.3 CDN (僅用於 Grid / Flexbox 響應式佈局) -->
+    <!-- 1. CSS 框架: Bootstrap 5.3 CDN (用於 Grid / Flexbox 響應式佈局) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- 2. 圖示庫: FontAwesome 6.4 CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- 字型載入：數位時鐘 JetBrains Mono -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <!-- 3. 字型載入：Noto Sans TC (跨平台中文) & JetBrains Mono (數位時鐘) -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <!-- 3. 原生內部 CSS (樣式隔離，禁用 :root 全域變數) -->
+    <!-- 4. 原生內部 CSS (模組化獨立樣式，禁用 :root 全域變數) -->
     <style>
         /* 全局基底設定 */
         * {
@@ -22,7 +22,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #F1F5F9;
             color: #1E293B;
             height: 100vh;
@@ -34,7 +34,7 @@
             -webkit-user-select: none;
         }
 
-        /* ── 四、版面架構：Header Bar (.header-bar) ── */
+        /* ── 版面架構：Header Bar (.header-bar) ── */
         .header-bar {
             background-color: #1E468A;
             color: #FFFFFF;
@@ -77,7 +77,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* ── 三、獨立模組：大螢幕即時展示卡片 (.exam-display-card) ── */
+        /* ── 大螢幕即時展示卡片 (.exam-display-card) ── */
         .exam-display-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
@@ -221,7 +221,7 @@
             width: 100%;
         }
 
-        /* ── 三、獨立模組：右側考程管理面板 (.admin-panel-card) ── */
+        /* ── 右側考程與音效管理面板 (.admin-panel-card) ── */
         .admin-panel-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
@@ -293,7 +293,7 @@
             background-color: #FEF2F2 !important;
         }
 
-        /* 五、表單與輸入元件 (.custom-input-text, .time-select-box) */
+        /* 表單與輸入元件 (.custom-input-text, .time-select-box) */
         .custom-input-text {
             width: 100%;
             background: transparent;
@@ -358,7 +358,7 @@
             animation: pulse-anim 1s infinite;
         }
 
-        /* ── 五、按鈕規範 (.btn-custom-primary / .btn-custom-secondary) ── */
+        /* 按鈕規範 (.btn-custom-primary / .btn-custom-secondary) */
         .btn-custom-primary {
             background-color: #1E468A;
             color: #FFFFFF;
@@ -422,19 +422,23 @@
             background-color: #FEF2F2;
         }
 
-        /* 底部音效設定區 */
-        .sound-setting-footer {
+        /* 底部多媒體與鈴聲設定區 (.media-setting-footer) */
+        .media-setting-footer {
             padding: 12px 16px;
             background-color: #F8FAFC;
             border-top: 1px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .sound-setting-label {
+        .media-setting-label {
             font-size: 13px;
             font-weight: 700;
             color: #1E293B;
-            margin-bottom: 6px;
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .sound-url-input {
@@ -460,11 +464,29 @@
             font-weight: 700;
             font-size: 15px;
         }
+
+        .youtube-control-box {
+            background-color: #EDF2F7;
+            border-radius: 6px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* 隱藏 YouTube 嵌入框架但保留功能 */
+        #yt-player-container {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            left: -9999px;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 四、版面架構：Header Bar -->
+    <!-- 1. 版面架構：Header Bar -->
     <header class="header-bar">
         <div class="header-title-box">
             <i class="fa-solid fa-clock"></i>
@@ -472,23 +494,23 @@
         </div>
         <div class="header-status-area">
             <i class="fa-solid fa-circle-check text-success"></i>
-            <span>系統服務中</span>
+            <span>系統運作中 (純網頁獨立版)</span>
         </div>
     </header>
 
-    <!-- 主工作區域 -->
+    <!-- 2. 主工作區域 -->
     <main class="main-workspace container-fluid">
         <div class="row g-3 h-100">
             
-            <!-- [左側] 大螢幕即時展示區 (寬度 60%) -->
+            <!-- [左側] 大螢幕即時展示區 (寬度 7/12) -->
             <section class="col-12 col-lg-7 h-100 d-flex flex-column">
                 
-                <!-- 1. 考試名稱卡片 -->
+                <!-- 考試名稱卡片 -->
                 <div class="exam-display-card title-input-card">
-                    <input type="text" id="main-title" value="115學年度 九年級第一次模擬考" oninput="saveAllData()" class="exam-main-title-input" placeholder="點擊點輸入考試名稱...">
+                    <input type="text" id="main-title" value="115學年度 九年級第一次模擬考" oninput="saveAllData()" class="exam-main-title-input" placeholder="點擊輸入考試名稱...">
                 </div>
 
-                <!-- 2. 日期與數位時鐘展示卡片 -->
+                <!-- 日期與數位時鐘展示卡片 -->
                 <div class="exam-display-card clock-display-card">
                     <div id="current-date" class="exam-current-date">----年--月--日 星期-</div>
                     <div id="current-time" class="exam-clock-text digital-font">00:00:00</div>
@@ -498,7 +520,7 @@
                     </div>
                 </div>
 
-                <!-- 3. 目前與下一科考程狀態卡片 -->
+                <!-- 目前與下一科考程狀態卡片 -->
                 <div class="exam-display-card status-display-card">
                     <!-- 當前狀態 -->
                     <div class="status-grid-row">
@@ -519,7 +541,7 @@
 
             </section>
 
-            <!-- [右側] 考程管理面板 (寬度 40%) -->
+            <!-- [右側] 考程與音效管理面板 (寬度 5/12) -->
             <section class="col-12 col-lg-5 h-100">
                 <div class="admin-panel-card">
                     
@@ -532,7 +554,7 @@
                         <div class="d-flex gap-2">
                             <button onclick="sortExams()" class="btn-custom-secondary">
                                 <i class="fa-solid fa-arrow-down-short-wide"></i>
-                                <span>排序</span>
+                                <span>時間排序</span>
                             </button>
                             <button onclick="addExam()" class="btn-custom-primary">
                                 <i class="fa-solid fa-plus"></i>
@@ -560,20 +582,40 @@
                         </div>
                     </div>
 
-                    <!-- 底部鈴聲設定區 -->
-                    <div class="sound-setting-footer">
-                        <label class="sound-setting-label" for="sound-url">
-                            <i class="fa-solid fa-bell me-1"></i>自訂鈴聲設定 (MP3 網址)
-                        </label>
-                        <div class="d-flex gap-2">
-                            <input id="sound-url" type="text" oninput="saveAllData()" class="sound-url-input" placeholder="請輸入 MP3 網址">
-                            <button onclick="testBell()" class="btn-custom-secondary" style="white-space: nowrap;">
-                                <i class="fa-solid fa-play"></i>測試
-                            </button>
-                            <button onclick="stopBell()" class="btn-custom-secondary" style="white-space: nowrap; color: #EF4444; border-color: #FCA5A5;">
-                                <i class="fa-solid fa-stop"></i>暫停
-                            </button>
+                    <!-- 底部鈴聲與背景音樂設定區 -->
+                    <div class="media-setting-footer">
+                        
+                        <!-- 1. 響鈴音效設定 (支援 MP3 / Google Drive) -->
+                        <div>
+                            <label class="media-setting-label" for="sound-url">
+                                <i class="fa-solid fa-bell text-primary"></i>
+                                <span>考程響鈴網址 (支援 MP3 直取 / Google Drive 分享連結)</span>
+                            </label>
+                            <div class="d-flex gap-2 mt-1">
+                                <input id="sound-url" type="text" onchange="handleSoundUrlChange()" class="sound-url-input" placeholder="貼上 MP3 或 Google Drive 連結">
+                                <button onclick="testBell()" class="btn-custom-secondary" style="white-space: nowrap;">
+                                    <i class="fa-solid fa-play"></i>測試
+                                </button>
+                                <button onclick="stopBell()" class="btn-custom-secondary" style="white-space: nowrap; color: #EF4444; border-color: #FCA5A5;">
+                                    <i class="fa-solid fa-stop"></i>暫停
+                                </button>
+                            </div>
                         </div>
+
+                        <!-- 2. YouTube 背景音樂擴充設定 -->
+                        <div>
+                            <label class="media-setting-label" for="yt-url">
+                                <i class="fa-fab fa-youtube text-danger"></i>
+                                <span>YouTube 背景音樂 (可選，播放讀書音樂/直播)</span>
+                            </label>
+                            <div class="d-flex gap-2 mt-1">
+                                <input id="yt-url" type="text" onchange="loadYouTubeVideo()" class="sound-url-input" placeholder="貼上 YouTube 影片或直播連結">
+                                <button onclick="toggleYouTubePlay()" id="btn-yt-toggle" class="btn-custom-secondary" style="white-space: nowrap;">
+                                    <i class="fa-solid fa-play" id="yt-play-icon"></i><span id="yt-play-text">播放</span>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -582,12 +624,15 @@
         </div>
     </main>
 
-    <!-- 隱藏的音訊播放元件 -->
+    <!-- 隱藏的音訊元件 -->
     <audio id="bell-audio" preload="auto"></audio>
+    <div id="yt-player-container"><div id="yt-player"></div></div>
 
-    <!-- 系統控制邏輯 -->
+    <!-- 3. 系統控制邏輯 JS -->
+    <!-- 載入 YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        /* 預設資料設定與變數初始化 */
+        /* 預設考試資料設定 */
         let exams = [
             { id: 1, name: '預備鐘', start: '08:00', end: '08:10', bell: true },
             { id: 2, name: '國文科', start: '08:10', end: '09:20', bell: true },
@@ -596,46 +641,75 @@
         
         const DEFAULT_SOUND = "https://williamlee8612.github.io/上課鐘聲.mp3";
         const $ = (id) => document.getElementById(id);
-        
-        /* 時間字串轉總秒數 */
+        let ytPlayer = null;
+        let isYtPlaying = false;
+
+        /* 時間字串 (HH:MM:SS) 轉換為總秒數 */
         const toSec = (t) => {
             const [h, m, s = 0] = t.split(':').map(Number);
             return h * 3600 + m * 60 + s;
         };
 
-        /* LocalStorage 儲存機制 */
+        /* Google Drive 連結自動轉譯為 Direct Stream API */
+        function parseAudioUrl(url) {
+            if (!url) return DEFAULT_SOUND;
+            // 處理 Google Drive 分享網址格式
+            if (url.includes('drive.google.com')) {
+                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    return `https://docs.google.com/uc?export=open&id=${match[1]}`;
+                }
+            }
+            return url;
+        }
+
+        /* 儲存資料至 LocalStorage */
         function saveAllData() {
             const data = {
                 mainTitle: $('main-title').value,
                 soundUrl: $('sound-url').value,
+                ytUrl: $('yt-url').value,
                 exams: exams
             };
             localStorage.setItem('chengzhiExamData', JSON.stringify(data));
         }
 
-        /* LocalStorage 載入機制 */
+        /* 自 LocalStorage 載入歷史設定 */
         function loadAllData() {
             const savedData = localStorage.getItem('chengzhiExamData');
             if (savedData) {
-                const data = JSON.parse(savedData);
-                if (data.mainTitle) $('main-title').value = data.mainTitle;
-                if (data.soundUrl) $('sound-url').value = data.soundUrl;
-                if (data.exams) exams = data.exams;
+                try {
+                    const data = JSON.parse(savedData);
+                    if (data.mainTitle) $('main-title').value = data.mainTitle;
+                    if (data.soundUrl) $('sound-url').value = data.soundUrl;
+                    if (data.ytUrl) $('yt-url').value = data.ytUrl;
+                    if (data.exams && Array.isArray(data.exams)) exams = data.exams;
+                } catch(e) {
+                    console.error("載入舊資料失敗，使用預設值", e);
+                }
             } else {
                 $('sound-url').value = DEFAULT_SOUND;
             }
         }
 
-        /* 頁面載入初始化 */
+        /* 響鈴網址變更處理 */
+        function handleSoundUrlChange() {
+            const rawUrl = $('sound-url').value;
+            const parsedUrl = parseAudioUrl(rawUrl);
+            $('bell-audio').src = parsedUrl;
+            saveAllData();
+        }
+
+        /* 初始化頁面 */
         window.onload = () => {
             loadAllData();
-            $('bell-audio').src = $('sound-url').value || DEFAULT_SOUND;
+            handleSoundUrlChange();
             renderExams();
             setInterval(tick, 1000);
             tick();
         };
 
-        /* 每秒更新時間與偵測鈴聲 */
+        /* 每秒觸發：時間更新與考程比對 */
         function tick() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -645,15 +719,17 @@
             $('current-date').innerText = now.toLocaleDateString('zh-TW', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
             $('current-time').innerText = `${h}:${m}:${s}`;
 
-            // 整點分（00 秒）比對時間播鈴
+            // 當秒數為 00 秒時，比對是否到了考程開始或結束時間點
             if (s === "00") {
                 const nowShort = `${h}:${m}`;
-                if (exams.some(e => e.bell && (e.start === nowShort || e.end === nowShort))) playSound();
+                if (exams.some(e => e.bell && (e.start === nowShort || e.end === nowShort))) {
+                    playSound();
+                }
             }
             updateStatus(h, m, s);
         }
 
-        /* 判斷目前考試狀態 */
+        /* 考程狀態判定與 UI 渲染 */
         function updateStatus(h, m, s) {
             const nowTotal = toSec(`${h}:${m}:${s}`);
             const sorted = [...exams].sort((a, b) => a.start.localeCompare(b.start));
@@ -668,7 +744,6 @@
                 }
             }
 
-            // 更新左側顯示卡片樣式
             const lbl = $('status-label');
             if (cur) {
                 lbl.innerText = "考試中";
@@ -695,9 +770,7 @@
                 const tr = document.createElement('tr');
                 if (conflict) tr.className = 'conflict-row';
                 
-                const warningTag = conflict 
-                    ? `<span class="warning-badge">時間重疊</span>` 
-                    : '';
+                const warningTag = conflict ? `<span class="warning-badge">時間重疊</span>` : '';
 
                 tr.innerHTML = `
                     <td>
@@ -728,7 +801,7 @@
             });
         }
 
-        /* 產生下拉時間選單 Component */
+        /* 時間下拉選擇選單組件 */
         function timePicker(id, val, field) {
             const [h, m] = val.split(':');
             const opt = (max, sel) => Array.from({length: max}, (_, i) => {
@@ -743,7 +816,7 @@
                 </div>`;
         }
 
-        /* 資料更新處理 */
+        /* 表格資料操作 handlers */
         function updateT(id, f, p, v) {
             const e = exams.find(x => x.id === id);
             let [h, m] = e[f].split(':');
@@ -775,12 +848,11 @@
             saveAllData(); 
         }
 
-        /* 音效播放控制 */
+        /* 鈴聲播放控制 */
         function playSound() { 
             const a = $('bell-audio'); 
-            a.src = $('sound-url').value || DEFAULT_SOUND;
             a.currentTime = 0; 
-            a.play().catch(()=>{}); 
+            a.play().catch(err => console.log("播放被瀏覽器阻擋，請點擊頁面允許聲音發出", err)); 
         }
 
         function testBell() { playSound(); }
@@ -789,6 +861,74 @@
             const a = $('bell-audio'); 
             a.pause(); 
             a.currentTime = 0; 
+        }
+
+        /* ── YouTube API 背景音樂整合 ── */
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('yt-player', {
+                height: '0',
+                width: '0',
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function extractYTVideoId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function loadYouTubeVideo() {
+            const url = $('yt-url').value;
+            const videoId = extractYTVideoId(url);
+            saveAllData();
+
+            if (videoId && ytPlayer && ytPlayer.loadVideoById) {
+                ytPlayer.loadVideoById(videoId);
+                isYtPlaying = true;
+                updateYTButtonUI();
+            }
+        }
+
+        function toggleYouTubePlay() {
+            if (!ytPlayer || !ytPlayer.getPlayerState) return;
+            const state = ytPlayer.getPlayerState();
+            
+            if (state === YT.PlayerState.PLAYING) {
+                ytPlayer.pauseVideo();
+                isYtPlaying = false;
+            } else {
+                const url = $('yt-url').value;
+                const videoId = extractYTVideoId(url);
+                if (videoId) {
+                    if (state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
+                        ytPlayer.loadVideoById(videoId);
+                    } else {
+                        ytPlayer.playVideo();
+                    }
+                    isYtPlaying = true;
+                } else {
+                    alert("請先貼上有效的 YouTube 影片網址！");
+                }
+            }
+            updateYTButtonUI();
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isYtPlaying = true;
+            } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                isYtPlaying = false;
+            }
+            updateYTButtonUI();
+        }
+
+        function updateYTButtonUI() {
+            $('yt-play-icon').className = isYtPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
+            $('yt-play-text').innerText = isYtPlaying ? "暫停" : "播放";
         }
     </script>
 </body>
