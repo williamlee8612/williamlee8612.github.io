@@ -57,7 +57,7 @@
 
         .header-title-box {
             font-size: 20px;
-            font-weight: 700;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -98,7 +98,7 @@
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
-            padding: 16px;
+            padding: 14px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             display: flex;
             flex-direction: column;
@@ -112,7 +112,7 @@
         }
 
         .exam-main-title-input {
-            font-size: clamp(1.4rem, 2.1vw, 2.2rem);
+            font-size: clamp(1.6rem, 2.6vw, 2.6rem);
             font-weight: 800;
             color: #1E293B;
             width: 100%;
@@ -136,14 +136,14 @@
         }
 
         .exam-current-date {
-            font-size: clamp(1.5rem, 2vw, 2rem);
+            font-size: clamp(2rem, 2vw, 4rem);
             font-weight: 700;
             color: #64748B;
             margin-bottom: 8px;
         }
 
         .exam-clock-text {
-            font-size: clamp(4.5rem, 9.5vw, 10rem);
+            font-size: clamp(6rem, 10vw, 12rem);
             line-height: 1;
             font-weight: 700;
             color: #1E293B;
@@ -174,17 +174,17 @@
 
         .status-grid-row {
             display: grid;
-            grid-template-columns: 140px 1fr 260px;
+            grid-template-columns: 160px 1fr 300px;
             align-items: center;
             gap: 16px;
             width: 100%;
         }
 
         .status-badge {
-            font-size: clamp(1.4rem, 1.8vw, 2.0rem);
-            font-weight: 800;
-            padding: 6px 12px;
-            border-radius: 8px;
+            font-size: clamp(2rem, 2.4vw, 4rem);
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 12px;
             text-align: center;
             border: 1px solid #E2E8F0;
         }
@@ -208,8 +208,8 @@
         }
 
         .status-exam-name {
-            font-size: clamp(1.4rem, 1.8vw, 2.0rem);
-            font-weight: 800;
+            font-size: clamp(2rem, 2.4vw, 4rem);
+            font-weight: 600;
             color: #1E293B;
             white-space: nowrap;
             overflow: hidden;
@@ -217,10 +217,11 @@
         }
 
         .status-exam-time {
-            font-size: clamp(1.4rem, 1.8vw, 2.0rem);
-            font-weight: 700;
+            font-size: clamp(2rem, 2.4vw, 4rem);
+            font-weight: 600;
             color: #64748B;
             text-align: right;
+            letter-spacing: -2px;
         }
 
         /* 管理面板卡片 */
@@ -266,9 +267,9 @@
             top: 0;
             background-color: #F8FAFC;
             color: #64748B;
-            font-size: 14px;
-            font-weight: 700;
-            padding: 6px 4px;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 4px 4px;
             border-bottom: 1px solid #E2E8F0;
             z-index: 10;
         }
@@ -288,8 +289,8 @@
             border: 1px solid transparent;
             border-radius: 6px;
             padding: 2px 4px;
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 600;
             color: #1E293B;
             outline: none;
             transition: all 0.2s ease;
@@ -308,7 +309,7 @@
             background: transparent;
             font-family: 'JetBrains Mono', monospace;
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 600;
             color: #1E293B;
             text-align: center;
             outline: none;
@@ -338,7 +339,7 @@
 
         .time-colon {
             color: #94A3B8;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 12px;
         }
 
@@ -360,7 +361,7 @@
             border: none;
             border-radius: 6px;
             padding: 6px 12px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -381,7 +382,7 @@
             border: 1px solid #CBD5E1;
             border-radius: 6px;
             padding: 6px 12px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -416,7 +417,7 @@
             background-color: #FEF2F2;
         }
 
-        /* 底部音效設定卡片：改為單列單排 */
+        /* 底部音效設定卡片*/
         .sound-setting-footer {
             padding: 12px 16px;
             background-color: #F8FAFC;
@@ -429,7 +430,7 @@
             padding: 6px 10px;
             border: 1px solid #CBD5E1;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 14px;
             color: #1E293B;
             outline: none;
             transition: all 0.2s ease;
@@ -441,7 +442,7 @@
         }
 
         .source-type-tag {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             padding: 2px 6px;
             border-radius: 4px;
@@ -548,9 +549,9 @@
                         </div>
                     </div>
 
-                    <!-- 底部鈴聲與音源設定區 (調整：單一排版整合) -->
+                    <!-- 底部鈴聲與音源設定區-->
                     <div class="sound-setting-footer">
-                        <div class="text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                        <div class="text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
                             <span><i class="fa-solid fa-bell mr-1"></i>自訂鈴聲網址 (MP3/Google Drive/YouTube)</span>
                             <span id="source-type-tag" class="source-type-tag bg-slate-200 text-slate-700">MP3 直連</span>
                         </div>
