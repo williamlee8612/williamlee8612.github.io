@@ -9,20 +9,21 @@
    - 通用材質: 背景 `#F1F5F9` | 卡片 `#FFFFFF` + 1px `#E2E8F0` + 圓角 10px (`rounded-[10px]`) + `shadow-sm`
    - 文字階層: 主標/內文 `#1E293B` | 次要中灰 `#64748B` | 警示紅 `#EF4444` | 提醒黃 `#F59E0B`
 2. 資源引進 (防跨 OS 亂碼):
-   - FontAwesome 6.5.1 CDN
-   - Google Fonts: Noto Sans TC
+   - 圖示：FontAwesome 6.5.1 CDN
+   - 字型：Google Fonts: Noto Sans TC
 3. 樣式獨立原則 (禁用 :root 全域樣式):
-   - 使用 Tailwind CSS。每個 UI 容器需有獨立 Class，所有的參數都必須明確宣告於元件自身的 Class 中，利於單獨微調。
+   - 架構：Tailwind CSS
+   - 每個 UI 容器需有獨立 Class，所有參數都必須明確宣告於元件自身的 Class 中，利於單獨微調。
    - 全程式碼需附帶繁體中文註解。
 4. 統一生態系版面結構:
    - Header Bar: 置頂高 64px (`h-16`) 深藍底白字 `px-4 sm:px-6`。
      * 左側: 字級 `text-[24px]`、字重 `font-[600]`，格式「[補習班名稱] | [子系統名稱]」。
-     * 右側: 狀態燈號 (如：🟢 系統連線中) + 特殊操作按鈕 (重整、音效開關、登出)。
+     * 右側: 全域操作按鈕 (重整頁面、音效開關、登出) + 狀態燈號說明 (如：🟢 系統連線中)，格式「[全域狀態按鈕] [狀態燈號說明]」。
    - Main Content: 容器外框 `.container max-w-7xl mx-auto px-4 py-6 sm:px-6` 支援 RWD。
-   - Data Table: 隔行變色 (表頭深色 / 奇數白底 / 偶數 `#F8FAFC`)，帶 1px 邊框。
-   - 互動與防呆: Focus 亮主色邊框光暈；按鈕 Hover 微上浮 1-2px (`hover:-translate-y-0.5 transition-all shadow-md`)；支援 Enter 發送、送出後自動清空並 Focus 輸入框。
+   - 資料表格: 隔行變色 (表頭深色 / 奇數白底 / 偶數 `#F8FAFC`)，帶 1px 邊框。
+   - 互動機制: Focus 亮主色邊框光暈；按鈕 Hover 微上浮 1-2px (`hover:-translate-y-0.5 transition-all shadow-md`)；支援 Enter 發送、送出後自動清空並 Focus 輸入框。
    - 狀態反饋: 訊息 Alert 用圓角背景框 (成功淡綠底深綠字 `#ECFDF5/#047857` / 失敗淡紅底深紅字 `#FEF2F2/#B91C1C`)，重大異常彈出 `alert()`；
-   - 其他：無資料時於表格內直接輸出純文字提示；按鈕點擊顯示 Loading 轉圈
+   - 其他細節：無資料時於表格內直接輸出純文字提示；按鈕點擊顯示 Loading 轉圈
 
 二、 後端與 API 規範 (Backend & API Protocol)
 1. 配置檔 (Config.gs):
