@@ -105,7 +105,7 @@
       width: 100%;
       padding-top: 56.25%;
       background-color: #000000;
-      border-radius: 8px;
+      border-radius: 8px 8px 0 0;
       overflow: hidden;
     }
 
@@ -118,55 +118,81 @@
       border: none;
     }
 
-    /* 防護遮罩 Zone 1: 頂部與畫面中央 (阻擋點擊標題與跳轉) */
-    .overlay-top-zone {
+    /* 【100% 完全防衛透明遮罩】：全面積蓋住影片，徹底阻斷跳轉 YouTube 網址 */
+    .overlay-full-shield {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 80%;
+      height: 100%;
       z-index: 10;
       background: transparent;
-    }
-
-    /* 防護遮罩 Zone 2: 右下角 YouTube Logo 區域 */
-    .overlay-logo-zone {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 140px;
-      height: 48px;
-      z-index: 10;
-      background: transparent;
+      cursor: default;
     }
 
     /* 版權防翻拍浮水印 (.watermark-layer) */
     .watermark-layer {
       position: absolute;
-      top: 12px;
+      top: 14px;
       right: 16px;
       z-index: 15;
       pointer-events: none;
-      background-color: rgba(0, 0, 0, 0.45);
-      color: rgba(255, 255, 255, 0.75);
-      padding: 4px 12px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: rgba(255, 255, 255, 0.85);
+      padding: 5px 14px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 1px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* 自訂外置控制條容器 (.custom-controls-bar) */
+    .custom-controls-bar {
+      background-color: #0F172A;
+      color: #FFFFFF;
+      padding: 12px 18px;
+      border-radius: 0 0 8px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* 自訂拉動進度條 (Range Slider) */
+    .custom-seekbar {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #334155;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .custom-seekbar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #3B82F6;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .custom-seekbar::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: #60A5FA;
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- ===================================================================== -->
-  <!-- Header 置頂導覽列                                                     -->
-  <!-- ===================================================================== -->
+  <!-- Header 置頂導覽列 -->
   <header class="header-bar">
     <div class="flex items-center gap-3 text-lg font-bold">
       <i class="fa-solid fa-graduation-cap"></i>
-      <span>承智教育 | 多功能線上服務平台</span>
+      <span>承智教育 | 線上補課系統</span>
     </div>
     <div class="text-sm text-slate-200 flex items-center gap-2">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
@@ -174,9 +200,7 @@
     </div>
   </header>
 
-  <!-- ===================================================================== -->
-  <!-- 主內容區域                                                            -->
-  <!-- ===================================================================== -->
+  <!-- 主內容區域 -->
   <main class="flex-1 flex items-center justify-center p-4 md:p-8">
 
     <!-- 1. 學生補課登入卡片 -->
@@ -186,7 +210,7 @@
           <i class="fa-solid fa-user-lock"></i>
         </div>
         <h2 class="text-2xl font-bold text-slate-800">線上補課系統</h2>
-        <p class="text-sm text-slate-500 mt-1">請輸入補課帳號與密碼</p>
+        <p class="text-sm text-slate-500 mt-1">請輸入您的補課帳號與密碼</p>
       </div>
 
       <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
@@ -214,34 +238,69 @@
       </div>
     </div>
 
-    <!-- 2. 播放器卡片 (登入後切換顯示) -->
+    <!-- 2. 播放器卡片 (登入驗證通過後顯示) -->
     <div id="player-card" class="player-card hidden">
       <div class="pb-3 mb-4 border-b border-slate-200 flex items-center justify-between">
         <h1 id="video-title" class="text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-3">
           <i class="fa-solid fa-circle-play text-[#1E468A]"></i>
           <span>課程載入中...</span>
         </h1>
-
-        <!-- DOM 全螢幕按鈕：保證全螢幕時防護層不失效 -->
-        <button onclick="toggleCardFullscreen()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-md text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
-          <i class="fa-solid fa-expand"></i>
-          <span>全螢幕模式</span>
-        </button>
       </div>
 
-      <!-- 雙層區域防護遮罩播放容器 -->
+      <!-- 影片播放區域與 100% 透明遮罩 -->
       <div class="player-wrap" oncontextmenu="return false;">
-        <!-- 動態 Floating 浮水印 -->
+        <!-- 版權防翻拍浮水印 -->
         <div class="watermark-layer">
           <i class="fa-solid fa-shield-halved mr-1"></i>承智補習班版權所有 禁止翻拍
         </div>
 
-        <!-- 透明區域遮罩 -->
-        <div class="overlay-top-zone" oncontextmenu="return false;"></div>
-        <div class="overlay-logo-zone" oncontextmenu="return false;"></div>
+        <!-- 全覆蓋遮罩：徹底阻斷點擊跳轉與右鍵 -->
+        <div class="overlay-full-shield" oncontextmenu="return false;"></div>
 
-        <!-- YouTube API 動態生成標籤容器 -->
+        <!-- YouTube API 渲染容器 -->
         <div id="yt-player-container"></div>
+      </div>
+
+      <!-- 專屬外置 API 控制列 (完全安全且不露 YouTube 網址) -->
+      <div class="custom-controls-bar">
+        <!-- 進度條 slider -->
+        <input type="range" id="seek-bar" class="custom-seekbar" value="0" min="0" max="100" step="0.1" oninput="handleSeek(this.value)">
+
+        <div class="flex items-center justify-between mt-1 text-xs md:text-sm">
+          <div class="flex items-center gap-3 md:gap-4">
+            <!-- 播放 / 暫停按鈕 -->
+            <button id="play-pause-btn" onclick="togglePlayPause()" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition">
+              <i class="fa-solid fa-play"></i>
+            </button>
+
+            <!-- 播放時間標籤 -->
+            <span class="font-mono text-slate-300">
+              <span id="current-time">00:00</span> / <span id="duration-time">00:00</span>
+            </span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- 倍速切換下拉選單 -->
+            <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+              <i class="fa-solid fa-[#1E468A] fa-gauge-high text-xs text-slate-400"></i>
+              <span class="text-slate-400 text-xs hidden md:inline">倍速:</span>
+              <select id="speed-select" onchange="changePlaybackSpeed(this.value)" class="bg-transparent text-white text-xs outline-none cursor-pointer">
+                <option value="0.5" class="bg-slate-800">0.5x</option>
+                <option value="0.75" class="bg-slate-800">0.75x</option>
+                <option value="1.0" selected class="bg-slate-800">1.0x (正常)</option>
+                <option value="1.25" class="bg-slate-800">1.25x</option>
+                <option value="1.5" class="bg-slate-800">1.5x</option>
+                <option value="2.0" class="bg-slate-800">2.0x</option>
+              </select>
+            </div>
+
+            <!-- DOM 全螢幕按鈕 -->
+            <button onclick="toggleCardFullscreen()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs text-white transition flex items-center gap-1">
+              <i class="fa-solid fa-expand"></i>
+              <span class="hidden md:inline">全螢幕</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="mt-4 text-xs text-red-500 flex items-center gap-1.5">
@@ -252,24 +311,18 @@
 
   </main>
 
-  <!-- ===================================================================== -->
-  <!-- JavaScript 邏輯控制腳本                                               -->
-  <!-- ===================================================================== -->
+  <!-- JavaScript 邏輯控制腳本 -->
   <script>
-    // ------------------------------------------------------------------------
-    // 1. 全域變數配置 (請填入您的 GAS Web App URL 與 API Key)
-    // ------------------------------------------------------------------------
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec"; 
-    const API_KEY = "CHANGE_EDUCATION";
+    const GAS_API_URL = "YOUR_GAS_WEB_APP_URL_HERE"; 
+    const API_KEY = "YOUR_SECRET_API_KEY_HERE";
 
     let ytPlayerInstance = null;
     let isApiReady = false;
     let pendingVideoId = null;
+    let updateTimer = null;
     let timeoutTimer = null;
 
-    // ------------------------------------------------------------------------
-    // 2. YouTube Player API 就緒回調函式 (YouTube 官方約定 API 名稱)
-    // ------------------------------------------------------------------------
+    // 1. YouTube API 就緒後觸發
     function onYouTubeIframeAPIReady() {
       isApiReady = true;
       if (pendingVideoId) {
@@ -277,29 +330,91 @@
       }
     }
 
-    // 動態建立 API 播放器實例
+    // 2. 建立播放器實例 (原生控制項 controls=0 完全關閉，由 API 自訂外置控制條操控)
     function createYouTubePlayer(videoId) {
       ytPlayerInstance = new YT.Player('yt-player-container', {
         videoId: videoId,
         playerVars: {
-          'autoplay': 1,        // 自動開始播放
-          'controls': 1,        // 顯示原生控制條 (倍速、進度條)
-          'fs': 0,              // 隱藏原生全螢幕按鈕 (改用我們頁面的全螢幕)
-          'rel': 0,             // 結束時只推薦同頻道影片
-          'modestbranding': 1,  // 隱藏顯眼 Logo
-          'disablekb': 0,       // 啟用鍵盤操作
-          'iv_load_policy': 3,  // 關閉影片註解
-          'cc_load_policy': 0   // 預設關閉字幕
+          'autoplay': 1,
+          'controls': 0,        // 完全關閉原生物件控制列 (避免出現標題與 Logo)
+          'fs': 0,              // 停用原生全螢幕
+          'rel': 0,             // 關閉相關影片
+          'modestbranding': 1,
+          'disablekb': 0,       // 仍允許鍵盤操控
+          'iv_load_policy': 3
         },
         events: {
-          'onReady': (event) => event.target.playVideo()
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
         }
       });
     }
 
-    // ------------------------------------------------------------------------
-    // 3. Web Audio API 音效系統
-    // ------------------------------------------------------------------------
+    function onPlayerReady(event) {
+      event.target.playVideo();
+      startProgressLoop();
+    }
+
+    function onPlayerStateChange(event) {
+      const btnIcon = document.getElementById('play-pause-btn').querySelector('i');
+      if (event.data === YT.PlayerState.PLAYING) {
+        btnIcon.className = 'fa-solid fa-pause';
+      } else {
+        btnIcon.className = 'fa-solid fa-play';
+      }
+    }
+
+    // 3. 自訂控制條 API 操作邏輯
+    function togglePlayPause() {
+      if (!ytPlayerInstance || !ytPlayerInstance.getPlayerState) return;
+      const state = ytPlayerInstance.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        ytPlayerInstance.pauseVideo();
+      } else {
+        ytPlayerInstance.playVideo();
+      }
+    }
+
+    function changePlaybackSpeed(rate) {
+      if (ytPlayerInstance && ytPlayerInstance.setPlaybackRate) {
+        ytPlayerInstance.setPlaybackRate(parseFloat(rate));
+      }
+    }
+
+    function handleSeek(percent) {
+      if (!ytPlayerInstance || !ytPlayerInstance.getDuration) return;
+      const duration = ytPlayerInstance.getDuration();
+      const targetTime = (percent / 100) * duration;
+      ytPlayerInstance.seekTo(targetTime, true);
+    }
+
+    // 4. 定時即時更新進度條與播放時間
+    function startProgressLoop() {
+      if (updateTimer) clearInterval(updateTimer);
+
+      updateTimer = setInterval(() => {
+        if (!ytPlayerInstance || !ytPlayerInstance.getCurrentTime) return;
+
+        const currentTime = ytPlayerInstance.getCurrentTime() || 0;
+        const duration = ytPlayerInstance.getDuration() || 0;
+
+        if (duration > 0) {
+          const percent = (currentTime / duration) * 100;
+          document.getElementById('seek-bar').value = percent;
+          document.getElementById('current-time').textContent = formatTime(currentTime);
+          document.getElementById('duration-time').textContent = formatTime(duration);
+        }
+      }, 500);
+    }
+
+    function formatTime(seconds) {
+      const sec = Math.floor(seconds);
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // 5. Web Audio API 音效系統
     function playSystemBeep(frequency = 440, type = 'sine', duration = 0.1) {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -318,25 +433,23 @@
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + duration);
       } catch (e) {
-        console.warn("Audio output blocked or unsupported");
+        console.warn("Audio disabled or blocked");
       }
     }
 
-    // ------------------------------------------------------------------------
-    // 4. Alert 動態提示看板控制
-    // ------------------------------------------------------------------------
+    // 6. Alert 訊息處理
     function showAlertMessage(message, type) {
       const alertEl = document.getElementById('msg-alert');
       alertEl.className = 'mt-4 p-3 rounded-lg text-sm text-center font-medium border ';
 
       if (type === 'error') {
         alertEl.classList.add('bg-red-50', 'text-red-600', 'border-red-200');
-        playSystemBeep(220, 'square', 0.25); // 低音錯誤警示
+        playSystemBeep(220, 'square', 0.25);
       } else if (type === 'loading') {
         alertEl.classList.add('bg-blue-50', 'text-blue-600', 'border-blue-200');
       } else if (type === 'success') {
         alertEl.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
-        playSystemBeep(880, 'sine', 0.15); // 高音成功音效
+        playSystemBeep(880, 'sine', 0.15);
       } else if (type === 'warn') {
         alertEl.classList.add('bg-amber-50', 'text-amber-600', 'border-amber-200');
       }
@@ -344,9 +457,7 @@
       alertEl.textContent = message;
     }
 
-    // ------------------------------------------------------------------------
-    // 5. 登入表單 POST 驗證處理
-    // ------------------------------------------------------------------------
+    // 7. 登入表單提交驗證
     async function handleLoginSubmit(event) {
       event.preventDefault();
 
@@ -363,23 +474,20 @@
         return;
       }
 
-      // UI 載入鎖定
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>連線驗證中...</span>';
       accInput.disabled = true;
       pwdInput.disabled = true;
 
       showAlertMessage('正在連線驗證，請稍候...', 'loading');
-      statusText.textContent = '伺服器連線中...';
+      statusText.textContent = '伺服器驗證中...';
 
-      // 15 秒防逾時提示
       timeoutTimer = setTimeout(() => {
-        showAlertMessage('伺服器回應較慢，請確認網路狀況', 'warn');
-        statusText.textContent = '等待連線回應中...';
+        showAlertMessage('伺服器回應較慢，請確認網路連線', 'warn');
+        statusText.textContent = '等待回應中...';
       }, 15000);
 
       try {
-        // 發送 POST 請求至 GAS (必須加上 redirect: "follow")
         const response = await fetch(GAS_API_URL, {
           method: 'POST',
           redirect: 'follow',
@@ -400,13 +508,11 @@
           statusText.textContent = '驗證通過';
 
           setTimeout(() => {
-            // 切換視窗卡片
             document.getElementById('login-card').classList.add('hidden');
             document.getElementById('player-card').classList.remove('hidden');
 
             document.getElementById('video-title').querySelector('span').textContent = result.data.name;
 
-            // 觸發 API 動態渲染播放器
             const ytId = result.data.ytId;
             if (isApiReady) {
               createYouTubePlayer(ytId);
@@ -429,7 +535,6 @@
       }
     }
 
-    // 重置表單狀態
     function resetFormInputs() {
       const accInput = document.getElementById('account-input');
       const pwdInput = document.getElementById('password-input');
@@ -442,24 +547,16 @@
       accInput.focus();
     }
 
-    // ------------------------------------------------------------------------
-    // 6. 全頁強效安全防護 (防右鍵、防抄襲、防開發者工具)
-    // ------------------------------------------------------------------------
+    // 8. 全頁防右鍵與防快捷鍵
     document.addEventListener('contextmenu', (e) => e.preventDefault());
-
     document.addEventListener('keydown', (e) => {
       const key = e.key.toLowerCase();
-      // 阻擋 F12 開發者工具
       if (e.key === 'F12') e.preventDefault();
-      // 阻擋 Ctrl+Shift+I / J / C
       if (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(key)) e.preventDefault();
-      // 阻擋 Ctrl+C, Ctrl+U, Ctrl+S, Ctrl+P
       if (e.ctrlKey && ['c', 'u', 's', 'p', 'a'].includes(key)) e.preventDefault();
     });
 
-    // ------------------------------------------------------------------------
-    // 7. 自訂 DOM 全螢幕機制
-    // ------------------------------------------------------------------------
+    // 9. 自訂全螢幕機制
     function toggleCardFullscreen() {
       const card = document.getElementById('player-card');
       if (!document.fullscreenElement) {
@@ -469,7 +566,6 @@
       }
     }
 
-    // 頁面初始化 Focusing
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('account-input').focus();
     });
