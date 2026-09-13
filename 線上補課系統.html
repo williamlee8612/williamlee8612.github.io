@@ -252,7 +252,7 @@
           <i class="fa-solid fa-user-lock"></i>
         </div>
         <h2 class="text-2xl font-bold text-slate-800">學生身份驗證</h2>
-        <p class="text-sm text-slate-500 mt-1">請輸入您的補課帳號與密碼</p>
+        <p class="text-sm text-slate-500 mt-1">請輸入補課帳號與密碼</p>
       </div>
 
       <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
@@ -279,14 +279,14 @@
     <!-- 2. 播放器卡片 (登入驗證通過後顯示) -->
     <div id="player-card" class="player-card hidden">
       
-      <!-- 頂部資訊列：標題與版權警語橫向單行併排 -->
+      <!-- 頂部資訊列 -->
       <div class="header-info-group mb-2.5 flex items-center justify-between gap-3 flex-shrink-0">
         <h1 id="video-title" class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 truncate">
           <i class="fa-solid fa-circle-play text-[#1E468A]"></i>
           <span class="truncate">課程載入中...</span>
         </h1>
 
-        <!-- 右側橫向精簡版權警語標籤 -->
+        <!-- 右側橫向警語標籤 -->
         <div class="bg-red-50 text-red-600 border border-red-200 rounded px-2.5 py-1 text-xs font-semibold flex items-center gap-1.5 shrink-0">
           <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
           <span>承智補習班版權所有，禁止翻拍</span>
@@ -344,8 +344,8 @@
 
   <!-- JavaScript 控制腳本 -->
   <script>
-    const GAS_API_URL = "YOUR_GAS_WEB_APP_URL_HERE"; 
-    const API_KEY = "YOUR_SECRET_API_KEY_HERE";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec"; 
+    const API_KEY = "CHANGE_EDUCATION";
 
     let ytPlayerInstance = null;
     let isApiReady = false;
