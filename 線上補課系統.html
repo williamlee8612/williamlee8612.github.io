@@ -45,22 +45,21 @@
       background-color: #FFFFFF;
       border: 1px solid #E2E8F0;
       border-radius: 10px;
-      padding: 32px 28px;
+      padding: 36px 32px;
       width: 100%;
       max-width: 420px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
-    /* 播放器卡片容器 (.player-card) - 單頁滿版伸縮 */
+    /* 播放器卡片容器 (.player-card) - 優化比例自適應 */
     .player-card {
       background-color: #FFFFFF;
       border: 1px solid #E2E8F0;
       border-radius: 10px;
-      padding: 20px;
+      padding: 20px 24px;
       width: 100%;
-      max-width: 1200px;
-      height: 100%;
-      max-height: calc(100vh - 92px);
+      max-width: 960px;
+      max-height: calc(100vh - 84px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       display: flex;
       flex-direction: column;
@@ -101,15 +100,14 @@
       box-shadow: 0 0 0 3px rgba(30, 70, 138, 0.15);
     }
 
-    /* 播放器包覆區域 */
+    /* 16:9 比例播放器包覆區域 */
     .player-wrap {
       position: relative;
       width: 100%;
-      flex: 1;
+      padding-top: 56.25%; /* 標準 16:9 比例 */
       background-color: #000000;
       border-radius: 8px 8px 0 0;
       overflow: hidden;
-      min-height: 240px;
     }
 
     .player-wrap iframe, .player-wrap #yt-player-container {
@@ -139,8 +137,8 @@
       right: 16px;
       z-index: 15;
       pointer-events: none;
-      background-color: rgba(0, 0, 0, 0.5);
-      color: rgba(255, 255, 255, 0.85);
+      background-color: rgba(0, 0, 0, 0.55);
+      color: rgba(255, 255, 255, 0.9);
       padding: 5px 14px;
       border-radius: 6px;
       font-size: 13px;
@@ -201,6 +199,8 @@
 
     .player-card:fullscreen .player-wrap {
       border-radius: 0 !important;
+      flex: 1;
+      padding-top: 0 !important;
     }
 
     .player-card:fullscreen .custom-controls-bar {
@@ -208,8 +208,7 @@
       padding: 16px 24px !important;
     }
 
-    .player-card:fullscreen .border-b,
-    .player-card:fullscreen .text-red-500 {
+    .player-card:fullscreen .header-info-group {
       display: none !important;
     }
   </style>
@@ -224,13 +223,14 @@
     </div>
 
     <div class="flex items-center gap-4 text-sm">
-      <!-- 登入前系統狀態 -->
-      <div id="status-indicator" class="text-slate-200 flex items-center gap-2">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-        <span>系統運作正常</span>
+      <!-- 整合後的動態狀態燈標籤 -->
+      <div id="system-status-badge" class="text-slate-200 flex items-center gap-2 bg-blue-900/50 px-3 py-1 rounded-full border border-blue-400/30">
+        <span id="status-dot" class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+        <span id="status-badge-text" class="text-xs font-medium">系統就緒</span>
       </div>
+
       <!-- 登入後顯示：登出按鈕 (預設隱藏) -->
-      <button id="logout-btn" onclick="handleLogout()" class="hidden px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-md font-semibold transition flex items-center gap-1.5">
+      <button id="logout-btn" onclick="handleLogout()" class="hidden px-3.5 py-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-md text-xs font-semibold transition flex items-center gap-1.5">
         <i class="fa-solid fa-right-from-bracket"></i>
         <span>登出系統</span>
       </button>
@@ -238,7 +238,7 @@
   </header>
 
   <!-- 主內容區域 (單頁免滾動 flex-1) -->
-  <main class="flex-1 flex items-center justify-center p-3 md:p-6 overflow-hidden">
+  <main class="flex-1 flex items-center justify-center p-4 overflow-hidden">
 
     <!-- 1. 學生補課登入卡片 -->
     <div id="login-card" class="login-card">
@@ -269,19 +269,23 @@
 
       <!-- 訊息提示 Banner -->
       <div id="msg-alert" class="hidden mt-4 p-3 rounded-lg text-sm text-center font-medium"></div>
-
-      <div class="text-xs text-slate-500 mt-5 pt-3 border-t border-slate-200 text-center">
-        <i class="fa-solid fa-info-circle mr-1"></i><span id="status-text">系統就緒，請輸入帳號密碼</span>
-      </div>
     </div>
 
     <!-- 2. 播放器卡片 (登入驗證通過後顯示) -->
     <div id="player-card" class="player-card hidden">
-      <div class="pb-3 mb-3 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
-        <h1 id="video-title" class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-3">
+      
+      <!-- 頂部資訊群組 (包含影片標題與強化版版權警語) -->
+      <div class="header-info-group mb-3 space-y-2 flex-shrink-0">
+        <h1 id="video-title" class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2.5">
           <i class="fa-solid fa-circle-play text-[#1E468A]"></i>
           <span>課程載入中...</span>
         </h1>
+
+        <!-- 簡化並放大的顯眼版權警語區塊 -->
+        <div class="bg-red-50 text-red-600 border border-red-200 rounded-lg px-3.5 py-2 text-sm font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-red-500 text-base"></i>
+          <span>承智補習班版權所有，未經許可禁止錄影或轉發，違者依法追究。</span>
+        </div>
       </div>
 
       <!-- 影片播放區域與 100% 透明遮罩 -->
@@ -329,10 +333,6 @@
         </div>
       </div>
 
-      <div class="mt-2 text-xs text-red-500 flex items-center gap-1.5 flex-shrink-0">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <span>本課程影片為承智補習班版權所有，未經許可禁止錄影、擷取或轉發。</span>
-      </div>
     </div>
 
   </main>
@@ -349,7 +349,26 @@
     let timeoutTimer = null;
     let isLoggedIn = false;
 
-    // 1. YouTube API 就緒
+    // 1. Header 燈號狀態切換
+    function updateSystemBadge(text, type) {
+      const dot = document.getElementById('status-dot');
+      const textEl = document.getElementById('status-badge-text');
+      
+      textEl.textContent = text;
+      dot.className = 'inline-block w-2.5 h-2.5 rounded-full ';
+
+      if (type === 'success') {
+        dot.classList.add('bg-emerald-400');
+      } else if (type === 'loading') {
+        dot.classList.add('bg-amber-400', 'animate-ping');
+      } else if (type === 'error') {
+        dot.classList.add('bg-red-400');
+      } else {
+        dot.classList.add('bg-emerald-400');
+      }
+    }
+
+    // 2. YouTube API 就緒與建立
     function onYouTubeIframeAPIReady() {
       isApiReady = true;
       if (pendingVideoId) {
@@ -390,7 +409,7 @@
       }
     }
 
-    // 2. 自訂播放控制 logic
+    // 3. 自訂播放控制
     function togglePlayPause() {
       if (!ytPlayerInstance || !ytPlayerInstance.getPlayerState) return;
       const state = ytPlayerInstance.getPlayerState();
@@ -437,7 +456,7 @@
       return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
-    // 3. 音效與 Alert 模組
+    // 4. 音效與 Alert 模組
     function playSystemBeep(frequency = 440, type = 'sine', duration = 0.1) {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -478,14 +497,13 @@
       alertEl.textContent = message;
     }
 
-    // 4. 表單提交與登入邏輯
+    // 5. 登入處理邏輯
     async function handleLoginSubmit(event) {
       event.preventDefault();
 
       const accInput = document.getElementById('account-input');
       const pwdInput = document.getElementById('password-input');
       const submitBtn = document.getElementById('submit-btn');
-      const statusText = document.getElementById('status-text');
 
       const account = accInput.value.trim();
       const password = pwdInput.value.trim();
@@ -501,11 +519,10 @@
       pwdInput.disabled = true;
 
       showAlertMessage('正在連線驗證，請稍候...', 'loading');
-      statusText.textContent = '伺服器驗證中...';
+      updateSystemBadge('驗證連線中', 'loading');
 
       timeoutTimer = setTimeout(() => {
         showAlertMessage('伺服器回應較慢，請確認網路連線', 'warn');
-        statusText.textContent = '等待回應中...';
       }, 15000);
 
       try {
@@ -526,12 +543,13 @@
 
         if (result.success && result.data) {
           showAlertMessage('驗證成功！正在載入課程...', 'success');
-          statusText.textContent = '驗證通過';
+          updateSystemBadge('驗證通過', 'success');
           isLoggedIn = true;
 
           setTimeout(() => {
             document.getElementById('login-card').classList.add('hidden');
             document.getElementById('player-card').classList.remove('hidden');
+            document.getElementById('system-status-badge').classList.add('hidden');
             document.getElementById('logout-btn').classList.remove('hidden');
 
             document.getElementById('video-title').querySelector('span').textContent = result.data.name;
@@ -546,14 +564,14 @@
 
         } else {
           showAlertMessage(result.message || '驗證失敗', 'error');
-          statusText.textContent = '驗證失敗，請重新輸入';
+          updateSystemBadge('驗證失敗', 'error');
           resetFormInputs();
         }
 
       } catch (err) {
         clearTimeout(timeoutTimer);
         showAlertMessage('網路連線失敗，請檢查連線後重試', 'error');
-        statusText.textContent = '連線失敗';
+        updateSystemBadge('連線異常', 'error');
         resetFormInputs();
       }
     }
@@ -570,7 +588,7 @@
       accInput.focus();
     }
 
-    // 5. 登出處理邏輯
+    // 6. 登出處理邏輯
     function handleLogout() {
       if (updateTimer) clearInterval(updateTimer);
       if (ytPlayerInstance && ytPlayerInstance.destroy) {
@@ -581,16 +599,17 @@
       isLoggedIn = false;
       document.getElementById('player-card').classList.add('hidden');
       document.getElementById('logout-btn').classList.add('hidden');
+      document.getElementById('system-status-badge').classList.remove('hidden');
       document.getElementById('login-card').classList.remove('hidden');
 
       document.getElementById('account-input').value = '';
       document.getElementById('password-input').value = '';
       document.getElementById('msg-alert').className = 'hidden mt-4 p-3 rounded-lg text-sm text-center font-medium';
-      document.getElementById('status-text').textContent = '系統就緒，請輸入帳號密碼';
+      updateSystemBadge('系統就緒', 'success');
       resetFormInputs();
     }
 
-    // 6. 全頁防護與鍵盤快捷鍵控管
+    // 7. 全頁防護與鍵盤快捷鍵
     document.addEventListener('contextmenu', (e) => e.preventDefault());
 
     document.addEventListener('keydown', (e) => {
@@ -598,12 +617,10 @@
       const isInputFocus = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'SELECT');
       const key = e.key.toLowerCase();
 
-      // 防開發者工具與抄襲
       if (e.key === 'F12') e.preventDefault();
       if (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(key)) e.preventDefault();
       if (e.ctrlKey && ['c', 'u', 's', 'p', 'a'].includes(key)) e.preventDefault();
 
-      // 登入狀態下的播放鍵盤快捷鍵控制
       if (isLoggedIn && !isInputFocus && ytPlayerInstance) {
         if (e.code === 'Space') {
           e.preventDefault();
@@ -628,7 +645,7 @@
       }
     });
 
-    // 7. 自訂全螢幕機制
+    // 8. 自訂全螢幕機制
     function toggleCardFullscreen() {
       const card = document.getElementById('player-card');
       if (!document.fullscreenElement) {
