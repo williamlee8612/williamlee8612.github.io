@@ -1,40 +1,36 @@
-【補習班管理系統 - 專案開發規範】  
-架構：GitHub Pages (前端網頁) + GAS Web App (API 後端) + Google Sheets (多資料庫)。
+【補習班管理系統 - 專案開發規範】
 
-一、 視覺與版面規範 (Visual & Layout)
-1. 視覺色彩與材質：
-   - 預設「深藍專業風」：主配色深藍色 `#1E468A` (Header Bar、主要按鈕 `btn-custom-primary`、重點標籤)。
-   - 背景與卡片：頁面背景淺灰藍 `#F1F5F9`；卡片/容器純白 `#FFFFFF` 帶 1px 邊框 `#E2E8F0` 與 10px 圓角 (`rounded-[10px]`)。
-   - 文字階層：主要文字深灰 `#1E293B` / 次要文字中灰 `#64748B` / 警示紅 `#EF4444` / 提醒黃 `#F59E0B`。
-2. 跨平台防亂碼 (字體與圖示)：
-   - 圖示：統一引入 FontAwesome CDN (`<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">`)。
-   - 字體：統一宣告 Google Fonts Noto Sans TC，防止跨 OS (Windows/Mac/iOS/Android) 產生字型缺失或亂碼。
-3. 模組化獨立樣式 (Modular Style Rules - 重點要求)：
-   - 採用 Tailwind CSS (CDN) 進行開發。
-   - 每個 UI 容器 (如 `.header-bar`, `.search-card`, `.data-table`, `.action-btn`) 必須擁有明確且獨立的 CSS Class。
-   - **禁用 :root 全域變數控管細節**，所有的 margin, padding, font-size, color, border-radius 必須明確宣告在各元件自身的 Class 內，便於單獨微調而不影響全站。
-4. 版面結構 (Layout Structure)：
-   - Header Bar：深藍底白字置頂，左側顯示「[補習班名稱] | [子系統名稱]」，右側預留狀態/操作區。
-   - Main Content：使用 `.container` 支援 RWD 自動伸縮，內部依業務邏輯彈性採用數據卡片、表格、表單或混合版面。
+一、 前端視覺與 UI/UX 規範 (Frontend Spec)
+1. 配色主題庫 (Default：深藍專業風)：
+   - 深藍專業: 主色 `#1E468A` | 懸停 `#1E3A8A` | Header字 `#BFDBFE` | Focus `#3B82F6`
+   - 暖橙活力: 主色 `#EA580C` | 懸停 `#C2410C` | Header字 `#FED7AA` | Focus `#F97316`
+   - 翠綠親和: 主色 `#059669` | 懸停 `#047857` | Header字 `#A7F3D0` | Focus `#10B981`
+   - 極簡石墨: 主色 `#334155` | 懸停 `#1E293B` | Header字 `#CBD5E1` | Focus `#64748B`
+   - 通用材質: 背景 `#F1F5F9` | 卡片 `#FFFFFF` + 1px `#E2E8F0` + 圓角 10px (`rounded-[10px]`) + `shadow-sm`
+   - 文字階層: 主標/內文 `#1E293B` | 次要中灰 `#64748B` | 警示紅 `#EF4444` | 提醒黃 `#F59E0B`
+2. 資源引進 (防跨 OS 亂碼):
+   - FontAwesome 6.5.1 CDN
+   - Google Fonts: Noto Sans TC
+3. 樣式獨立原則 (禁用 :root 全域樣式):
+   - 使用 Tailwind CSS。每個 UI 容器需有獨立 Class，所有的參數都必須明確宣告於元件自身的 Class 中，利於單獨微調。
+   - 全程式碼需附帶繁體中文註解。
+4. 統一生態系版面結構:
+   - Header Bar: 置頂高 64px (`h-16`) 深藍底白字 `px-4 sm:px-6`。
+     * 左側: 字級 `text-[24px]`、字重 `font-[600]`，格式「[補習班名稱] | [子系統名稱]」。
+     * 右側: 狀態燈號 (如：🟢 系統連線中) + 特殊操作按鈕 (重整、音效開關、登出)。
+   - Main Content: 容器外框 `.container max-w-7xl mx-auto px-4 py-6 sm:px-6` 支援 RWD。
+   - Data Table: 隔行變色 (表頭深色 / 奇數白底 / 偶數 `#F8FAFC`)，帶 1px 邊框。
+   - 互動與防呆: Focus 亮主色邊框光暈；按鈕 Hover 微上浮 1-2px (`hover:-translate-y-0.5 transition-all shadow-md`)；支援 Enter 發送、送出後自動清空並 Focus 輸入框。
+   - 狀態反饋: 訊息 Alert 用圓角背景框 (成功淡綠底深綠字 `#ECFDF5/#047857` / 失敗淡紅底深紅字 `#FEF2F2/#B91C1C`)，重大異常彈出 `alert()`；
+   - 其他：無資料時於表格內直接輸出純文字提示；按鈕點擊顯示 Loading 轉圈
 
-二、 操作與音效機制 (Input & Audio)
-1. 鍵盤優先與防呆：表單 `Focus` 時呈現深藍邊框與光暈；支援 `Enter` 鍵觸發送出；送出成功後自動清空並自動聚焦 (Focus) 輸入框。
-2. 互動體驗：點擊按鈕切換 Loading 載入狀態；主要按鈕 Hover 時加深底色並帶輕微位移與陰影。
-3. 多模組音效系統：預設內建 Web Audio API 短嗶聲；預留使用者自訂雲端 MP3 / YouTube 網址背景播放機制。
-
-三、 GAS 後端與多檔案 API 規範 (.gs)
-1. 全域配置檔 (Config.gs)：
-   - 頂端宣告全域變數 `CONFIG`，統一管理 API Key、各 Google Sheet 檔案 ID 以及各分頁 (Tab) 名稱，預留後續更換檔案與重新命名的彈性。
-   - 範例格式：
-     `const CONFIG = { API_KEY: "...", SHEETS: { DB_STUDENT: { ID: "...", TAB_MAIN: "學生名冊" }, DB_ATTENDANCE: { ID: "...", TAB_LOGS: "打卡紀錄" } } };`
-2. 單一入口與多模組串接 (Code.gs & Sub-modules)：
-   - 統一以 `doPost(e)` 作為唯一的 Web App 進入點。
-   - 收到請求時先強烈驗證 `payload.apiKey`，驗證失敗安全回傳 403。
-   - 依 `payload.action` 透過 `switch` 分流轉發給各功能的專屬後端檔案 (如 `Attendance.gs`, `Calendar.gs` 中的處理函式)。
-3. 回應與時區處理：
-   - 統一回應格式：`{ success: boolean, data: {}, message: string }`。
-   - 時間統一使用 `GMT+8 yyyy-MM-dd HH:mm:ss` 格式化，所有後端邏輯必須包覆在 `try...catch` 區塊內。
-
-四、 前端網頁 API 串接規範 (.html)
-1. `fetch()` 發送 POST 請求至 GAS API 時，必須設定 `method: "POST"`、帶入 `apiKey` 與 `action` 參數，並務必加上 `redirect: "follow"` 處理 302 轉址。
-2. 一般提示訊息呈現在表單下方靜態文字 Alert，發生重大異常或系統限制時彈出 `alert()` 視窗。
+二、 後端與 API 規範 (Backend & API Protocol)
+1. 配置檔 (Config.gs):
+   - 宣告 `CONFIG = { API_KEY: "...", SHEETS: { DB_NAME: { ID: "...", TAB: "分頁名" } } }` 統整 ID 與分頁名。
+2. 進入點與路由 (Code.gs):
+   - 統一以 `doPost(e)` 為 Web App 唯一進入點。
+   - 優先驗證 `payload.apiKey`，失敗回傳 HTTP 403。依 `payload.action` 透過 `switch` 分流處理邏輯。
+   - 時間統一以 `GMT+8 yyyy-MM-dd HH:mm:ss` 格式化，全邏輯包覆於 `try...catch`。
+3. API 通訊協定:
+   - Request: 前端 `fetch(GAS_URL, { method: "POST", redirect: "follow", body: JSON.stringify({ apiKey, action, data }) })`
+   - Response: 後端統一回傳 JSON `{ success: boolean, data: object/array, message: string }`
