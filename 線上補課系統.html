@@ -165,9 +165,8 @@
     }
 
     /* 自訂進度條 Slider */
-    .custom-seekbar {
+    .custom-seekbar, .custom-volbar {
       -webkit-appearance: none;
-      width: 100%;
       height: 6px;
       border-radius: 3px;
       background: #334155;
@@ -175,18 +174,26 @@
       cursor: pointer;
     }
 
-    .custom-seekbar::-webkit-slider-thumb {
+    .custom-seekbar {
+      width: 100%;
+    }
+
+    .custom-volbar {
+      width: 70px;
+    }
+
+    .custom-seekbar::-webkit-slider-thumb, .custom-volbar::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       background: #3B82F6;
       cursor: pointer;
       transition: all 0.15s ease;
     }
 
-    .custom-seekbar::-webkit-slider-thumb:hover {
+    .custom-seekbar::-webkit-slider-thumb:hover, .custom-volbar::-webkit-slider-thumb:hover {
       transform: scale(1.2);
       background: #60A5FA;
     }
@@ -252,7 +259,7 @@
           <i class="fa-solid fa-user-lock"></i>
         </div>
         <h2 class="text-2xl font-bold text-slate-800">學生身份驗證</h2>
-        <p class="text-sm text-slate-500 mt-1">請輸入補課帳號與密碼</p>
+        <p class="text-sm text-slate-500 mt-1">請輸入您的補課帳號與密碼</p>
       </div>
 
       <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
@@ -279,14 +286,14 @@
     <!-- 2. 播放器卡片 (登入驗證通過後顯示) -->
     <div id="player-card" class="player-card hidden">
       
-      <!-- 頂部資訊列 -->
+      <!-- 頂部資訊列：標題與版權警語橫向單行併排 -->
       <div class="header-info-group mb-2.5 flex items-center justify-between gap-3 flex-shrink-0">
         <h1 id="video-title" class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 truncate">
           <i class="fa-solid fa-circle-play text-[#1E468A]"></i>
           <span class="truncate">課程載入中...</span>
         </h1>
 
-        <!-- 右側橫向警語標籤 -->
+        <!-- 右側橫向精簡版權警語標籤 -->
         <div class="bg-red-50 text-red-600 border border-red-200 rounded px-2.5 py-1 text-xs font-semibold flex items-center gap-1.5 shrink-0">
           <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
           <span>承智補習班版權所有，禁止翻拍</span>
@@ -304,22 +311,50 @@
 
       <!-- 專屬外置 API 控制列 -->
       <div class="custom-controls-bar">
+        <!-- 進度條 slider -->
         <input type="range" id="seek-bar" class="custom-seekbar" value="0" min="0" max="100" step="0.1" oninput="handleSeek(this.value)">
 
         <div class="flex items-center justify-between mt-0.5 text-xs md:text-sm">
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2.5 md:gap-3">
+            <!-- 播放 / 暫停按鈕 -->
             <button id="play-pause-btn" onclick="togglePlayPause()" class="w-7 h-7 md:w-8 md:h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition">
               <i class="fa-solid fa-play text-xs"></i>
             </button>
+
+            <!-- 時間顯示 -->
             <span class="font-mono text-slate-300 text-xs">
               <span id="current-time">00:00</span> / <span id="duration-time">00:00</span>
             </span>
+
+            <!-- 音量拉桿與靜音切換燈號 -->
+            <div class="flex items-center gap-1.5 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/80 ml-1">
+              <button onclick="toggleMute()" class="text-slate-300 hover:text-white transition w-4 text-center">
+                <i id="volume-icon" class="fa-solid fa-volume-high text-xs"></i>
+              </button>
+              <input type="range" id="volume-bar" class="custom-volbar hidden md:inline-block" value="100" min="0" max="100" oninput="handleVolumeChange(this.value)">
+              <!-- 音量顯示燈標籤 -->
+              <span id="volume-text-badge" class="text-[11px] font-mono text-blue-400 font-medium">100%</span>
+            </div>
           </div>
 
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2 md:gap-2.5">
+            <!-- 畫質切換選單與畫質顯示燈 -->
+            <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+              <i class="fa-solid fa-sliders text-xs text-slate-400"></i>
+              <select id="quality-select" onchange="changeVideoQuality(this.value)" class="bg-transparent text-white text-xs outline-none cursor-pointer">
+                <option value="auto" selected class="bg-slate-800">自動 (Auto)</option>
+                <option value="hd1080" class="bg-slate-800">1080p (高畫質)</option>
+                <option value="hd720" class="bg-slate-800">720p (高清)</option>
+                <option value="large" class="bg-slate-800">480p (標清)</option>
+                <option value="medium" class="bg-slate-800">360p (流暢)</option>
+              </select>
+              <!-- 畫質顯示燈標籤 -->
+              <span id="quality-text-badge" class="text-[10px] bg-blue-900/80 text-blue-300 px-1.5 py-0.5 rounded font-mono font-semibold border border-blue-500/40">AUTO</span>
+            </div>
+
+            <!-- 倍速切換選單 -->
             <div class="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
               <i class="fa-solid fa-gauge-high text-xs text-slate-400"></i>
-              <span class="text-slate-400 text-xs hidden md:inline">倍速:</span>
               <select id="speed-select" onchange="changePlaybackSpeed(this.value)" class="bg-transparent text-white text-xs outline-none cursor-pointer">
                 <option value="0.5" class="bg-slate-800">0.5x</option>
                 <option value="0.75" class="bg-slate-800">0.75x</option>
@@ -330,6 +365,7 @@
               </select>
             </div>
 
+            <!-- 全螢幕按鈕 -->
             <button onclick="toggleCardFullscreen()" class="px-2.5 py-0.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs text-white transition flex items-center gap-1">
               <i class="fa-solid fa-expand"></i>
               <span class="hidden md:inline">全螢幕</span>
@@ -344,8 +380,8 @@
 
   <!-- JavaScript 控制腳本 -->
   <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec"; 
-    const API_KEY = "CHANGE_EDUCATION";
+    const GAS_API_URL = "YOUR_GAS_WEB_APP_URL_HERE"; 
+    const API_KEY = "YOUR_SECRET_API_KEY_HERE";
 
     let ytPlayerInstance = null;
     let isApiReady = false;
@@ -353,6 +389,7 @@
     let updateTimer = null;
     let timeoutTimer = null;
     let isLoggedIn = false;
+    let lastVolume = 100;
 
     // 1. Header 燈號狀態切換
     function updateSystemBadge(text, type) {
@@ -391,11 +428,13 @@
           'rel': 0,
           'modestbranding': 1,
           'disablekb': 1,
-          'iv_load_policy': 3
+          'iv_load_policy': 3,
+          'playsinline': 1 // 行動裝置防護，防止被系統原生播放器接管
         },
         events: {
           'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
+          'onStateChange': onPlayerStateChange,
+          'onPlaybackQualityChange': onPlaybackQualityChange
         }
       });
     }
@@ -403,6 +442,7 @@
     function onPlayerReady(event) {
       event.target.playVideo();
       startProgressLoop();
+      updateVolumeDisplay(ytPlayerInstance.getVolume(), ytPlayerInstance.isMuted());
     }
 
     function onPlayerStateChange(event) {
@@ -414,7 +454,26 @@
       }
     }
 
-    // 3. 自訂播放控制
+    // 畫質改變事件觸發 (更新畫質顯示燈標籤)
+    function onPlaybackQualityChange(event) {
+      updateQualityBadge(event.data);
+    }
+
+    function updateQualityBadge(quality) {
+      const badge = document.getElementById('quality-text-badge');
+      const map = {
+        'hd1080': '1080p HD',
+        'hd720': '720p HD',
+        'large': '480p',
+        'medium': '360p',
+        'small': '240p',
+        'tiny': '144p',
+        'auto': 'AUTO'
+      };
+      badge.textContent = map[quality] || quality.toUpperCase();
+    }
+
+    // 3. 自訂播放與音量/畫質控制 API
     function togglePlayPause() {
       if (!ytPlayerInstance || !ytPlayerInstance.getPlayerState) return;
       const state = ytPlayerInstance.getPlayerState();
@@ -431,11 +490,69 @@
       }
     }
 
+    function changeVideoQuality(quality) {
+      if (ytPlayerInstance && ytPlayerInstance.setPlaybackQuality) {
+        ytPlayerInstance.setPlaybackQuality(quality);
+        updateQualityBadge(quality);
+      }
+    }
+
     function handleSeek(percent) {
       if (!ytPlayerInstance || !ytPlayerInstance.getDuration) return;
       const duration = ytPlayerInstance.getDuration();
       const targetTime = (percent / 100) * duration;
       ytPlayerInstance.seekTo(targetTime, true);
+    }
+
+    // 音量手動調整
+    function handleVolumeChange(val) {
+      if (!ytPlayerInstance || !ytPlayerInstance.setVolume) return;
+      const volume = parseInt(val, 10);
+      if (volume === 0) {
+        ytPlayerInstance.mute();
+      } else {
+        if (ytPlayerInstance.isMuted()) ytPlayerInstance.unMute();
+        ytPlayerInstance.setVolume(volume);
+        lastVolume = volume;
+      }
+      updateVolumeDisplay(volume, volume === 0);
+    }
+
+    // 一鍵切換靜音
+    function toggleMute() {
+      if (!ytPlayerInstance || !ytPlayerInstance.isMuted) return;
+      const volBar = document.getElementById('volume-bar');
+      if (ytPlayerInstance.isMuted()) {
+        ytPlayerInstance.unMute();
+        const restoreVol = lastVolume > 0 ? lastVolume : 50;
+        ytPlayerInstance.setVolume(restoreVol);
+        volBar.value = restoreVol;
+        updateVolumeDisplay(restoreVol, false);
+      } else {
+        ytPlayerInstance.mute();
+        volBar.value = 0;
+        updateVolumeDisplay(0, true);
+      }
+    }
+
+    // 即時更新音量顯示燈與 Icon
+    function updateVolumeDisplay(vol, isMuted) {
+      const icon = document.getElementById('volume-icon');
+      const badge = document.getElementById('volume-text-badge');
+
+      if (isMuted || vol === 0) {
+        icon.className = 'fa-solid fa-volume-xmark text-xs text-red-400';
+        badge.textContent = '靜音';
+        badge.className = 'text-[11px] font-mono text-red-400 font-medium';
+      } else {
+        if (vol > 50) {
+          icon.className = 'fa-solid fa-volume-high text-xs text-slate-300';
+        } else {
+          icon.className = 'fa-solid fa-volume-low text-xs text-slate-300';
+        }
+        badge.textContent = `${vol}%`;
+        badge.className = 'text-[11px] font-mono text-blue-400 font-medium';
+      }
     }
 
     function startProgressLoop() {
@@ -641,11 +758,17 @@
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
           const vol = ytPlayerInstance.getVolume() || 0;
-          ytPlayerInstance.setVolume(Math.min(100, vol + 10));
+          const nextVol = Math.min(100, vol + 10);
+          ytPlayerInstance.setVolume(nextVol);
+          document.getElementById('volume-bar').value = nextVol;
+          updateVolumeDisplay(nextVol, false);
         } else if (e.key === 'ArrowDown') {
           e.preventDefault();
           const vol = ytPlayerInstance.getVolume() || 0;
-          ytPlayerInstance.setVolume(Math.max(0, vol - 10));
+          const nextVol = Math.max(0, vol - 10);
+          ytPlayerInstance.setVolume(nextVol);
+          document.getElementById('volume-bar').value = nextVol;
+          updateVolumeDisplay(nextVol, nextVol === 0);
         }
       }
     });
