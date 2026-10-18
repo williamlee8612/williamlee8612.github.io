@@ -7,7 +7,7 @@ https://williamlee8612.github.io/讀卡成績系統
 https://williamlee8612.github.io/模擬考考程系統  
 備註：純網站
 
-https://williamlee8612.github.io/洞洞樂抽獎系統  
+https://williamlee8612.github.io/洞洞樂抽獎程式  
 備註：純網站
 
 ### 家長端  
