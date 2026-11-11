@@ -302,8 +302,8 @@
             <span>承智教育 | 讀卡成績系統</span>
         </div>
         <div class="header-status-area">
-            <i class="fa-solid fa-circle-check text-success"></i>
-            <span>閱卷引擎就緒</span>
+            <i id="dbStatusIcon" class="fa-solid fa-spinner fa-spin text-warning"></i>
+            <span id="dbStatusTxt">連線載入名冊中...</span>
         </div>
     </header>
 
@@ -370,16 +370,17 @@
                 <table class="omr-data-table">
                     <thead>
                         <tr>
-                            <th style="width: 8%; text-align: center;">序號</th>
-                            <th style="width: 14%;">學生學號</th>
-                            <th style="width: 32%;">原始作答明細</th>
-                            <th style="width: 32%;">成績單模式 (對: - / 錯: 原作答)</th>
+                            <th style="width: 6%; text-align: center;">序號</th>
+                            <th style="width: 12%;">學生學號</th>
+                            <th style="width: 12%;">學生姓名</th>
+                            <th style="width: 28%;">原始作答明細</th>
+                            <th style="width: 28%;">成績單模式 (對: - / 錯: 原作答)</th>
                             <th style="width: 14%; text-align: center;">答對題數 / 總題數</th>
                         </tr>
                     </thead>
                     <tbody id="resultTableBody">
                         <tr>
-                            <td colspan="5" class="txt-center text-secondary py-5">
+                            <td colspan="6" class="txt-center text-secondary py-5">
                                 <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
                                 請先上傳「標準答案卡」，再批次上傳「學生作答卡」開始閱卷。
                             </td>
@@ -398,6 +399,12 @@
     <script async src="https://docs.opencv.org/4.5.4/opencv.js" type="text/javascript"></script>
 
     <script>
+    // ── GAS API 設定區 ──
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec"; // 請替換為部署後的 Web App URL
+    const API_KEY = "CHANGE_EDUCATION"; // 請替換為 CONFIG 中設定的 API_KEY
+
+    let 學生名冊Map = {}; 
+
     const 標準寬 = 1000;
     const 標準高 = 1414;
 
@@ -422,6 +429,42 @@
         }
     };
 
+    // 頁面初始化：自動載入 Google Sheet 學生名冊
+    window.addEventListener('DOMContentLoaded', () => {
+        載入學生名冊();
+    });
+
+    async function 載入學生名冊() {
+        const icon = document.getElementById('dbStatusIcon');
+        const txt = document.getElementById('dbStatusTxt');
+
+        try {
+            const response = await fetch(GAS_API_URL, {
+                method: "POST",
+                redirect: "follow",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    apiKey: API_KEY,
+                    action: "getStudentMap"
+                })
+            });
+            const resData = await response.json();
+            
+            if (resData.success && resData.data) {
+                學生名冊Map = resData.data;
+                icon.className = "fa-solid fa-circle-check text-success";
+                txt.innerText = `名冊載入完成 (${Object.keys(學生名冊Map).length} 筆)`;
+            } else {
+                icon.className = "fa-solid fa-triangle-exclamation text-warning";
+                txt.innerText = "名冊無資料 (預設查無此人)";
+            }
+        } catch (err) {
+            console.error("載入學生名冊失敗:", err);
+            icon.className = "fa-solid fa-circle-xmark text-danger";
+            txt.innerText = "名冊連線失敗";
+        }
+    }
+
     document.getElementById('answerKeyInput').addEventListener('change', function(e) {
         if (e.target.files.length === 0) return;
         document.getElementById('ansStatusTxt').innerText = '(正在讀取分析中...)';
@@ -438,11 +481,11 @@
                     標準答案字串 = 識別結果.answers; 
                     document.getElementById('answerPreviewRow').style.display = 'flex';
                     document.getElementById('answerKeyPreview').innerText = 標準答案字串;
-                    document.getElementById('ansStatusTxt').innerText = '✓ 標準答案讀取成功';
+                    document.getElementById('ansStatusTxt').innerText = ' 標準答案讀取成功';
                     document.getElementById('ansStatusTxt').style.color = '#10B981';
                     document.getElementById('studentFileInput').disabled = false; 
                 } else {
-                    document.getElementById('ansStatusTxt').innerText = '✕ 定位失敗，請確認影像品質';
+                    document.getElementById('ansStatusTxt').innerText = ' 定位失敗，請確認影像品質';
                     document.getElementById('ansStatusTxt').style.color = '#EF4444';
                 }
             };
@@ -504,6 +547,13 @@
                         
                         let 前綴碼 = document.getElementById('idPrefixInput').value.padStart(2, '0');
                         學生作答.studentID = 前綴碼 + 學生作答.studentID; 
+
+                        // 名冊學號查驗與比對
+                        if (學生作答.studentID.includes("#") || 學生作答.studentID.includes("*")) {
+                            學生作答.studentName = "查無此人";
+                        } else {
+                            學生作答.studentName = 學生名冊Map[學生作答.studentID] || "查無此人";
+                        }
 
                         學生作答.serialNo = 學生卡流水序號; 
                         學生作答.reportModeString = 成績單模式陣列.join(""); 
@@ -693,6 +743,7 @@
         tr.innerHTML = `
             <td class="txt-center"><b>${data.serialNo}</b></td>
             <td><span class="txt-font-mono txt-student-id">${data.studentID}</span></td>
+            <td><span class="fw-bold text-dark">${data.studentName}</span></td>
             <td><span class="txt-font-mono txt-raw-answers">${data.answers}</span></td>
             <td><span class="txt-font-mono txt-report-mode">${data.reportModeString}</span></td>
             <td class="txt-center"><span class="txt-font-mono txt-score-highlight">${data.scoreString}</span></td>
@@ -707,6 +758,7 @@
         tr.innerHTML = `
             <td class="txt-center"><b>${serialNo}</b></td>
             <td style="color:#EF4444; font-weight:bold;"><i class="fa-solid fa-triangle-exclamation me-1"></i>辨識失敗</td>
+            <td style="color:#EF4444; font-weight:bold;">-</td>
             <td colspan="3" style="color:#94A3B8; font-style:italic;">影像邊界定位異常。請確認考卷四周黑框完整且無嚴重反光。</td>
         `;
         tableBody.appendChild(tr);
@@ -716,10 +768,10 @@
         if (全域成績資料庫.length === 0) return;
         
         let csvContent = "\uFEFF"; 
-        csvContent += "序號,原始檔名,學生學號,原始作答明細,成績單對照模式,答對題數,總題數\n";
+        csvContent += "序號,原始檔名,學生學號,學生姓名,原始作答明細,成績單對照模式,答對題數,總題數\n";
         
         全域成績資料庫.forEach(row => {
-            csvContent += `${row.serialNo},"${row.fileName}","${row.studentID}","${row.answers}","${row.reportModeString}",${row.correctCount},${row.totalCount}\n`;
+            csvContent += `${row.serialNo},"${row.fileName}","${row.studentID}","${row.studentName}","${row.answers}","${row.reportModeString}",${row.correctCount},${row.totalCount}\n`;
         });
         
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
