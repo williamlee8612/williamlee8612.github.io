@@ -37,4 +37,25 @@
 二、 後端極簡模組架構 (GAS)
 1. 兩段式直線架構 (無 Config 檔、無 API Key)：
    - 總機入口 (`Code.gs`)：
-     * 資料庫集中管理：頂端設 `const DB = { 鍵: { id: "Sheet_ID",
+     * 資料庫集中管理：頂端設 `const DB = { 鍵: { id: "Sheet_ID", tab: "分頁" } };`（前端嚴禁出現 ID）
+     * 健康檢查 (`doGet`)：回傳 `{ success: true, code: 200, message: "API 運作正常" }`
+     * 請求分流 (`doPost`)：內建 `LockService.getScriptLock()` 防並發衝突，透過 `actions` 字典物件直接呼叫對應函式
+   - 功能模組檔 (`[功能].gs`)：
+     * 撰寫獨立 `handleXxx(data)` 函式
+     * 產出時需明確標明要貼入 `Code.gs` (`DB` 與 `actions`) 的擴充程式碼
+
+3. 安全與讀寫效能：
+   - 個資最小化：後端篩選後只回傳前端必要欄位，嚴禁整表輸出
+   - 批次讀寫：嚴禁在迴圈內單格讀寫，一律使用 `getValues()` / `setValues()` / `appendRow()`
+   - 統一格式：回傳 `{ success, code, data, message, timestamp }`（時區 `GMT+8 yyyy-MM-dd HH:mm:ss`）
+   - 錯誤捕捉：全邏輯包覆於 `try...catch...finally`
+
+三、 前後端 API 串接協定
+1. 前端請求 (避開 CORS 預檢)：
+   - `fetch(GAS_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, redirect: "follow", body: JSON.stringify({ action, data }) })`
+2. 狀態碼分流處理：
+   - `code === 200`：顯示靜態成功 Alert
+   - `code === 400 / 404`：顯示靜態警告 Alert
+   - `code === 500` 或網路異常：彈出 `alert()` 視窗並更新 Header 狀態燈號
+
+【任務目標】：撰寫 [請填入功能名稱] 的前端 HTML、後端 `[功能].gs`，並列出需貼入 `Code.gs` 的擴充程式碼。
