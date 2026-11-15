@@ -100,12 +100,12 @@
             transform: none;
         }
 
-        /* ── 主內容寬螢幕自適應容器 (.main-container) ── */
+        /* ── 主內容寬螢幕自適應容器 (.main-container，放寬至 98%) ── */
         .main-container {
-            width: 96%;
-            max-width: 1720px;
+            width: 98%;
+            max-width: 1920px;
             margin: 0 auto;
-            padding: 20px 8px;
+            padding: 20px 4px;
             flex: 1;
         }
 
@@ -148,6 +148,32 @@
             padding: 20px 24px;
             margin-bottom: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        /* 雙欄對齊網格：確保 步驟1/步驟3 上下對齊、步驟2/步驟4 上下對齊 */
+        .omr-steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px 32px;
+            align-items: center;
+        }
+
+        @media (min-width: 1180px) {
+            .omr-steps-grid {
+                grid-template-columns: 1.05fr 1fr;
+            }
+        }
+
+        .omr-step-cell {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 16px;
+        }
+
+        .omr-step-cell-bottom {
+            padding-top: 14px;
+            border-top: 1px solid #E2E8F0;
         }
 
         /* 步驟區塊標題徽章 */
@@ -246,7 +272,7 @@
             color: #FFFFFF;
             border: none;
             border-radius: 8px;
-            padding: 9px 18px;
+            padding: 8px 18px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -276,7 +302,7 @@
             color: #475569;
             border: 1px solid #CBD5E1;
             border-radius: 8px;
-            padding: 8px 16px;
+            padding: 7px 16px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -442,64 +468,58 @@
         </div>
     </header>
 
-    <!-- 主內容區（自適應寬螢幕容器） -->
+    <!-- 主內容區（自適應寬螢幕容器 98%） -->
     <main class="main-container">
 
         <!-- 靜態系統訊息提示區（預設隱藏，依狀態顯示成功或警告 Alert） -->
         <div id="systemAlertContainer" style="display: none;"></div>
 
-        <!-- 閱卷控制台卡片（四步驟統一動線） -->
+        <!-- 閱卷控制台卡片（四步驟上下對齊網格） -->
         <section class="omr-control-card">
-            <div class="flex flex-col gap-4">
+            <div class="omr-steps-grid">
 
-                <!-- 上排：步驟 1（考試設定） + 步驟 2（標準答案卡） -->
-                <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                <!-- 左上：步驟 1（考試設定） -->
+                <div class="omr-step-cell">
+                    <span class="step-badge-title">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>步驟 1｜考試設定</span>
+                    </span>
 
-                    <!-- 步驟 1：考試設定 -->
-                    <div class="flex flex-wrap items-center gap-4">
-                        <span class="step-badge-title">
-                            <i class="fa-solid fa-sliders"></i>
-                            <span>步驟 1｜考試設定</span>
-                        </span>
-
-                        <div class="flex items-center gap-2">
-                            <label for="totalQuestionsInput" class="control-item-label">
-                                <i class="fa-solid fa-list-ol text-[#1E468A]"></i>
-                                <span>考試題數：</span>
-                            </label>
-                            <input type="number" id="totalQuestionsInput" class="omr-number-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                            <span class="text-[13px] font-semibold text-[#64748B]">題</span>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <label for="idPrefixInput" class="control-item-label">
-                                <i class="fa-solid fa-id-badge text-[#1E468A]"></i>
-                                <span>學號前綴 (2碼)：</span>
-                            </label>
-                            <input type="text" id="idPrefixInput" class="omr-number-input" maxlength="2" placeholder="00" value="00" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                        </div>
+                    <div class="flex items-center gap-2">
+                        <label for="totalQuestionsInput" class="control-item-label">
+                            <i class="fa-solid fa-list-ol text-[#1E468A]"></i>
+                            <span>考試題數：</span>
+                        </label>
+                        <input type="number" id="totalQuestionsInput" class="omr-number-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                        <span class="text-[13px] font-semibold text-[#64748B]">題</span>
                     </div>
 
-                    <div class="hidden xl:block h-6 w-[1px] bg-[#E2E8F0]"></div>
-
-                    <!-- 步驟 2：標準答案卡 -->
-                    <div class="flex flex-wrap items-center gap-3 flex-1">
-                        <span class="step-badge-title">
-                            <i class="fa-solid fa-key"></i>
-                            <span>步驟 2｜標準答案</span>
-                        </span>
-
-                        <label for="answerKeyInput" class="control-item-label">
-                            <i class="fa-solid fa-file-arrow-up text-[#1E468A]"></i>
-                            <span>上傳答案卡：</span>
+                    <div class="flex items-center gap-2">
+                        <label for="idPrefixInput" class="control-item-label">
+                            <i class="fa-solid fa-id-badge text-[#1E468A]"></i>
+                            <span>學號前綴 (2碼)：</span>
                         </label>
-                        <input type="file" id="answerKeyInput" class="omr-file-input" accept="image/*" disabled>
-                        <span id="ansStatusTxt" class="text-[13px] font-semibold text-[#64748B]">請稍候...</span>
+                        <input type="text" id="idPrefixInput" class="omr-number-input" maxlength="2" placeholder="00" value="00" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                     </div>
                 </div>
 
-                <!-- 標準答案預覽列（讀取成功後自動展開，同樣採每 10 題間隔、50 題換行排版） -->
-                <div id="answerPreviewRow" class="flex flex-col sm:flex-row sm:items-center gap-3 pt-3 border-t border-dashed border-[#E2E8F0]" style="display: none;">
+                <!-- 右上：步驟 2（標準答案，與下方步驟 4 垂直對齊） -->
+                <div class="omr-step-cell">
+                    <span class="step-badge-title">
+                        <i class="fa-solid fa-key"></i>
+                        <span>步驟 2｜標準答案</span>
+                    </span>
+
+                    <label for="answerKeyInput" class="control-item-label">
+                        <i class="fa-solid fa-file-arrow-up text-[#1E468A]"></i>
+                        <span>上傳答案卡：</span>
+                    </label>
+                    <input type="file" id="answerKeyInput" class="omr-file-input" accept="image/*" disabled>
+                    <span id="ansStatusTxt" class="text-[13px] font-semibold text-[#64748B]">請稍候...</span>
+                </div>
+
+                <!-- 中間橫跨列：標準答案預覽（讀取成功後自動展開，採每 10 題間隔、50 題換行排版） -->
+                <div id="answerPreviewRow" class="col-span-full flex flex-col sm:flex-row sm:items-center gap-3 pt-3 border-t border-dashed border-[#E2E8F0]" style="display: none;">
                     <span class="control-item-label" style="color: #047857;">
                         <i class="fa-solid fa-circle-check"></i>
                         <span>標準答案預覽：</span>
@@ -507,42 +527,37 @@
                     <div id="answerKeyPreview" class="omr-preview-box">尚未讀取標準答案</div>
                 </div>
 
-                <!-- 下排：步驟 3（批量作答卡） + 步驟 4（報表匯出與清空重設） -->
-                <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#E2E8F0]">
+                <!-- 左下：步驟 3（學生閱卷，與上方步驟 1 垂直對齊） -->
+                <div class="omr-step-cell omr-step-cell-bottom">
+                    <span class="step-badge-title">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>步驟 3｜學生閱卷</span>
+                    </span>
 
-                    <!-- 步驟 3：學生閱卷 -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="step-badge-title">
-                            <i class="fa-solid fa-copy"></i>
-                            <span>步驟 3｜學生閱卷</span>
-                        </span>
+                    <label for="studentFileInput" class="control-item-label">
+                        <i class="fa-solid fa-images text-[#1E468A]"></i>
+                        <span>批量上傳作答卡：</span>
+                    </label>
+                    <input type="file" id="studentFileInput" class="omr-file-input" accept="image/*" multiple disabled>
+                    <span id="importProgressTxt" class="text-[13px] font-bold text-[#047857]" style="display: none;"></span>
+                </div>
 
-                        <label for="studentFileInput" class="control-item-label">
-                            <i class="fa-solid fa-images text-[#1E468A]"></i>
-                            <span>批量上傳作答卡：</span>
-                        </label>
-                        <input type="file" id="studentFileInput" class="omr-file-input" accept="image/*" multiple disabled>
-                        <span id="importProgressTxt" class="text-[13px] font-bold text-[#047857]" style="display: none;"></span>
-                    </div>
+                <!-- 右下：步驟 4（報表操作，與上方步驟 2 垂直對齊） -->
+                <div class="omr-step-cell omr-step-cell-bottom">
+                    <span class="step-badge-title">
+                        <i class="fa-solid fa-file-export"></i>
+                        <span>步驟 4｜報表操作</span>
+                    </span>
 
-                    <!-- 步驟 4：報表操作（匯出 CSV + 清空重設） -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="step-badge-title">
-                            <i class="fa-solid fa-file-export"></i>
-                            <span>步驟 4｜報表操作</span>
-                        </span>
+                    <button id="btnExport" type="button" class="btn-omr-primary" onclick="匯出成績單CSV()" disabled>
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>匯出成績單 (CSV)</span>
+                    </button>
 
-                        <button id="btnExport" type="button" class="btn-omr-primary" onclick="匯出成績單CSV()" disabled>
-                            <i class="fa-solid fa-file-csv"></i>
-                            <span>匯出成績單 (CSV)</span>
-                        </button>
-
-                        <button id="btnResetAll" type="button" class="btn-omr-secondary" onclick="清空重設系統()" title="清除目前答案卡與所有閱卷結果並恢復預設值">
-                            <i class="fa-solid fa-trash-can-arrow-up"></i>
-                            <span>清空重設</span>
-                        </button>
-                    </div>
-
+                    <button id="btnResetAll" type="button" class="btn-omr-secondary" onclick="清空重設系統()" title="清除目前答案卡與所有閱卷結果並恢復預設值">
+                        <i class="fa-solid fa-trash-can-arrow-up"></i>
+                        <span>清空重設</span>
+                    </button>
                 </div>
 
             </div>
