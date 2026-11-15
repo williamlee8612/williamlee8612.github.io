@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>承智教育 | 讀卡成績系統</title>
-    
-    <!-- 1. CSS 框架: Bootstrap 5.3 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- 2. 圖示庫: FontAwesome 6.4 CDN -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- 3. 原生內部 CSS (獨立模組，嚴禁使用 :root 全域變數) -->
+    <!-- 1. 字體引入：Google Fonts Noto Sans TC（防止跨作業系統中文字體顯示異常） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- 2. CSS 框架：Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 3. 圖示庫：FontAwesome 6.5.1 CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- 4. 原生獨立模組樣式（嚴禁使用 :root 全域變數，所有尺寸、顏色、間距皆明確宣告於獨立 Class） -->
     <style>
         /* 全局基底設定 */
         * {
@@ -20,7 +26,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #F1F5F9;
             color: #1E293B;
             min-height: 100vh;
@@ -30,141 +36,193 @@
             -webkit-user-select: none;
         }
 
-        /* ── 四、版面架構：Header Bar (.header-bar) ── */
+        /* ── 頂部導覽列 (.header-bar) ── */
         .header-bar {
             background-color: #1E468A;
             color: #FFFFFF;
-            height: 60px;
+            height: 64px;
             padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
-        .header-title-box {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .header-title-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFFFFF;
             letter-spacing: 0.5px;
-        }
-
-        .header-status-area {
-            font-size: 14px;
-            color: #E2E8F0;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
-        /* 主容器 */
+        .header-sub-badge {
+            font-size: 13px;
+            font-weight: 500;
+            color: #BFDBFE;
+            background-color: rgba(255, 255, 255, 0.12);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .header-action-btn {
+            background-color: rgba(255, 255, 255, 0.14);
+            color: #FFFFFF;
+            border: 1px solid rgba(191, 219, 254, 0.35);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .header-action-btn:hover {
+            background-color: #1E3A8A;
+            border-color: #BFDBFE;
+            transform: translateY(-1px);
+        }
+
+        .header-action-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── 主內容容器 (.main-container) ── */
         .main-container {
-            flex: 1;
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
             padding: 24px 16px;
+            flex: 1;
         }
 
-        /* ── 三、獨立模組：閱卷控制台卡片 (.omr-control-card) ── */
+        /* ── 提示訊息橫幅 (.system-alert-box) ── */
+        .system-alert-success {
+            background-color: #ECFDF5;
+            color: #047857;
+            border: 1px solid #A7F3D0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .system-alert-error {
+            background-color: #FEF2F2;
+            color: #B91C1C;
+            border: 1px solid #FECACA;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        /* ── 閱卷控制台卡片 (.omr-control-card) ── */
         .omr-control-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
-        .omr-step-block {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .omr-step-row {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .omr-section-title {
+        .omr-section-label {
             font-size: 15px;
             font-weight: 700;
             color: #1E468A;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
-            min-width: 140px;
+            gap: 8px;
+            white-space: nowrap;
         }
 
-        /* 答案預覽框 */
-        .omr-preview-box {
-            background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 14px;
-            letter-spacing: 1px;
-            color: #1E293B;
-            word-break: break-all;
-            flex: 1;
-        }
-
-        /* 五、表單元件 (.custom-input, .custom-file-input) */
-        .custom-input {
-            width: 90px;
+        /* ── 輸入框與檔案上傳元件 ── */
+        .omr-number-input {
+            width: 88px;
             padding: 8px 12px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: #1E293B;
             background-color: #FFFFFF;
-            border: 1px solid #E2E8F0;
+            border: 1px solid #CBD5E1;
             border-radius: 8px;
             text-align: center;
             outline: none;
             transition: all 0.2s ease;
         }
 
-        .custom-input:focus {
-            border-color: #1E468A;
-            box-shadow: 0 0 0 3px rgba(30, 70, 138, 0.15);
+        .omr-number-input:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        .custom-file-input {
+        .omr-file-input {
             font-size: 14px;
             color: #64748B;
+            max-width: 280px;
         }
 
-        .custom-file-input::-webkit-file-upload-button {
+        .omr-file-input::file-selector-button {
             background-color: #F8FAFC;
             border: 1px solid #CBD5E1;
-            border-radius: 6px;
-            padding: 6px 12px;
+            border-radius: 8px;
+            padding: 7px 14px;
             font-size: 13px;
             font-weight: 600;
             color: #1E293B;
             cursor: pointer;
-            transition: all 0.2s ease;
             margin-right: 10px;
+            transition: all 0.2s ease;
         }
 
-        .custom-file-input::-webkit-file-upload-button:hover {
+        .omr-file-input::file-selector-button:hover:not(:disabled) {
             background-color: #E2E8F0;
+            border-color: #94A3B8;
         }
 
-        .counter-badge {
+        .omr-file-input:disabled::file-selector-button {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ── 標準答案預覽框 (.omr-preview-box) ── */
+        .omr-preview-box {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 14px;
-            font-weight: 700;
-            color: #10B981;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: #1E293B;
+            word-break: break-all;
+            flex: 1;
         }
 
-        /* ── 五、按鈕規範 (.btn-custom-primary / .btn-custom-secondary) ── */
-        .btn-custom-primary {
+        /* ── 主操作按鈕 (.btn-omr-primary) ── */
+        .btn-omr-primary {
             background-color: #1E468A;
             color: #FFFFFF;
             border: none;
@@ -173,71 +231,45 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.2s ease;
         }
 
-        .btn-custom-primary:hover {
-            background-color: #163467;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(30, 70, 138, 0.2);
-            color: #FFFFFF;
+        .btn-omr-primary:hover:not(:disabled) {
+            background-color: #1E3A8A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(30, 70, 138, 0.22);
         }
 
-        .btn-custom-primary:disabled {
+        .btn-omr-primary:disabled {
             background-color: #94A3B8;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
-        .btn-custom-secondary {
-            background-color: #FFFFFF;
-            color: #1E293B;
-            border: 1px solid #CBD5E1;
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-custom-secondary:hover {
-            background-color: #F8FAFC;
-            border-color: #94A3B8;
-        }
-
-        /* ── 三、獨立模組：成績報表表格 (.omr-table-card, .omr-data-table) ── */
+        /* ── 成績報表卡片與表格 (.omr-table-card, .omr-data-table) ── */
         .omr-table-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
-        .table-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .table-card-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1E293B;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .omr-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
         }
 
         .omr-data-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 820px;
         }
 
         .omr-data-table th {
@@ -246,8 +278,9 @@
             font-size: 14px;
             font-weight: 700;
             padding: 12px 16px;
-            border-bottom: 2px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
             text-align: left;
+            white-space: nowrap;
         }
 
         .omr-data-table td {
@@ -257,165 +290,218 @@
             color: #1E293B;
         }
 
-        .omr-data-table tr:hover {
+        /* 表格隔行變色規範（奇數列白底 / 偶數列 #F8FAFC） */
+        .omr-data-table tbody tr:nth-child(odd) {
+            background-color: #FFFFFF;
+        }
+
+        .omr-data-table tbody tr:nth-child(even) {
             background-color: #F8FAFC;
         }
 
-        .txt-font-mono {
+        .omr-data-table tbody tr:hover {
+            background-color: #EFF6FF;
+        }
+
+        /* 識別異常列專屬底色 */
+        .omr-data-table tbody tr.row-scan-error {
+            background-color: #FEF2F2;
+        }
+
+        .txt-mono-code {
             font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             letter-spacing: 1px;
             word-break: break-all;
         }
 
-        .txt-student-id {
-            color: #1E468A;
-            font-weight: 700;
+        /* 隱藏灰階緩衝畫布 */
+        #grayBufferCanvas {
+            display: none;
         }
-
-        .txt-raw-answers {
-            color: #334155;
-        }
-
-        .txt-report-mode {
-            color: #64748B;
-            font-weight: 700;
-        }
-
-        .txt-score-highlight {
-            color: #EF4444;
-            font-weight: 800;
-            font-size: 15px;
-        }
-
-        .txt-center { text-align: center; }
-
-        /* 隱藏緩衝 Canvas */
-        #grayBufferCanvas { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- 四、版面架構：Header Bar -->
+    <!-- 頂部導覽列 (高 64px / 深藍專業底色) -->
     <header class="header-bar">
-        <div class="header-title-box">
-            <i class="fa-solid fa-file-circle-check"></i>
-            <span>承智教育 | 讀卡成績系統</span>
+        <div class="flex items-center gap-3">
+            <h1 class="header-title-text">
+                <i class="fa-solid fa-file-circle-check text-[#BFDBFE]"></i>
+                <span>承智教育 | 讀卡成績系統</span>
+            </h1>
+            <span id="cvStatusBadge" class="header-sub-badge hidden sm:inline-block">
+                <i class="fa-solid fa-spinner fa-spin mr-1"></i>視覺引擎載入中...
+            </span>
         </div>
-        <div class="header-status-area">
-            <i id="dbStatusIcon" class="fa-solid fa-spinner fa-spin text-warning"></i>
-            <span id="dbStatusTxt">連線載入名冊中...</span>
+
+        <div class="flex items-center gap-3">
+            <!-- 後端名冊連線狀態燈號 -->
+            <div class="flex items-center gap-2 text-[14px] text-[#BFDBFE]">
+                <i id="dbStatusIcon" class="fa-solid fa-spinner fa-spin text-[#F59E0B]"></i>
+                <span id="dbStatusTxt" class="hidden md:inline">系統連線中...</span>
+            </div>
+
+            <!-- 重整名冊按鈕 -->
+            <button id="btnRefreshRoster" type="button" class="header-action-btn" onclick="載入學生名冊(true)" title="重新從 Google Sheet 同步學生名冊">
+                <i id="refreshIcon" class="fa-solid fa-rotate"></i>
+                <span>重整名冊</span>
+            </button>
+
+            <!-- 音效開關按鈕 -->
+            <button id="btnToggleSound" type="button" class="header-action-btn" onclick="切換提示音效()" title="切換閱卷完成提示音效">
+                <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                <span id="soundTxt" class="hidden sm:inline">音效開</span>
+            </button>
         </div>
     </header>
 
     <!-- 主內容區 -->
-    <main class="main-container container-fluid">
-        
-        <!-- 閱卷控制台 -->
-        <div class="omr-control-card">
-            <div class="omr-step-block">
-                
-                <!-- 步驟 1 -->
-                <div class="omr-step-row">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="omr-section-title"><i class="fa-solid fa-1"></i> 考試題數：</span>
-                        <input type="number" id="totalQuestionsInput" class="custom-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                        <span class="text-secondary fw-semibold">題</span>
+    <main class="main-container">
+
+        <!-- 靜態系統訊息提示區（預設隱藏，依 API 狀態碼顯示成功或警告 Alert） -->
+        <div id="systemAlertContainer" style="display: none;"></div>
+
+        <!-- 閱卷控制台卡片 -->
+        <section class="omr-control-card">
+            <div class="flex flex-col gap-5">
+
+                <!-- 步驟 1：考試參數設定與標準答案卡上傳 -->
+                <div class="flex flex-wrap items-center gap-6">
+                    <!-- 考試題數 -->
+                    <div class="flex items-center gap-2">
+                        <span class="omr-section-label">
+                            <i class="fa-solid fa-circle-1"></i>
+                            <span>1. 考試題數：</span>
+                        </span>
+                        <input type="number" id="totalQuestionsInput" class="omr-number-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                        <span class="text-[14px] font-semibold text-[#64748B]">題</span>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2 ms-md-4">
-                        <span class="omr-section-title"><i class="fa-solid fa-hashtag"></i> 學號前綴 (2碼)：</span>
-                        <input type="text" id="idPrefixInput" class="custom-input" maxlength="2" placeholder="00" value="00" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                    <!-- 學號前綴 2 碼（與讀卡 4 碼組合成 6 碼查詢名冊） -->
+                    <div class="flex items-center gap-2">
+                        <span class="omr-section-label">
+                            <i class="fa-solid fa-hashtag"></i>
+                            <span>學號前綴 (2碼)：</span>
+                        </span>
+                        <input type="text" id="idPrefixInput" class="omr-number-input" maxlength="2" placeholder="00" value="00" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                     </div>
 
-                    <div class="d-flex align-items-center gap-2 flex-grow-1 ms-md-4">
-                        <span class="omr-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> 答案卡上傳：</span>
-                        <input type="file" id="answerKeyInput" class="custom-file-input" accept="image/*">
-                        <span id="ansStatusTxt" class="fw-bold text-secondary" style="font-size: 13px;">(等待上傳標準答案卡)</span>
+                    <!-- 標準答案卡上傳 -->
+                    <div class="flex flex-wrap items-center gap-3 flex-1">
+                        <span class="omr-section-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>答案卡上傳：</span>
+                        </span>
+                        <input type="file" id="answerKeyInput" class="omr-file-input" accept="image/*" disabled>
+                        <span id="ansStatusTxt" class="text-[13px] font-bold text-[#64748B]">(等待視覺引擎就緒)</span>
                     </div>
                 </div>
 
-                <!-- 答案預覽 -->
-                <div class="omr-step-row" id="answerPreviewRow" style="display: none; border-top: 1px dashed #E2E8F0; padding-top: 12px;">
-                    <span class="omr-section-title" style="color: #10B981;"><i class="fa-solid fa-bullseye"></i> 標準答案預覽：</span>
+                <!-- 標準答案預覽列（讀取成功後展開） -->
+                <div id="answerPreviewRow" class="flex flex-col sm:flex-row sm:items-center gap-3 pt-4 border-t border-dashed border-[#E2E8F0]" style="display: none;">
+                    <span class="omr-section-label" style="color: #047857;">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>標準答案預覽：</span>
+                    </span>
                     <div id="answerKeyPreview" class="omr-preview-box">尚未讀取標準答案</div>
                 </div>
 
-                <!-- 步驟 2 & 步驟 3 -->
-                <div class="omr-step-row justify-content-between" style="border-top: 1px solid #E2E8F0; padding-top: 16px;">
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="omr-section-title"><i class="fa-solid fa-2"></i> 批量作答卡：</span>
-                        <input type="file" id="studentFileInput" class="custom-file-input" accept="image/*" multiple disabled>
-                        <span id="importCounter" class="counter-badge" style="display: none;">已成功匯入：0 筆</span>
+                <!-- 步驟 2 & 步驟 3：批量學生作答卡上傳與匯出 CSV -->
+                <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="omr-section-label">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>2. 批量作答卡：</span>
+                        </span>
+                        <input type="file" id="studentFileInput" class="omr-file-input" accept="image/*" multiple disabled>
+                        <span id="importCounter" class="text-[14px] font-bold text-[#047857]" style="display: none;">已成功匯入：0 筆</span>
                     </div>
 
-                    <button id="btnExport" class="btn-custom-primary" onclick="匯出成績單CSV()" disabled>
+                    <button id="btnExport" type="button" class="btn-omr-primary" onclick="匯出成績單CSV()" disabled>
                         <i class="fa-solid fa-file-csv"></i>
-                        <span>步驟 3：匯出成績報表 (CSV)</span>
+                        <span>3. 匯出成績報表 (CSV)</span>
                     </button>
                 </div>
 
             </div>
-        </div>
+        </section>
 
         <!-- 成績報表表格區 -->
-        <div class="omr-table-card">
-            <div class="table-card-header">
-                <div class="table-card-title">
-                    <i class="fa-solid fa-table-list text-primary"></i>
+        <section class="omr-table-card">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <div class="flex items-center gap-2 text-[18px] font-bold text-[#1E293B]">
+                    <i class="fa-solid fa-table-list text-[#1E468A]"></i>
                     <span>學生閱卷計分報表</span>
                 </div>
+                <span class="text-[13px] text-[#64748B]">
+                    學號比對規則：前綴(2碼) + 讀卡學號(4碼) = 6碼查詢 Google Sheet B 欄並回傳 C 欄姓名
+                </span>
             </div>
 
-            <div class="table-responsive">
+            <div class="omr-table-wrapper">
                 <table class="omr-data-table">
                     <thead>
                         <tr>
-                            <th style="width: 6%; text-align: center;">序號</th>
-                            <th style="width: 12%;">學生學號</th>
-                            <th style="width: 12%;">學生姓名</th>
-                            <th style="width: 28%;">原始作答明細</th>
-                            <th style="width: 28%;">成績單模式 (對: - / 錯: 原作答)</th>
+                            <th style="width: 7%; text-align: center;">序號</th>
+                            <th style="width: 13%;">學生學號 (6碼)</th>
+                            <th style="width: 14%;">學生姓名</th>
+                            <th style="width: 26%;">原始作答明細</th>
+                            <th style="width: 26%;">成績單模式 (對: - / 錯: 原作答)</th>
                             <th style="width: 14%; text-align: center;">答對題數 / 總題數</th>
                         </tr>
                     </thead>
                     <tbody id="resultTableBody">
                         <tr>
-                            <td colspan="6" class="txt-center text-secondary py-5">
-                                <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
-                                請先上傳「標準答案卡」，再批次上傳「學生作答卡」開始閱卷。
+                            <td colspan="6" style="text-align: center; color: #64748B; padding: 48px 16px;">
+                                尚無閱卷資料，請先上傳「標準答案卡」，再批次上傳「學生作答卡」開始閱卷。
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
     </main>
 
-    <!-- 緩衝 Canvas -->
+    <!-- 灰階前置處理緩衝 Canvas -->
     <canvas id="grayBufferCanvas"></canvas>
 
-    <!-- 載入 OpenCV.js -->
+    <!-- OpenCV.js 載入完成監聽設定（必須在載入 opencv.js 之前宣告） -->
+    <script>
+        var Module = {
+            onRuntimeInitialized: function() {
+                啟動視覺引擎就緒狀態();
+            }
+        };
+    </script>
     <script async src="https://docs.opencv.org/4.5.4/opencv.js" type="text/javascript"></script>
 
     <script>
-    // ── GAS API 設定區 ──
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec"; // 請替換為部署後的 Web App URL
-    const API_KEY = "CHANGE_EDUCATION"; // 請替換為 CONFIG 中設定的 API_KEY
+    // =========================================================================
+    // 一、 後端 GAS API 設定區（前後端串接協定：免 API Key，純 JSON 傳遞 action 與 data）
+    // =========================================================================
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec";
 
-    let 學生名冊Map = {}; 
+    // 全域狀態變數
+    let 學生名冊Map = {};          // 格式：{ "001234": "王小明", ... }
+    let 名冊已載入 = false;
+    let 音效已開啟 = true;
+    let 視覺引擎已就緒 = false;
 
+    // =========================================================================
+    // 二、 OMR 光學讀卡核心參數（經實測驗證之標準比例與門檻，維持原精準度）
+    // =========================================================================
     const 標準寬 = 1000;
     const 標準高 = 1414;
 
-    let 標準答案字串 = ""; 
-    let 全域成績資料庫 = []; 
-    let 學生卡流水序號 = 0; 
+    let 標準答案字串 = "";
+    let 全域成績資料庫 = [];
+    let 學生卡流水序號 = 0;
 
     const 辨識門檻設定 = {
-        學號門檻百分比: 0.45,  
-        答案門檻百分比: 0.70,   
-        印刷框線基礎白點數: 43  
+        學號門檻百分比: 0.45,
+        答案門檻百分比: 0.70,
+        印刷框線基礎白點數: 43
     };
 
     const OMR完美比例 = {
@@ -429,64 +515,257 @@
         }
     };
 
-    // 頁面初始化：自動載入 Google Sheet 學生名冊
+    // =========================================================================
+    // 三、 頁面初始化與 Web Audio 音效機制
+    // =========================================================================
     window.addEventListener('DOMContentLoaded', () => {
-        載入學生名冊();
+        // 自動向後端取得 Google Sheet 學生名冊對照表
+        載入學生名冊(false);
+
+        // 雙重保險：若 OpenCV 載入速度快於事件綁定，主動檢查 cv.Mat 是否可用
+        const checkCvTimer = setInterval(() => {
+            if (typeof cv !== 'undefined' && cv.Mat) {
+                啟動視覺引擎就緒狀態();
+                clearInterval(checkCvTimer);
+            }
+        }, 300);
+
+        // 支援在題數與前綴輸入框按 Enter 鍵直接觸發選擇標準答案卡
+        ['totalQuestionsInput', 'idPrefixInput'].forEach(inputId => {
+            document.getElementById(inputId).addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const ansInput = document.getElementById('answerKeyInput');
+                    if (!ansInput.disabled) ansInput.click();
+                }
+            });
+        });
     });
 
-    async function 載入學生名冊() {
-        const icon = document.getElementById('dbStatusIcon');
-        const txt = document.getElementById('dbStatusTxt');
+    /**
+     * 當 OpenCV.js 視覺辨識引擎初始化完成時，解鎖答案卡上傳功能
+     */
+    function 啟動視覺引擎就緒狀態() {
+        if (視覺引擎已就緒) return;
+        視覺引擎已就緒 = true;
 
+        const badge = document.getElementById('cvStatusBadge');
+        badge.innerHTML = '<i class="fa-solid fa-eye mr-1"></i>視覺引擎就緒';
+
+        document.getElementById('answerKeyInput').disabled = false;
+        const ansStatus = document.getElementById('ansStatusTxt');
+        ansStatus.innerText = '(等待上傳標準答案卡)';
+        ansStatus.style.color = '#64748B';
+    }
+
+    /**
+     * Web Audio 提示音效播放（用於批改完成或錯誤提醒，無需外部音檔）
+     */
+    function 播放提示音效(type = 'success') {
+        if (!音效已開啟) return;
         try {
-            const response = await fetch(GAS_API_URL, {
-                method: "POST",
-                redirect: "follow",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({
-                    apiKey: API_KEY,
-                    action: "getStudentMap"
-                })
-            });
-            const resData = await response.json();
-            
-            if (resData.success && resData.data) {
-                學生名冊Map = resData.data;
-                icon.className = "fa-solid fa-circle-check text-success";
-                txt.innerText = `名冊載入完成 (${Object.keys(學生名冊Map).length} 筆)`;
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);       // D5
+                osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.1); // A5
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
             } else {
-                icon.className = "fa-solid fa-triangle-exclamation text-warning";
-                txt.innerText = "名冊無資料 (預設查無此人)";
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(220, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.25);
             }
-        } catch (err) {
-            console.error("載入學生名冊失敗:", err);
-            icon.className = "fa-solid fa-circle-xmark text-danger";
-            txt.innerText = "名冊連線失敗";
+        } catch (e) {
+            // 忽略瀏覽器未互動前的自動播放限制
         }
     }
 
+    /**
+     * 切換 Header 音效開關狀態
+     */
+    function 切換提示音效() {
+        音效已開啟 = !音效已開啟;
+        const icon = document.getElementById('soundIcon');
+        const txt = document.getElementById('soundTxt');
+        if (音效已開啟) {
+            icon.className = 'fa-solid fa-volume-high';
+            txt.innerText = '音效開';
+            播放提示音效('success');
+        } else {
+            icon.className = 'fa-solid fa-volume-xmark text-[#BFDBFE]';
+            txt.innerText = '音效關';
+        }
+    }
+
+    /**
+     * 顯示規範化圓角 Alert 提示訊息
+     * @param {'success'|'error'} type 訊息類型
+     * @param {string} message 顯示內容
+     */
+    function 顯示系統訊息(type, message) {
+        const container = document.getElementById('systemAlertContainer');
+        const isSuccess = type === 'success';
+        const cssClass = isSuccess ? 'system-alert-success' : 'system-alert-error';
+        const iconClass = isSuccess ? 'fa-solid fa-circle-check' : 'fa-solid fa-triangle-exclamation';
+
+        container.style.display = 'block';
+        container.innerHTML = `
+            <div class="${cssClass}">
+                <div class="flex items-center gap-2">
+                    <i class="${iconClass}"></i>
+                    <span>${message}</span>
+                </div>
+                <button type="button" onclick="document.getElementById('systemAlertContainer').style.display='none'" style="background:none; border:none; cursor:pointer; color:inherit; font-size:16px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    // =========================================================================
+    // 四、 後端 API 串接：向 Google Sheet 載入 6 碼學號與姓名對照表
+    // =========================================================================
+    /**
+     * 向 GAS 後端請求學生名冊 (B欄學號 -> C欄姓名)
+     * @param {boolean} isManualRefresh 是否為使用者手動點擊「重整名冊」
+     */
+    async function 載入學生名冊(isManualRefresh = false) {
+        const statusIcon = document.getElementById('dbStatusIcon');
+        const statusTxt = document.getElementById('dbStatusTxt');
+        const refreshBtn = document.getElementById('btnRefreshRoster');
+        const refreshIcon = document.getElementById('refreshIcon');
+
+        // 切換 Loading 狀態
+        statusIcon.className = 'fa-solid fa-spinner fa-spin text-[#F59E0B]';
+        statusTxt.innerText = '名冊同步中...';
+        refreshBtn.disabled = true;
+        refreshIcon.classList.add('fa-spin');
+
+        try {
+            // 遵守前後端串接協定：text/plain 避開 CORS 預檢，傳送 action 與 data
+            const response = await fetch(GAS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                redirect: 'follow',
+                body: JSON.stringify({
+                    action: 'getStudentMap',
+                    data: {}
+                })
+            });
+
+            const resData = await response.json();
+
+            // 狀態碼分流處理
+            if (resData.code === 200 && resData.success) {
+                學生名冊Map = resData.data || {};
+                名冊已載入 = true;
+                const totalCount = Object.keys(學生名冊Map).length;
+
+                statusIcon.className = 'fa-solid fa-circle-check text-[#10B981]';
+                statusTxt.innerText = `名冊已連線 (${totalCount} 筆)`;
+
+                // 若畫面上已有批改完成的資料，重整名冊後自動重新比對並刷新姓名
+                if (全域成績資料庫.length > 0) {
+                    重新比對現有成績單姓名();
+                }
+
+                if (isManualRefresh) {
+                    顯示系統訊息('success', `學生名冊同步完成，共載入 ${totalCount} 筆 6 碼學號資料。`);
+                    播放提示音效('success');
+                }
+            } else if (resData.code === 400 || resData.code === 404) {
+                statusIcon.className = 'fa-solid fa-triangle-exclamation text-[#F59E0B]';
+                statusTxt.innerText = '名冊資料異常';
+                顯示系統訊息('error', resData.message || '找不到學生名冊資料，請檢查 Google Sheet 設定。');
+                播放提示音效('error');
+            } else {
+                // code === 500 伺服器內部錯誤
+                statusIcon.className = 'fa-solid fa-circle-xmark text-[#EF4444]';
+                statusTxt.innerText = '後端異常 (500)';
+                alert(`後端系統發生異常 (${resData.code})：\n${resData.message || '請檢查 GAS 執行紀錄'}`);
+            }
+        } catch (err) {
+            console.error('載入學生名冊網路異常:', err);
+            statusIcon.className = 'fa-solid fa-circle-xmark text-[#EF4444]';
+            statusTxt.innerText = '名冊連線失敗';
+            alert('無法連線至後端 Google Sheet 資料庫，請檢查網路狀態或 GAS 部署網址是否正確。');
+        } finally {
+            refreshBtn.disabled = false;
+            refreshIcon.classList.remove('fa-spin');
+        }
+    }
+
+    /**
+     * 根據 6 碼學號查詢學生姓名
+     * @param {string} sixDigitId 組合後的 6 碼學號
+     * @returns {string} 學生姓名或狀態標記
+     */
+    function 查詢學生姓名(sixDigitId) {
+        if (!sixDigitId || sixDigitId.includes('#') || sixDigitId.includes('*')) {
+            return '學號劃記異常';
+        }
+        if (!名冊已載入) {
+            return '名冊未連線';
+        }
+        return 學生名冊Map[sixDigitId] || '查無此人';
+    }
+
+    /**
+     * 當使用者重新點擊「重整名冊」或修改前綴時，即時更新表格中的學生姓名
+     */
+    function 重新比對現有成績單姓名() {
+        const tableBody = document.getElementById('resultTableBody');
+        tableBody.innerHTML = '';
+
+        全域成績資料庫.forEach(item => {
+            item.studentName = 查詢學生姓名(item.studentID);
+            新增列到成績表格(item);
+        });
+    }
+
+    // =========================================================================
+    // 五、 步驟 1 與 步驟 2：讀卡事件監聽與批量閱卷流程
+    // =========================================================================
     document.getElementById('answerKeyInput').addEventListener('change', function(e) {
         if (e.target.files.length === 0) return;
-        document.getElementById('ansStatusTxt').innerText = '(正在讀取分析中...)';
-        
+        const ansStatus = document.getElementById('ansStatusTxt');
+        ansStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>正在讀取分析中...';
+        ansStatus.style.color = '#1E468A';
+
         const 檔案 = e.target.files[0];
         const 讀取器 = new FileReader();
         讀取器.onload = function(event) {
             const img = new Image();
             img.onload = function() {
-                let 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value) || 100;
-                let 識別結果 = 核心閱卷處理流程(img, 檔案.name, 目標題數);
-                
+                const 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value, 10) || 100;
+                const 識別結果 = 核心閱卷處理流程(img, 檔案.name, 目標題數);
+
                 if (識別結果) {
-                    標準答案字串 = 識別結果.answers; 
+                    標準答案字串 = 識別結果.answers;
                     document.getElementById('answerPreviewRow').style.display = 'flex';
                     document.getElementById('answerKeyPreview').innerText = 標準答案字串;
-                    document.getElementById('ansStatusTxt').innerText = ' 標準答案讀取成功';
-                    document.getElementById('ansStatusTxt').style.color = '#10B981';
-                    document.getElementById('studentFileInput').disabled = false; 
+                    ansStatus.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>標準答案讀取成功';
+                    ansStatus.style.color = '#047857';
+                    document.getElementById('studentFileInput').disabled = false;
+                    播放提示音效('success');
                 } else {
-                    document.getElementById('ansStatusTxt').innerText = ' 定位失敗，請確認影像品質';
-                    document.getElementById('ansStatusTxt').style.color = '#EF4444';
+                    ansStatus.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i>定位失敗，請確認影像品質';
+                    ansStatus.style.color = '#EF4444';
+                    顯示系統訊息('error', '標準答案卡定位失敗！請確認考卷四周黑框完整且無嚴重反光。');
+                    播放提示音效('error');
                 }
             };
             img.src = event.target.result;
@@ -497,74 +776,78 @@
     document.getElementById('studentFileInput').addEventListener('change', async function(e) {
         const 檔案列表 = e.target.files;
         if (檔案列表.length === 0) return;
-        
-        document.getElementById('resultTableBody').innerHTML = ""; 
-        全域成績資料庫 = []; 
-        學生卡流水序號 = 0;  
-        
-        let 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value) || 100;
+
+        // 重置報表狀態
+        document.getElementById('resultTableBody').innerHTML = '';
+        全域成績資料庫 = [];
+        學生卡流水序號 = 0;
+
+        const 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value, 10) || 100;
         const 計數器 = document.getElementById('importCounter');
         計數器.style.display = 'inline';
         計數器.innerText = `正在批改：0 / ${檔案列表.length} 筆`;
-        計數器.style.color = '#F59E0B'; 
-        
+        計數器.style.color = '#F59E0B';
+
         for (let i = 0; i < 檔案列表.length; i++) {
             const 檔案 = 檔案列表[i];
             await 閱卷單張學生卡(檔案, 目標題數);
             計數器.innerText = `正在批改：${i + 1} / ${檔案列表.length} 筆`;
         }
-        
+
         計數器.innerText = `已成功匯入批改：${檔案列表.length} 筆`;
-        計數器.style.color = '#10B981'; 
-        
-        if (全域成績資料庫.length > 0) document.getElementById('btnExport').disabled = false;
+        計數器.style.color = '#047857';
+        播放提示音效('success');
+
+        if (全域成績資料庫.length > 0) {
+            document.getElementById('btnExport').disabled = false;
+        }
     });
 
+    /**
+     * 處理單張學生作答卡：辨識學號與答案 -> 組合 6 碼學號 -> 查詢名冊姓名 -> 寫入表格
+     */
     function 閱卷單張學生卡(file, totalQ) {
         return new Promise((resolve) => {
             const 讀取器 = new FileReader();
             讀取器.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
-                    let 學生作答 = 核心閱卷處理流程(img, file.name, totalQ);
-                    學生卡流水序號++; 
-                    
+                    const 學生作答 = 核心閱卷處理流程(img, file.name, totalQ);
+                    學生卡流水序號++;
+
                     if (學生作答) {
                         let 答對題數 = 0;
-                        let 成績單模式陣列 = [];
+                        const 成績單模式陣列 = [];
 
                         for (let q = 0; q < totalQ; q++) {
-                            let 學生單題答案 = 學生作答.answers[q];
-                            let 標準單題答案 = 標準答案字串[q];
+                            const 學生單題答案 = 學生作答.answers[q];
+                            const 標準單題答案 = 標準答案字串[q];
 
                             if (學生單題答案 !== '#' && 學生單題答案 !== '*' && 學生單題答案 === 標準單題答案) {
                                 答對題數++;
-                                成績單模式陣列.push("-"); 
+                                成績單模式陣列.push('-');
                             } else {
-                                成績單模式陣列.push(學生單題答案); 
+                                成績單模式陣列.push(學生單題答案);
                             }
                         }
-                        
-                        let 前綴碼 = document.getElementById('idPrefixInput').value.padStart(2, '0');
-                        學生作答.studentID = 前綴碼 + 學生作答.studentID; 
 
-                        // 名冊學號查驗與比對
-                        if (學生作答.studentID.includes("#") || 學生作答.studentID.includes("*")) {
-                            學生作答.studentName = "查無此人";
-                        } else {
-                            學生作答.studentName = 學生名冊Map[學生作答.studentID] || "查無此人";
-                        }
+                        // 組合 2 碼前綴 + 4 碼讀卡學號 = 6 碼完整學號
+                        const 前綴碼 = document.getElementById('idPrefixInput').value.padStart(2, '0');
+                        學生作答.studentID = 前綴碼 + 學生作答.studentID;
 
-                        學生作答.serialNo = 學生卡流水序號; 
-                        學生作答.reportModeString = 成績單模式陣列.join(""); 
+                        // 向快取名冊查詢 Google Sheet B 欄對應的 C 欄學生姓名
+                        學生作答.studentName = 查詢學生姓名(學生作答.studentID);
+
+                        學生作答.serialNo = 學生卡流水序號;
+                        學生作答.reportModeString = 成績單模式陣列.join('');
                         學生作答.scoreString = `${答對題數} / ${totalQ}`;
                         學生作答.correctCount = 答對題數;
                         學生作答.totalCount = totalQ;
-                        
+
                         全域成績資料庫.push(學生作答);
                         新增列到成績表格(學生作答);
                     } else {
-                        新增錯誤列到成績表格(學生卡流水序號);
+                        新增錯誤列到成績表格(學生卡流水序號, file.name);
                     }
                     resolve();
                 };
@@ -574,216 +857,265 @@
         });
     }
 
-    /* 灰階前置脫色函數 */
+    // =========================================================================
+    // 六、 OMR 影像視覺辨識演算法（保留原版已驗證邏輯，補全中文註解）
+    // =========================================================================
+    /**
+     * 灰階前置脫色函數：消除紅色/彩色印刷格線對二值化判斷的干擾
+     */
     function 強制瀏覽器底層轉灰階(imgElement) {
         const bufferCanvas = document.getElementById('grayBufferCanvas');
         const ctx = bufferCanvas.getContext('2d');
-        
+
         bufferCanvas.width = imgElement.width;
         bufferCanvas.height = imgElement.height;
-        
+
         ctx.drawImage(imgElement, 0, 0);
-        
+
         const imgData = ctx.getImageData(0, 0, bufferCanvas.width, bufferCanvas.height);
         const data = imgData.data;
-        
+
         for (let i = 0; i < data.length; i += 4) {
-            let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-            data[i]     = gray; 
-            data[i + 1] = gray; 
-            data[i + 2] = gray; 
+            const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            data[i]     = gray;
+            data[i + 1] = gray;
+            data[i + 2] = gray;
         }
-        
+
         ctx.putImageData(imgData, 0, 0);
         return bufferCanvas;
     }
 
-    /* 核心閱卷邏輯 */
+    /**
+     * 核心閱卷處理流程：尋找定位外框 -> 透視變形校正 -> 讀取 4 碼學號與作答區
+     */
     function 核心閱卷處理流程(imgElement, fileName, totalQ) {
         try {
             const 灰階畫布 = 強制瀏覽器底層轉灰階(imgElement);
-            
+
             const src = cv.imread(灰階畫布);
             const 灰階 = new cv.Mat();
-            cv.cvtColor(src, 灰階, cv.COLOR_RGBA2GRAY); 
+            cv.cvtColor(src, 灰階, cv.COLOR_RGBA2GRAY);
 
-            const 模糊 = new cv.Mat(); const 二值化 = new cv.Mat();
+            const 模糊 = new cv.Mat();
+            const 二值化 = new cv.Mat();
             cv.GaussianBlur(灰階, 模糊, new cv.Size(5, 5), 0);
             cv.threshold(模糊, 二值化, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
-            
-            const 輪廓集 = new cv.MatVector(); const 層級 = new cv.Mat();
+
+            const 輪廓集 = new cv.MatVector();
+            const 層級 = new cv.Mat();
             cv.findContours(二值化, 輪廓集, 層級, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-            
-            let 最大面積 = 0; let 外框輪廓 = null;
+
+            let 最大面積 = 0;
+            let 外框輪廓 = null;
             for (let i = 0; i < 輪廓集.size(); ++i) {
-                let 輪廓 = 輪廓集.get(i); let 面積 = cv.contourArea(輪廓);
+                const 輪廓 = 輪廓集.get(i);
+                const 面積 = cv.contourArea(輪廓);
                 if (面積 > 最大面積) {
-                    let 周長 = cv.arcLength(輪廓, true); let 近似 = new cv.Mat();
+                    const 周長 = cv.arcLength(輪廓, true);
+                    const 近似 = new cv.Mat();
                     cv.approxPolyDP(輪廓, 近似, 0.02 * 周長, true);
-                    if (近似.rows === 4) { 最大面積 = 面積; if (外框輪廓) 外框輪廓.delete(); 外框輪廓 = 近似.clone(); }
+                    if (近似.rows === 4) {
+                        最大面積 = 面積;
+                        if (外框輪廓) 外框輪廓.delete();
+                        外框輪廓 = 近似.clone();
+                    }
                     近似.delete();
                 }
             }
-            
+
             if (!外框輪廓) {
                 src.delete(); 灰階.delete(); 模糊.delete(); 二值化.delete(); 輪廓集.delete(); 層級.delete();
                 return null;
             }
-            
+
+            // 排序四個頂點（左上、右上、右下、左下）
             const 頂點 = [];
-            for (let i = 0; i < 4; i++) { 頂點.push({ x: 外框輪廓.data32S[i * 2], y: 外框輪廓.data32S[i * 2 + 1] }); }
+            for (let i = 0; i < 4; i++) {
+                頂點.push({ x: 外框輪廓.data32S[i * 2], y: 外框輪廓.data32S[i * 2 + 1] });
+            }
             頂點.sort((a, b) => a.y - b.y);
             const 上兩點 = [頂點[0], 頂點[1]].sort((a, b) => a.x - b.x);
             const 下兩點 = [頂點[2], 頂點[3]].sort((a, b) => a.x - b.x);
-            
-            const 來源座標 = cv.matFromArray(4, 1, cv.CV_32FC2, [上兩點[0].x, 上兩點[0].y, 上兩點[1].x, 上兩點[1].y, 下兩點[1].x, 下兩點[1].y, 下兩點[0].x, 下兩點[0].y]);
+
+            const 來源座標 = cv.matFromArray(4, 1, cv.CV_32FC2, [
+                上兩點[0].x, 上兩點[0].y,
+                上兩點[1].x, 上兩點[1].y,
+                下兩點[1].x, 下兩點[1].y,
+                下兩點[0].x, 下兩點[0].y
+            ]);
             const 目標座標 = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, 標準寬, 0, 標準寬, 標準高, 0, 標準高]);
             const M = cv.getPerspectiveTransform(來源座標, 目標座標);
-            
+
             const 校正後二值化影像 = new cv.Mat();
             cv.warpPerspective(二值化, 校正後二值化影像, M, new cv.Size(標準寬, 標準高));
-            
+
             const 參數 = OMR完美比例;
             const 總像素 = 14 * 14;
-            
-            let 學號碼陣列 = ["#", "#", "#", "#"];
-            let 左X步 = (參數.學號左.結束X - 參數.學號左.起始X) * 標準寬 / 9;
-            
-            let 碼1 = []; for(let i=0; i<10; i++) {
-                let cx = Math.round(參數.學號左.起始X * 標準寬 + i * 左X步);
-                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號左.上排Y * 標準高) - 7, 14, 14));
-                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+
+            // 讀取 4 碼學號（左區上排、左區下排、右區上排、右區下排）
+            const 學號碼陣列 = ['#', '#', '#', '#'];
+            const 左X步 = (參數.學號左.結束X - 參數.學號左.起始X) * 標準寬 / 9;
+
+            const 碼1 = [];
+            for (let i = 0; i < 10; i++) {
+                const cx = Math.round(參數.學號左.起始X * 標準寬 + i * 左X步);
+                const 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號左.上排Y * 標準高) - 7, 14, 14));
+                const 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數);
+                區域.delete();
                 if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼1.push(i);
             }
             if (碼1.length === 1) 學號碼陣列[0] = 碼1[0];
-            if (碼1.length > 1) 學號碼陣列[0] = "*";
+            if (碼1.length > 1) 學號碼陣列[0] = '*';
 
-            let 碼2 = []; for(let i=0; i<10; i++) {
-                let cx = Math.round(參數.學號左.起始X * 標準寬 + i * 左X步);
-                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號左.下排Y * 標準高) - 7, 14, 14));
-                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+            const 碼2 = [];
+            for (let i = 0; i < 10; i++) {
+                const cx = Math.round(參數.學號左.起始X * 標準寬 + i * 左X步);
+                const 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號左.下排Y * 標準高) - 7, 14, 14));
+                const 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數);
+                區域.delete();
                 if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼2.push(i);
             }
             if (碼2.length === 1) 學號碼陣列[1] = 碼2[0];
-            if (碼2.length > 1) 學號碼陣列[1] = "*";
+            if (碼2.length > 1) 學號碼陣列[1] = '*';
 
-            let 右X步 = (參數.學號右.結束X - 參數.學號右.起始X) * 標準寬 / 9;
-            let 碼3 = []; for(let i=0; i<10; i++) {
-                let cx = Math.round(參數.學號右.起始X * 標準寬 + i * 右X步);
-                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號右.上排Y * 標準高) - 7, 14, 14));
-                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+            const 右X步 = (參數.學號右.結束X - 參數.學號右.起始X) * 標準寬 / 9;
+            const 碼3 = [];
+            for (let i = 0; i < 10; i++) {
+                const cx = Math.round(參數.學號右.起始X * 標準寬 + i * 右X步);
+                const 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號右.上排Y * 標準高) - 7, 14, 14));
+                const 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數);
+                區域.delete();
                 if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼3.push(i);
             }
             if (碼3.length === 1) 學號碼陣列[2] = 碼3[0];
-            if (碼3.length > 1) 學號碼陣列[2] = "*";
+            if (碼3.length > 1) 學號碼陣列[2] = '*';
 
-            let 碼4 = []; for(let i=0; i<10; i++) {
-                let cx = Math.round(參數.學號右.起始X * 標準寬 + i * 右X步);
-                let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號右.下排Y * 標準高) - 7, 14, 14));
-                let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
+            const 碼4 = [];
+            for (let i = 0; i < 10; i++) {
+                const cx = Math.round(參數.學號右.起始X * 標準寬 + i * 右X步);
+                const 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, Math.round(參數.學號右.下排Y * 標準高) - 7, 14, 14));
+                const 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數);
+                區域.delete();
                 if (實質填滿 >= 辨識門檻設定.學號門檻百分比) 碼4.push(i);
             }
             if (碼4.length === 1) 學號碼陣列[3] = 碼4[0];
-            if (碼4.length > 1) 學號碼陣列[3] = "*";
+            if (碼4.length > 1) 學號碼陣列[3] = '*';
 
-            let 最終學號字串 = 學號碼陣列.join("");
+            const 最終學號字串 = 學號碼陣列.join('');
 
+            // 讀取 4 欄 x 25 題作答區
             const 題目Y步 = (參數.作答區.最後一題Y - 參數.作答區.第一題Y) * 標準高 / 24;
-            const 選項代號 = ["", "A", "B", "C", "D"];
-            let 答案字串陣列 = [];
+            const 選項代號 = ['', 'A', 'B', 'C', 'D'];
+            const 答案字串陣列 = [];
             let 累計題數 = 0;
 
-            for(let 欄=0; 欄<4; 欄++) {
-                let 題號X = 參數.作答區.直欄題號X[欄] * 標準寬;
-                for(let 題=0; 題<25; 題++) {
+            for (let 欄 = 0; 欄 < 4; 欄++) {
+                const 題號X = 參數.作答區.直欄題號X[欄] * 標準寬;
+                for (let 題 = 0; 題 < 25; 題++) {
                     累計題數++;
-                    if (累計題數 > totalQ) break; 
-                    
-                    let cy = Math.round(參數.作答區.第一題Y * 標準高 + 題 * 題目Y步);
-                    let 本題答案暫存 = [];
-                    
-                    for(let 選=1; 選<=4; 選++) {
-                        let cx = Math.round(題號X + 參數.作答區.選項相對位移X[選] * 標準寬);
-                        let 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, cy - 7, 14, 14));
-                        let 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數); 區域.delete();
-                        
+                    if (累計題數 > totalQ) break;
+
+                    const cy = Math.round(參數.作答區.第一題Y * 標準高 + 題 * 題目Y步);
+                    const 本題答案暫存 = [];
+
+                    for (let 選 = 1; 選 <= 4; 選++) {
+                        const cx = Math.round(題號X + 參數.作答區.選項相對位移X[選] * 標準寬);
+                        const 區域 = 校正後二值化影像.roi(new cv.Rect(cx - 7, cy - 7, 14, 14));
+                        const 實質填滿 = (cv.countNonZero(區域) - 辨識門檻設定.印刷框線基礎白點數) / (總像素 - 辨識門檻設定.印刷框線基礎白點數);
+                        區域.delete();
+
                         if (實質填滿 >= 辨識門檻設定.答案門檻百分比) {
                             本題答案暫存.push(選項代號[選]);
                         }
                     }
-                    
+
                     if (本題答案暫存.length === 0) {
-                        答案字串陣列.push("#");
+                        答案字串陣列.push('#');
                     } else if (本題答案暫存.length === 1) {
                         答案字串陣列.push(本題答案暫存[0]);
                     } else {
-                        答案字串陣列.push("*"); 
+                        答案字串陣列.push('*');
                     }
                 }
                 if (累計題數 > totalQ) break;
             }
 
+            // 釋放 OpenCV 記憶體避免瀏覽器記憶體洩漏
             src.delete(); 灰階.delete(); 模糊.delete(); 二值化.delete(); 輪廓集.delete(); 層級.delete();
             來源座標.delete(); 目標座標.delete(); M.delete(); 外框輪廓.delete(); 校正後二值化影像.delete();
 
             return {
                 fileName: fileName,
                 studentID: 最終學號字串,
-                answers: 答案字串陣列.join("")
+                answers: 答案字串陣列.join('')
             };
-        } catch(err) {
-            console.error(err);
+        } catch (err) {
+            console.error('OpenCV 影像辨識錯誤:', err);
             return null;
         }
     }
 
+    // =========================================================================
+    // 七、 成績表格渲染與 CSV 報表匯出
+    // =========================================================================
     function 新增列到成績表格(data) {
         const tableBody = document.getElementById('resultTableBody');
         const tr = document.createElement('tr');
+
+        // 針對查無此人或劃記異常給予醒目顏色提醒
+        const isNotFound = (data.studentName === '查無此人' || data.studentName === '學號劃記異常' || data.studentName === '名冊未連線');
+        const nameStyle = isNotFound
+            ? 'color: #EF4444; font-weight: 700;'
+            : 'color: #1E293B; font-weight: 700;';
+
         tr.innerHTML = `
-            <td class="txt-center"><b>${data.serialNo}</b></td>
-            <td><span class="txt-font-mono txt-student-id">${data.studentID}</span></td>
-            <td><span class="fw-bold text-dark">${data.studentName}</span></td>
-            <td><span class="txt-font-mono txt-raw-answers">${data.answers}</span></td>
-            <td><span class="txt-font-mono txt-report-mode">${data.reportModeString}</span></td>
-            <td class="txt-center"><span class="txt-font-mono txt-score-highlight">${data.scoreString}</span></td>
+            <td style="text-align: center; font-weight: 700;">${data.serialNo}</td>
+            <td><span class="txt-mono-code" style="color: #1E468A; font-weight: 700;">${data.studentID}</span></td>
+            <td><span style="${nameStyle}">${data.studentName}</span></td>
+            <td><span class="txt-mono-code" style="color: #334155;">${data.answers}</span></td>
+            <td><span class="txt-mono-code" style="color: #64748B; font-weight: 600;">${data.reportModeString}</span></td>
+            <td style="text-align: center;"><span class="txt-mono-code" style="color: #EF4444; font-weight: 800; font-size: 15px;">${data.scoreString}</span></td>
         `;
         tableBody.appendChild(tr);
     }
 
-    function 新增錯誤列到成績表格(serialNo) {
+    function 新增錯誤列到成績表格(serialNo, fileName) {
         const tableBody = document.getElementById('resultTableBody');
         const tr = document.createElement('tr');
-        tr.style.backgroundColor = "#FEF2F2";
+        tr.className = 'row-scan-error';
         tr.innerHTML = `
-            <td class="txt-center"><b>${serialNo}</b></td>
-            <td style="color:#EF4444; font-weight:bold;"><i class="fa-solid fa-triangle-exclamation me-1"></i>辨識失敗</td>
-            <td style="color:#EF4444; font-weight:bold;">-</td>
-            <td colspan="3" style="color:#94A3B8; font-style:italic;">影像邊界定位異常。請確認考卷四周黑框完整且無嚴重反光。</td>
+            <td style="text-align: center; font-weight: 700;">${serialNo}</td>
+            <td style="color: #EF4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation mr-1"></i>辨識失敗</td>
+            <td style="color: #EF4444; font-weight: 700;">-</td>
+            <td colspan="3" style="color: #64748B; font-style: italic;">檔案「${fileName}」邊界定位異常，請確認考卷四周黑框完整且無嚴重反光。</td>
         `;
         tableBody.appendChild(tr);
     }
 
     function 匯出成績單CSV() {
         if (全域成績資料庫.length === 0) return;
-        
-        let csvContent = "\uFEFF"; 
-        csvContent += "序號,原始檔名,學生學號,學生姓名,原始作答明細,成績單對照模式,答對題數,總題數\n";
-        
+
+        // 加入 UTF-8 BOM 確保 Excel 開啟中文不亂碼
+        let csvContent = '\uFEFF';
+        csvContent += '序號,原始檔名,學生學號,學生姓名,原始作答明細,成績單對照模式,答對題數,總題數\n';
+
         全域成績資料庫.forEach(row => {
             csvContent += `${row.serialNo},"${row.fileName}","${row.studentID}","${row.studentName}","${row.answers}","${row.reportModeString}",${row.correctCount},${row.totalCount}\n`;
         });
-        
+
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        
-        link.setAttribute("href", url);
-        link.setAttribute("download", `承智教育_讀卡成績單_${new Date().toISOString().slice(0,10)}.csv`);
+        const link = document.createElement('a');
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `承智教育_讀卡成績單_${new Date().toISOString().slice(0, 10)}.csv`);
         document.body.appendChild(link);
-        
+
         link.click();
         document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        播放提示音效('success');
     }
     </script>
 </body>
