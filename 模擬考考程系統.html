@@ -5,18 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>承智教育 | 模擬考考程系統</title>
     
-    <!-- 1. Tailwind CSS CDN -->
+    <!-- 引入 Tailwind CSS、FontAwesome 6.5.1 與 Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- 2. 圖示庫: FontAwesome 6.5.1 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- 3. Google Fonts: Noto Sans TC & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- 4. 自訂獨立模組 CSS 樣式 (樣式隔離，無 :root 全域變數) -->
+    <!-- 自訂獨立模組 CSS 樣式 (禁用 :root 全域變數，各 UI 容器皆設獨立 Class) -->
     <style>
         * {
             box-sizing: border-box;
@@ -24,11 +20,13 @@
             padding: 0;
         }
 
+        /* 鎖定單一投影視窗高度，禁止外層頁面出現捲動條 */
         body {
             font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #F1F5F9;
             color: #1E293B;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             overflow: hidden;
             display: flex;
@@ -37,16 +35,16 @@
             -webkit-user-select: none;
         }
 
+        /* 等寬數字字體 (防止時鐘秒數跳動造成畫面晃動) */
         .digital-font {
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* 頂部 Header Bar 樣式 */
+        /* 頂部 Header Bar (規範：高 64px、深藍底白字) */
         .header-bar {
             background-color: #1E468A;
             color: #FFFFFF;
-            height: 56px;
-            padding: 0 24px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -56,23 +54,31 @@
         }
 
         .header-title-box {
-            font-size: 24px;
+            font-size: clamp(18px, 2vw, 24px);
             font-weight: 600;
+            color: #FFFFFF;
             display: flex;
             align-items: center;
             gap: 10px;
+            white-space: nowrap;
         }
 
+        .header-subtitle-accent {
+            color: #BFDBFE;
+        }
+
+        /* 音效解鎖狀態按鈕 */
         .audio-unlock-btn {
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: clamp(13px, 1.1vw, 15px);
             font-weight: 600;
-            transition: all 0.2s ease;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            border: none;
+            white-space: nowrap;
         }
 
         .audio-unlock-btn.locked {
@@ -85,40 +91,57 @@
             color: #FFFFFF;
         }
 
-        /* 主工作區域 */
+        .header-status-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(14px, 1.2vw, 16px);
+            font-weight: 500;
+            color: #BFDBFE;
+            white-space: nowrap;
+        }
+
+        /* 主工作區域 (精確扣除 64px Header 高度) */
         .main-workspace {
             flex: 1;
-            padding: 16px;
-            height: calc(100vh - 56px);
+            width: 100%;
+            height: calc(100vh - 64px);
+            height: calc(100dvh - 64px);
+            padding: clamp(8px, 1.2vh, 16px) clamp(12px, 1.5vw, 24px);
             overflow: hidden;
         }
 
-        /* 大螢幕即時展示區卡片 */
+        /* 純白微圓角展示卡片 */
         .exam-display-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
-            padding: 14px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            padding: clamp(8px, 1.2vh, 16px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            width: 100%;
+            min-height: 0;
         }
 
+        /* 左側 1：考試名稱輸入卡片 */
         .title-input-card {
-            height: 14%;
-            margin-bottom: 12px;
+            height: 15%;
+            margin-bottom: clamp(8px, 1.2vh, 14px);
         }
 
         .exam-main-title-input {
-            font-size: clamp(1.6rem, 2.6vw, 2.6rem);
+            font-size: clamp(1.3rem, 2.5vw, 2.75rem);
             font-weight: 800;
             color: #1E293B;
             width: 100%;
+            height: 100%;
             background: transparent;
             border: 1px solid transparent;
             border-radius: 6px;
+            padding: 0 12px;
             outline: none;
             text-align: center;
             transition: all 0.2s ease;
@@ -126,28 +149,39 @@
 
         .exam-main-title-input:focus {
             background-color: #F8FAFC;
-            border-color: #1E468A;
-            box-shadow: 0 0 0 3px rgba(30, 70, 138, 0.15);
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
+        /* 左側 2：中央超大電子時鐘卡片 */
         .clock-display-card {
-            height: 48%;
-            margin-bottom: 12px;
+            height: 47%;
+            margin-bottom: clamp(8px, 1.2vh, 14px);
         }
 
         .exam-current-date {
-            font-size: clamp(2rem, 2vw, 4rem);
+            font-size: clamp(1.1rem, 2vw, 2.4rem);
             font-weight: 700;
             color: #64748B;
-            margin-bottom: 8px;
+            margin-bottom: clamp(4px, 0.8vh, 10px);
         }
 
         .exam-clock-text {
-            font-size: clamp(6rem, 10vw, 12rem);
-            line-height: 1;
+            font-size: clamp(3.5rem, min(9.5vw, 17vh), 12rem);
+            line-height: 1.05;
             font-weight: 700;
             color: #1E293B;
             letter-spacing: -2px;
+        }
+
+        .clock-sync-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: clamp(4px, 1vh, 14px);
+            font-size: clamp(0.85rem, 1.1vw, 1.15rem);
+            font-weight: 600;
+            color: #64748B;
         }
 
         .sync-pulse-dot {
@@ -155,6 +189,7 @@
             height: 10px;
             border-radius: 50%;
             background-color: #10B981;
+            flex-shrink: 0;
             animation: pulse-anim 1.5s infinite;
         }
 
@@ -163,10 +198,10 @@
             50% { opacity: 0.3; }
         }
 
-        /* 考程狀態展示區 */
+        /* 左側 3：當前與下一科考程狀態卡片 */
         .status-display-card {
-            height: calc(38% - 24px);
-            padding: 10px 20px;
+            flex: 1;
+            padding: clamp(8px, 1.2vh, 16px) clamp(12px, 1.8vw, 24px);
             display: flex;
             flex-direction: column;
             justify-content: space-around;
@@ -174,19 +209,20 @@
 
         .status-grid-row {
             display: grid;
-            grid-template-columns: 160px 1fr 300px;
+            grid-template-columns: minmax(100px, 150px) 1fr minmax(140px, 270px);
             align-items: center;
-            gap: 16px;
+            gap: clamp(8px, 1.2vw, 16px);
             width: 100%;
         }
 
         .status-badge {
-            font-size: clamp(2rem, 2.4vw, 4rem);
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: 12px;
+            font-size: clamp(1.1rem, min(2vw, 3.5vh), 2.5rem);
+            font-weight: 700;
+            padding: clamp(4px, 0.6vh, 8px) 10px;
+            border-radius: 10px;
             text-align: center;
             border: 1px solid #E2E8F0;
+            white-space: nowrap;
         }
 
         .status-badge.resting {
@@ -208,8 +244,8 @@
         }
 
         .status-exam-name {
-            font-size: clamp(2rem, 2.4vw, 4rem);
-            font-weight: 600;
+            font-size: clamp(1.2rem, min(2.3vw, 4vh), 3rem);
+            font-weight: 700;
             color: #1E293B;
             white-space: nowrap;
             overflow: hidden;
@@ -217,49 +253,63 @@
         }
 
         .status-exam-time {
-            font-size: clamp(2rem, 2.4vw, 4rem);
-            font-weight: 600;
+            font-size: clamp(1.1rem, min(2.1vw, 3.6vh), 2.75rem);
+            font-weight: 700;
             color: #64748B;
             text-align: right;
-            letter-spacing: -2px;
+            letter-spacing: -1px;
+            white-space: nowrap;
         }
 
-        /* 管理面板卡片 */
+        /* 右側：考程管理與音效設定面板 */
         .admin-panel-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
             height: 100%;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .admin-panel-header {
-            padding: 12px 16px;
+            padding: clamp(8px, 1vh, 12px) 16px;
             border-bottom: 1px solid #E2E8F0;
             background-color: #F8FAFC;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .admin-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(16px, 1.3vw, 20px);
+            font-weight: 700;
+            color: #1E293B;
         }
 
         .admin-body-table-wrap {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
-            overflow-x: auto; /* 防擠壓橫向滾動 */
+            overflow-x: auto;
         }
 
         .admin-body-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
         .admin-body-table-wrap::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
 
-        /* 自訂對齊與 RWD 表格 */
+        /* 考程資料表格 (隔行變色 + 1px 邊框) */
         .custom-table {
             width: 100%;
-            min-width: 420px; /* 保障小螢幕不會重疊 */
+            min-width: 400px;
             border-collapse: collapse;
             table-layout: fixed;
+            border-bottom: 1px solid #E2E8F0;
         }
 
         .custom-table th {
@@ -267,29 +317,39 @@
             top: 0;
             background-color: #F8FAFC;
             color: #64748B;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            padding: 4px 4px;
+            padding: 8px 4px;
             border-bottom: 1px solid #E2E8F0;
             z-index: 10;
         }
 
         .custom-table td {
-            padding: 4px;
+            padding: 6px 4px;
             border-bottom: 1px solid #F1F5F9;
             vertical-align: middle;
         }
 
-        .custom-table tr:nth-child(even) { background-color: #F8FAFC; }
-        .custom-table tr.conflict-row { background-color: #FEF2F2 !important; }
+        .custom-table tbody tr:nth-child(odd) { background-color: #FFFFFF; }
+        .custom-table tbody tr:nth-child(even) { background-color: #F8FAFC; }
+        .custom-table tbody tr.conflict-row { background-color: #FEF2F2 !important; }
+
+        .empty-table-cell {
+            padding: 36px 16px !important;
+            text-align: center;
+            color: #64748B;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: #FFFFFF;
+        }
 
         .custom-input-text {
             width: 100%;
             background: transparent;
             border: 1px solid transparent;
             border-radius: 6px;
-            padding: 2px 4px;
-            font-size: 20px;
+            padding: 4px 6px;
+            font-size: clamp(16px, 1.2vw, 19px);
             font-weight: 600;
             color: #1E293B;
             outline: none;
@@ -298,18 +358,18 @@
 
         .custom-input-text:focus {
             background-color: #FFFFFF;
-            border-color: #1E468A;
-            box-shadow: 0 0 0 3px rgba(30, 70, 138, 0.15);
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        /* 數字時間輸入框 (純數字，無 spinner) */
+        /* 時間純數字輸入框 */
         .time-number-input {
-            width: 32px;
+            width: 30px;
             border: none;
             background: transparent;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 17px;
+            font-weight: 700;
             color: #1E293B;
             text-align: center;
             outline: none;
@@ -333,28 +393,29 @@
         }
 
         .time-picker-group:focus-within {
-            border-color: #1E468A;
-            box-shadow: 0 0 0 2px rgba(30, 70, 138, 0.15);
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
         .time-colon {
             color: #94A3B8;
-            font-weight: 600;
-            font-size: 12px;
+            font-weight: 700;
+            font-size: 13px;
         }
 
         .warning-badge {
             background-color: #EF4444;
             color: #FFFFFF;
-            font-size: 18px;
+            font-size: 13px;
             font-weight: 700;
-            padding: 2px 4px;
+            padding: 2px 6px;
             border-radius: 4px;
             margin-left: 4px;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        /* 按鈕定義 */
+        /* 按鈕與底部音效設定樣式 */
         .btn-custom-primary {
             background-color: #1E468A;
             color: #FFFFFF;
@@ -364,7 +425,6 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -372,8 +432,7 @@
         }
 
         .btn-custom-primary:hover {
-            background-color: #163467;
-            box-shadow: 0 4px 6px rgba(30, 70, 138, 0.2);
+            background-color: #1E3A8A;
         }
 
         .btn-custom-secondary {
@@ -385,7 +444,6 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -395,6 +453,26 @@
         .btn-custom-secondary:hover {
             background-color: #F8FAFC;
             border-color: #94A3B8;
+        }
+
+        .btn-custom-danger-outline {
+            background-color: #FFFFFF;
+            color: #EF4444;
+            border: 1px solid #FCA5A5;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-custom-danger-outline:hover {
+            background-color: #FEF2F2;
+            border-color: #EF4444;
         }
 
         .btn-delete-icon {
@@ -417,17 +495,18 @@
             background-color: #FEF2F2;
         }
 
-        /* 底部音效設定卡片*/
         .sound-setting-footer {
-            padding: 12px 16px;
+            padding: clamp(8px, 1vh, 12px) 16px;
             background-color: #F8FAFC;
             border-top: 1px solid #E2E8F0;
+            flex-shrink: 0;
         }
 
         .sound-url-input {
             flex: 1;
             min-width: 0;
             padding: 6px 10px;
+            background-color: #FFFFFF;
             border: 1px solid #CBD5E1;
             border-radius: 6px;
             font-size: 14px;
@@ -437,54 +516,103 @@
         }
 
         .sound-url-input:focus {
-            border-color: #1E468A;
-            box-shadow: 0 0 0 3px rgba(30, 70, 138, 0.15);
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
         .source-type-tag {
             font-size: 12px;
             font-weight: 700;
-            padding: 2px 6px;
+            padding: 2px 8px;
             border-radius: 4px;
             white-space: nowrap;
+        }
+
+        /* 輕量級操作回饋 Alert 膠囊 */
+        .toast-alert-box {
+            position: fixed;
+            top: 76px;
+            right: 24px;
+            z-index: 100;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.25s ease;
+        }
+
+        .toast-alert-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-alert-box.success {
+            background-color: #ECFDF5;
+            color: #047857;
+            border: 1px solid #A7F3D0;
+        }
+
+        .toast-alert-box.error {
+            background-color: #FEF2F2;
+            color: #B91C1C;
+            border: 1px solid #FECACA;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Bar -->
-    <header class="header-bar">
+    <!-- 頂部導覽列 Header Bar -->
+    <header class="header-bar h-16 px-4 sm:px-6">
         <div class="header-title-box">
-            <i class="fa-solid fa-clock"></i>
-            <span>承智教育 | 模擬考考程系統</span>
+            <i class="fa-solid fa-clock header-subtitle-accent"></i>
+            <span>承智教育 <span class="header-subtitle-accent">|</span> 模擬考考程系統</span>
         </div>
         
-        <div class="flex items-center gap-3">
-            <button id="unlock-audio-btn" onclick="unlockAudioContext()" class="audio-unlock-btn locked" title="點擊授權瀏覽器自動播音功能">
+        <div class="flex items-center gap-3 sm:gap-4">
+            <button id="unlock-audio-btn" onclick="unlockAudioContext()" 
+                class="audio-unlock-btn locked hover:-translate-y-0.5 transition-all shadow-md" 
+                title="點擊授權瀏覽器自動播音功能">
                 <i id="unlock-audio-icon" class="fa-solid fa-volume-xmark"></i>
                 <span id="unlock-audio-text">點擊啟用音效</span>
             </button>
-            <div class="flex items-center gap-2 text-lg text-slate-200">
+            <div class="header-status-box">
                 <span class="sync-pulse-dot"></span>
                 <span>系統服務中</span>
             </div>
         </div>
     </header>
 
-    <!-- 主工作區域 -->
-    <main class="main-workspace container-fluid">
-        <div class="grid grid-cols-12 gap-4 h-full">
+    <!-- 輕量級浮動狀態回饋 Alert -->
+    <div id="toast-alert" class="toast-alert-box success" role="status" aria-live="polite">
+        <i id="toast-alert-icon" class="fa-solid fa-circle-check"></i>
+        <span id="toast-alert-text">設定已自動儲存</span>
+    </div>
+
+    <!-- 主工作區域 (左右 7:5 雙欄比例) -->
+    <main class="main-workspace">
+        <div class="grid grid-cols-12 gap-3 lg:gap-4 h-full">
             
-            <!-- [左側] 大螢幕即時展示區 (~60%) -->
-            <section class="col-span-12 lg:col-span-7 h-full flex flex-col">
+            <!-- 左側大螢幕即時展示區 -->
+            <section class="col-span-7 h-full flex flex-col min-h-0">
                 <div class="exam-display-card title-input-card">
-                    <input type="text" id="main-title" value="115學年度 九年級第一次模擬考" oninput="saveAllData()" class="exam-main-title-input" placeholder="點擊點輸入考試名稱">
+                    <input type="text" id="main-title" value="115學年度 九年級第一次模擬考" 
+                        oninput="saveAllData()" 
+                        onkeydown="handleEnterBlur(event, '考試名稱已更新')"
+                        class="exam-main-title-input" 
+                        placeholder="點擊輸入考試名稱">
                 </div>
 
                 <div class="exam-display-card clock-display-card">
                     <div id="current-date" class="exam-current-date">----年--月--日 星期-</div>
                     <div id="current-time" class="exam-clock-text digital-font">00:00:00</div>
-                    <div class="flex items-center gap-2 mt-4 text-base font-semibold text-slate-500">
+                    <div class="clock-sync-hint">
                         <span class="sync-pulse-dot"></span>
                         <span>系統時間同步中</span>
                     </div>
@@ -497,7 +625,7 @@
                         <div id="current-exam-time" class="status-exam-time digital-font">--:-- ~ --:--</div>
                     </div>
                     
-                    <div class="w-full border-t border-slate-200"></div>
+                    <div class="w-full border-t border-slate-200 my-1"></div>
                     
                     <div class="status-grid-row">
                         <span class="status-badge next-up">下一科</span>
@@ -507,62 +635,57 @@
                 </div>
             </section>
 
-            <!-- [右側] 考程管理與音效設定面板 (~40%) -->
-            <section class="col-span-12 lg:col-span-5 h-full">
+            <!-- 右側考程管理與鈴聲設定面板 -->
+            <section class="col-span-5 h-full min-h-0">
                 <div class="admin-panel-card">
                     
-                    <!-- 面板頂部工具列 -->
                     <div class="admin-panel-header">
-                        <div class="flex items-center gap-2 text-xl font-bold text-slate-800">
-                            <i class="fa-solid fa-list-check text-blue-800"></i>
+                        <div class="admin-panel-title">
+                            <i class="fa-solid fa-list-check text-[#1E468A]"></i>
                             <span>考試時程表</span>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="sortExams()" class="btn-custom-secondary">
+                        <div class="flex items-center gap-2">
+                            <button onclick="sortExams()" class="btn-custom-secondary hover:-translate-y-0.5 transition-all shadow-md" title="依開始時間由早到晚排序">
                                 <i class="fa-solid fa-arrow-down-short-wide"></i>
                                 <span>排序</span>
                             </button>
-                            <button onclick="addExam()" class="btn-custom-primary">
+                            <button onclick="addExam()" class="btn-custom-primary hover:-translate-y-0.5 transition-all shadow-md" title="新增一列考科">
                                 <i class="fa-solid fa-plus"></i>
                                 <span>新增考科</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- 考程列表表格區 -->
                     <div class="admin-body-table-wrap">
                         <table class="custom-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 50%; text-align: left; padding-left: 12px;">科目名稱</th>
-                                    <th style="width: 30%; text-align: center;">時間範圍</th>
+                                    <th style="width: 46%; text-align: left; padding-left: 12px;">科目名稱</th>
+                                    <th style="width: 34%; text-align: center;">時間範圍</th>
                                     <th style="width: 10%; text-align: center;">響鈴</th>
                                     <th style="width: 10%; text-align: center;">刪除</th>
                                 </tr>
                             </thead>
                             <tbody id="exam-list"></tbody>
                         </table>
-                        
-                        <div id="empty-state" class="p-10 text-center text-slate-400 font-bold hidden">
-                            <i class="fa-solid fa-calendar-xmark text-4xl mb-2 block"></i>
-                            目前尚無任何考程安排
-                        </div>
                     </div>
 
-                    <!-- 底部鈴聲與音源設定區-->
                     <div class="sound-setting-footer">
-                        <div class="text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                            <span><i class="fa-solid fa-bell mr-1"></i>自訂鈴聲網址 (MP3/Google Drive/YouTube)</span>
+                        <div class="text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center justify-between gap-2">
+                            <span class="truncate"><i class="fa-solid fa-bell mr-1 text-[#1E468A]"></i>自訂鈴聲網址 (MP3 / Google Drive / YouTube)</span>
                             <span id="source-type-tag" class="source-type-tag bg-slate-200 text-slate-700">MP3 直連</span>
                         </div>
                         
-                        <!-- 核心要求 3: 將網址輸入欄與測試、暫停按鈕放置於同一列 -->
                         <div class="flex items-center gap-2">
-                            <input id="sound-url" type="text" oninput="handleUrlInputChange()" class="sound-url-input" placeholder="貼上 MP3, Drive 或 YouTube 網址">
-                            <button onclick="testBell()" class="btn-custom-secondary">
+                            <input id="sound-url" type="text" 
+                                oninput="handleUrlInputChange()" 
+                                onkeydown="handleEnterBlur(event, '鈴聲網址已套用')"
+                                class="sound-url-input" 
+                                placeholder="貼上 MP3、Drive 或 YouTube 網址">
+                            <button onclick="testBell()" class="btn-custom-secondary hover:-translate-y-0.5 transition-all shadow-md" title="立即試聽鈴聲">
                                 <i class="fa-solid fa-play"></i>測試
                             </button>
-                            <button onclick="stopBell()" class="btn-custom-secondary text-red-600 border-red-300 hover:bg-red-50">
+                            <button onclick="stopBell()" class="btn-custom-danger-outline hover:-translate-y-0.5 transition-all shadow-md" title="停止播放鈴聲">
                                 <i class="fa-solid fa-stop"></i>暫停
                             </button>
                         </div>
@@ -574,48 +697,86 @@
         </div>
     </main>
 
-    <!-- 隱藏音效元件 -->
+    <!-- 隱藏原生音訊與 YouTube 播放器元件 -->
     <audio id="bell-audio" preload="auto" class="hidden"></audio>
     <div id="yt-player-container" class="hidden" style="position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none;">
         <div id="yt-player"></div>
     </div>
 
-    <!-- 系統控制邏輯 Script -->
+    <!-- 系統前端控制邏輯 Script -->
     <script>
+        // 預設模擬考考程資料
         let exams = [
             { id: 1, name: '預備鐘', start: '08:00', end: '08:10', bell: true },
             { id: 2, name: '國文科', start: '08:10', end: '09:20', bell: true },
             { id: 3, name: '英文科', start: '09:40', end: '10:40', bell: true }
         ];
         
+        // 預設上課鐘聲 MP3 網址
         const DEFAULT_SOUND = "https://williamlee8612.github.io/上課鐘聲.mp3";
         const $ = (id) => document.getElementById(id);
         
+        // 音效與播放器狀態追蹤變數
         let audioUnlocked = false;
         let soundType = 'MP3';
         let parsedSourceUrl = '';
         let youtubeVideoId = '';
         let ytPlayer = null;
         let isYtReady = false;
+        let toastTimer = null;
 
-        /* 音訊網址解析 */
+        // 顯示右上角輕量級狀態提示膠囊
+        function showToastAlert(message, type = 'success') {
+            const toastEl = $('toast-alert');
+            const iconEl = $('toast-alert-icon');
+            const textEl = $('toast-alert-text');
+
+            toastEl.className = `toast-alert-box ${type} show`;
+            iconEl.className = type === 'success' 
+                ? 'fa-solid fa-circle-check' 
+                : 'fa-solid fa-triangle-exclamation';
+            textEl.innerText = message;
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 2200);
+        }
+
+        // 監聽輸入框按下 Enter 鍵自動失焦確認
+        function handleEnterBlur(event, feedbackMsg) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.target.blur();
+                if (feedbackMsg) showToastAlert(feedbackMsg, 'success');
+            }
+        }
+
+        // 解析鈴聲網址格式 (辨識 YouTube、Google Drive 或 MP3 直連)
         function parseSoundUrl(rawUrl) {
             const url = (rawUrl || '').trim();
             if (!url) return { type: 'MP3', target: DEFAULT_SOUND, ytId: '' };
 
             const ytReg = /(?:youtube\.com\/(?:watch\?.*v=|embed\/|v\/)|youtu\.be\/)([\w-]{11})/;
             const ytMatch = url.match(ytReg);
-            if (ytMatch && ytMatch[1]) return { type: 'YOUTUBE', target: url, ytId: ytMatch[1] };
+            if (ytMatch && ytMatch[1]) {
+                return { type: 'YOUTUBE', target: url, ytId: ytMatch[1] };
+            }
 
             const driveReg = /drive\.google\.com\/file\/d\/([^\/\?]+)/;
             const driveMatch = url.match(driveReg);
             if (driveMatch && driveMatch[1]) {
-                return { type: 'DRIVE', target: `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`, ytId: '' };
+                return { 
+                    type: 'DRIVE', 
+                    target: `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`, 
+                    ytId: '' 
+                };
             }
 
             return { type: 'MP3', target: url, ytId: '' };
         }
 
+        // 鈴聲網址變動時更新標籤與音源
         function handleUrlInputChange() {
             const inputUrl = $('sound-url').value;
             const res = parseSoundUrl(inputUrl);
@@ -640,40 +801,62 @@
             saveAllData();
         }
 
-        /* YouTube API 初始化 */
+        // 非同步載入 YouTube IFrame API (不阻塞主時鐘執行)
         (function initYouTubeAPI() {
             const tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            if (firstScriptTag && firstScriptTag.parentNode) {
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            }
         })();
 
+        // YouTube API 載入完成回呼
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('yt-player', {
-                height: '0', width: '0', videoId: '',
+                height: '0',
+                width: '0',
+                videoId: '',
                 playerVars: { 'autoplay': 0, 'controls': 0 },
-                events: { 'onReady': () => { isYtReady = true; if (youtubeVideoId) loadYouTubeVideo(youtubeVideoId); } }
+                events: {
+                    'onReady': () => {
+                        isYtReady = true;
+                        if (youtubeVideoId) loadYouTubeVideo(youtubeVideoId);
+                    }
+                }
             });
         }
 
+        // 預載 YouTube 影片至播放器佇列
         function loadYouTubeVideo(vid) {
-            if (isYtReady && ytPlayer && vid) ytPlayer.cueVideoById(vid);
+            if (isYtReady && ytPlayer && vid) {
+                ytPlayer.cueVideoById(vid);
+            }
         }
 
-        /* 解鎖背景音效 */
+        // 解鎖瀏覽器自動播音限制
         function unlockAudioContext() {
             const audio = $('bell-audio');
-            audio.play().then(() => { audio.pause(); audio.currentTime = 0; }).catch(() => {});
+            audio.play().then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+            }).catch(() => {});
+
             if (isYtReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
-                try { ytPlayer.playVideo(); ytPlayer.pauseVideo(); } catch(e) {}
+                try {
+                    ytPlayer.playVideo();
+                    ytPlayer.pauseVideo();
+                } catch (e) {}
             }
+
             audioUnlocked = true;
-            $('unlock-audio-btn').className = 'audio-unlock-btn unlocked';
+            $('unlock-audio-btn').className = 'audio-unlock-btn unlocked hover:-translate-y-0.5 transition-all shadow-md';
             $('unlock-audio-icon').className = 'fa-solid fa-volume-high';
             $('unlock-audio-text').innerText = '音效已就緒';
+            showToastAlert('瀏覽器自動響鈴功能已啟用', 'success');
         }
 
-        /* 播放控制 */
+        // 播放鈴聲
         function playSound() {
             if (soundType === 'YOUTUBE') {
                 if (isYtReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
@@ -681,91 +864,123 @@
                     ytPlayer.playVideo();
                 }
             } else {
-                const a = $('bell-audio');
-                a.src = parsedSourceUrl || DEFAULT_SOUND;
-                a.currentTime = 0;
-                a.play().catch(() => {});
+                const audio = $('bell-audio');
+                audio.src = parsedSourceUrl || DEFAULT_SOUND;
+                audio.currentTime = 0;
+                audio.play().catch(() => {
+                    showToastAlert('瀏覽器阻擋自動播音，請先點擊上方「點擊啟用音效」', 'error');
+                });
             }
         }
 
+        // 測試鈴聲按鈕事件
         function testBell() {
             if (!audioUnlocked) unlockAudioContext();
             playSound();
+            showToastAlert('正在測試播放鈴聲...', 'success');
         }
 
+        // 停止鈴聲按鈕事件
         function stopBell() {
-            const a = $('bell-audio');
-            a.pause();
-            a.currentTime = 0;
+            const audio = $('bell-audio');
+            audio.pause();
+            audio.currentTime = 0;
+
             if (isYtReady && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-                try { ytPlayer.pauseVideo(); ytPlayer.seekTo(0); } catch(e) {}
-            }
-        }
-
-        /* 持久化與資料載入 */
-        function saveAllData() {
-            localStorage.setItem('chengzhiExamData', JSON.stringify({
-                mainTitle: $('main-title').value,
-                soundUrl: $('sound-url').value,
-                exams: exams
-            }));
-        }
-
-        function loadAllData() {
-            const savedData = localStorage.getItem('chengzhiExamData');
-            if (savedData) {
                 try {
+                    ytPlayer.pauseVideo();
+                    ytPlayer.seekTo(0);
+                } catch (e) {}
+            }
+            showToastAlert('已停止鈴聲播放', 'success');
+        }
+
+        // 儲存設定至瀏覽器 localStorage
+        function saveAllData() {
+            try {
+                localStorage.setItem('chengzhiExamData', JSON.stringify({
+                    mainTitle: $('main-title').value,
+                    soundUrl: $('sound-url').value,
+                    exams: exams
+                }));
+            } catch (e) {}
+        }
+
+        // 從 localStorage 讀取上次設定
+        function loadAllData() {
+            try {
+                const savedData = localStorage.getItem('chengzhiExamData');
+                if (savedData) {
                     const data = JSON.parse(savedData);
                     if (data.mainTitle) $('main-title').value = data.mainTitle;
                     if (data.soundUrl) $('sound-url').value = data.soundUrl;
-                    if (data.exams) exams = data.exams;
-                } catch(e) {}
-            } else {
+                    if (Array.isArray(data.exams)) exams = data.exams;
+                } else {
+                    $('sound-url').value = DEFAULT_SOUND;
+                }
+            } catch (e) {
                 $('sound-url').value = DEFAULT_SOUND;
             }
         }
 
-        const toSec = (t) => {
-            if (!t) return 0;
-            const [h, m] = t.split(':').map(Number);
-            return h * 3600 + m * 60;
+        // 時間字串轉總秒數
+        const toSec = (timeStr) => {
+            if (!timeStr) return 0;
+            const parts = timeStr.split(':').map(Number);
+            return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
         };
 
-        window.onload = () => {
+        // DOM 結構載入完成後立即啟動系統與時鐘 (不等待外部資源)
+        document.addEventListener('DOMContentLoaded', () => {
             loadAllData();
             handleUrlInputChange();
             renderExams();
-            setInterval(tick, 1000);
             tick();
-        };
+            setInterval(tick, 1000);
+        });
 
+        // 每秒更新時鐘並檢查是否到達響鈴時間
         function tick() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
             
-            $('current-date').innerText = now.toLocaleDateString('zh-TW', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
+            $('current-date').innerText = now.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
             $('current-time').innerText = `${h}:${m}:${s}`;
 
             if (s === "00") {
                 const nowShort = `${h}:${m}`;
-                if (exams.some(e => e.bell && (e.start === nowShort || e.end === nowShort))) playSound();
+                const shouldRing = exams.some(e => e.bell && (e.start === nowShort || e.end === nowShort));
+                if (shouldRing) playSound();
             }
+
             updateStatus(h, m, s);
         }
 
+        // 更新目前考試與下一科狀態看板
         function updateStatus(h, m, s) {
             const nowTotal = toSec(`${h}:${m}:${s}`);
             const sorted = [...exams].sort((a, b) => a.start.localeCompare(b.start));
-            let cur = null, nxt = null;
+            let cur = null;
+            let nxt = null;
 
             for (let i = 0; i < sorted.length; i++) {
-                const sStart = toSec(sorted[i].start), sEnd = toSec(sorted[i].end);
+                const sStart = toSec(sorted[i].start);
+                const sEnd = toSec(sorted[i].end);
+
                 if (nowTotal >= sStart && nowTotal < sEnd) {
-                    cur = sorted[i]; nxt = sorted[i+1] || null; break;
+                    cur = sorted[i];
+                    nxt = sorted[i + 1] || null;
+                    break;
                 } else if (nowTotal < sStart) {
-                    nxt = sorted[i]; break;
+                    nxt = sorted[i];
+                    break;
                 }
             }
 
@@ -784,25 +999,42 @@
             $('next-exam-time').innerText = nxt ? `${nxt.start} ~ ${nxt.end}` : "--:-- ~ --:--";
         }
 
-        /* 渲染考程列表 (核心要求 1 & 2: 數字輸入框與對齊優化) */
+        // 渲染右側考程管理表格
         function renderExams() {
             const list = $('exam-list');
             list.innerHTML = '';
-            $('empty-state').classList.toggle('hidden', exams.length > 0);
+
+            if (exams.length === 0) {
+                list.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-table-cell">
+                            目前尚無任何考程安排，請點擊右上角「新增考科」建立時程
+                        </td>
+                    </tr>`;
+                return;
+            }
 
             exams.forEach(e => {
-                const conflict = exams.some(o => o.id !== e.id && (toSec(e.start) < toSec(o.end) && toSec(e.end) > toSec(o.start)));
+                const isInvalidRange = toSec(e.end) < toSec(e.start);
+                const isOverlap = exams.some(o => 
+                    o.id !== e.id && (toSec(e.start) < toSec(o.end) && toSec(e.end) > toSec(o.start))
+                );
+                const hasConflict = isOverlap || isInvalidRange;
+
                 const tr = document.createElement('tr');
-                if (conflict) tr.className = 'conflict-row';
+                if (hasConflict) tr.className = 'conflict-row';
                 
-                const warningTag = conflict ? `<span class="warning-badge">重疊</span>` : '';
+                const warningText = isInvalidRange ? '異常' : (isOverlap ? '重疊' : '');
+                const warningTag = hasConflict ? `<span class="warning-badge">${warningText}</span>` : '';
 
                 tr.innerHTML = `
                     <td style="padding-left: 8px;">
                         <div class="flex items-center">
-                            <input type="text" value="${e.name}" 
-                                onchange="updateE(${e.id},'name',this.value)" 
+                            <input type="text" value="${escapeHtml(e.name)}" 
+                                onchange="updateE(${e.id}, 'name', this.value)" 
+                                onkeydown="handleEnterBlur(event, '考科名稱已更新')"
                                 class="custom-input-text"
+                                placeholder="輸入科目名稱"
                             >
                             ${warningTag}
                         </div>
@@ -815,10 +1047,13 @@
                         </div>
                     </td>
                     <td style="text-align: center;">
-                        <input type="checkbox" ${e.bell ? 'checked' : ''} onchange="updateE(${e.id},'bell',this.checked)" class="w-4 h-4 text-blue-800 rounded cursor-pointer">
+                        <input type="checkbox" ${e.bell ? 'checked' : ''} 
+                            onchange="updateE(${e.id}, 'bell', this.checked)" 
+                            class="w-4 h-4 accent-[#1E468A] rounded cursor-pointer"
+                            title="勾選後將於開始與結束時間自動響鈴">
                     </td>
                     <td style="text-align: center;">
-                        <button onclick="delE(${e.id})" class="btn-delete-icon" title="刪除考科">
+                        <button onclick="delE(${e.id})" class="btn-delete-icon" title="刪除此考科">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </td>`;
@@ -826,28 +1061,37 @@
             });
         }
 
-        /**
-         * 產生直接填入數字的時間輸入元件 (Hour & Minute Number Inputs)
-         */
+        // 特殊字元轉義，防止破壞 HTML 屬性
+        function escapeHtml(str) {
+            return String(str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // 產生純數字時/分輸入元件
         function timeInputGroup(id, val, field) {
-            const [h, m] = val.split(':');
+            const [h, m] = (val || '08:00').split(':');
             return `
                 <div class="time-picker-group">
                     <input type="number" min="0" max="23" value="${h}" 
+                        onfocus="this.select()"
                         onblur="formatTimeInput(this)"
-                        onchange="updateT(${id},'${field}','h',this.value)" 
+                        onchange="updateT(${id}, '${field}', 'h', this.value)" 
+                        onkeydown="handleEnterBlur(event, '考程時間已更新')"
                         class="time-number-input"
+                        aria-label="小時"
                     >
                     <span class="time-colon">:</span>
                     <input type="number" min="0" max="59" value="${m}" 
+                        onfocus="this.select()"
                         onblur="formatTimeInput(this)"
-                        onchange="updateT(${id},'${field}','m',this.value)" 
+                        onchange="updateT(${id}, '${field}', 'm', this.value)" 
+                        onkeydown="handleEnterBlur(event, '考程時間已更新')"
                         class="time-number-input"
+                        aria-label="分鐘"
                     >
                 </div>`;
         }
 
-        /* 自動補零格式化 (如輸入 8 自動補 08) */
+        // 數字自動補零格式化
         function formatTimeInput(el) {
             let val = parseInt(el.value, 10);
             const max = parseInt(el.max, 10);
@@ -856,13 +1100,16 @@
             el.value = String(val).padStart(2, '0');
         }
 
-        function updateT(id, f, p, v) {
-            const e = exams.find(x => x.id === id);
-            let [h, m] = e[f].split(':');
-            let val = parseInt(v, 10);
-            if (isNaN(val)) val = 0;
+        // 更新考科小時或分鐘數值
+        function updateT(id, field, part, value) {
+            const targetExam = exams.find(x => x.id === id);
+            if (!targetExam) return;
+
+            let [h, m] = targetExam[field].split(':');
+            let val = parseInt(value, 10);
+            if (isNaN(val) || val < 0) val = 0;
             
-            if (p === 'h') {
+            if (part === 'h') {
                 if (val > 23) val = 23;
                 h = String(val).padStart(2, '0');
             } else {
@@ -870,31 +1117,63 @@
                 m = String(val).padStart(2, '0');
             }
             
-            updateE(id, f, `${h}:${m}`);
+            updateE(id, field, `${h}:${m}`);
         }
 
-        function updateE(id, f, v) { 
-            exams.find(x => x.id === id)[f] = v; 
-            renderExams(); 
-            saveAllData(); 
+        // 更新考科欄位並存檔
+        function updateE(id, field, value) {
+            const targetExam = exams.find(x => x.id === id);
+            if (targetExam) {
+                targetExam[field] = value;
+                renderExams();
+                saveAllData();
+                tick();
+            }
         }
 
-        function delE(id) { 
-            exams = exams.filter(e => e.id !== id); 
-            renderExams(); 
-            saveAllData(); 
+        // 刪除考科
+        function delE(id) {
+            exams = exams.filter(e => e.id !== id);
+            renderExams();
+            saveAllData();
+            tick();
+            showToastAlert('已刪除考科', 'success');
         }
 
-        function addExam() { 
-            exams.push({ id: Date.now(), name: '新考科', start: '08:00', end: '09:00', bell: true }); 
-            renderExams(); 
-            saveAllData(); 
+        // 新增考科 (自動帶入上一科結束時間)
+        function addExam() {
+            let defaultStart = '08:00';
+            let defaultEnd = '09:00';
+
+            if (exams.length > 0) {
+                const lastExam = exams[exams.length - 1];
+                defaultStart = lastExam.end;
+                const [h, m] = defaultStart.split(':').map(Number);
+                const nextH = String(Math.min(23, h + 1)).padStart(2, '0');
+                defaultEnd = `${nextH}:${String(m).padStart(2, '0')}`;
+            }
+
+            exams.push({
+                id: Date.now(),
+                name: '新考科',
+                start: defaultStart,
+                end: defaultEnd,
+                bell: true
+            });
+
+            renderExams();
+            saveAllData();
+            tick();
+            showToastAlert('已新增考科', 'success');
         }
 
-        function sortExams() { 
-            exams.sort((a, b) => a.start.localeCompare(b.start)); 
-            renderExams(); 
-            saveAllData(); 
+        // 依開始時間排序考科
+        function sortExams() {
+            exams.sort((a, b) => a.start.localeCompare(b.start));
+            renderExams();
+            saveAllData();
+            tick();
+            showToastAlert('考程已依時間順序排列', 'success');
         }
     </script>
 </body>
