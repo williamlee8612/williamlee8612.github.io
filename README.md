@@ -2,7 +2,7 @@
 ## 補習班相關系統  
 ### 老師端
 https://williamlee8612.github.io/讀卡成績系統  
-備註：串聯Appsheet資料頁
+備註：串聯Appsheet的學生資料
 
 https://williamlee8612.github.io/模擬考考程系統  
 備註：純網站
