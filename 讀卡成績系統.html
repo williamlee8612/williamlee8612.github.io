@@ -326,7 +326,6 @@
         .omr-data-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1120px;
         }
 
         .omr-data-table th {
@@ -334,18 +333,23 @@
             color: #64748B;
             font-size: 13px;
             font-weight: 700;
-            padding: 11px 12px;
+            padding: 11px 10px;
             border-bottom: 1px solid #E2E8F0;
             text-align: left;
             white-space: nowrap;
         }
 
         .omr-data-table td {
-            padding: 10px 12px;
+            padding: 10px 10px;
             border-bottom: 1px solid #E2E8F0;
             font-size: 14px;
             color: #1E293B;
             vertical-align: middle;
+        }
+
+        /* 短欄位鎖定單行不換行，避免窄螢幕擠成直排 */
+        .col-nowrap {
+            white-space: nowrap;
         }
 
         /* 表格隔行變色規範（奇數列白底 / 偶數列 #F8FAFC） */
@@ -369,7 +373,16 @@
         /* 等寬字體與 10 題微間隔排版樣式（50題自動換行，100題最多兩行） */
         .txt-mono-code {
             font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
+        }
+
+        /* 成績欄位專屬緊湊樣式（半形無空格，節省橫向寬度） */
+        .txt-score-compact {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            letter-spacing: 0;
+            color: #EF4444;
+            font-weight: 800;
+            font-size: 15px;
         }
 
         .ans-line-row {
@@ -380,7 +393,7 @@
 
         .ans-chunk-10 {
             display: inline-block;
-            margin-right: 10px;
+            margin-right: 8px;
         }
 
         .ans-chunk-10:last-child {
@@ -563,12 +576,12 @@
                 <table class="omr-data-table">
                     <thead>
                         <tr>
-                            <th style="width: 5%; text-align: center;">序號</th>
-                            <th style="width: 8%;">學號</th>
-                            <th style="width: 9%;">姓名</th>
-                            <th style="width: 34.5%;">原始作答明細（每10題間隔 / 50題換行）</th>
-                            <th style="width: 34.5%;">成績單模式（對: - / 錯: 原作答）</th>
-                            <th style="width: 9%; text-align: center;">答對 / 總題</th>
+                            <th class="col-nowrap" style="min-width: 54px; text-align: center;">序號</th>
+                            <th class="col-nowrap" style="min-width: 82px;">學號</th>
+                            <th class="col-nowrap" style="min-width: 112px;">姓名</th>
+                            <th style="width: 39%;">原始作答明細（每10題間隔 / 50題換行）</th>
+                            <th style="width: 39%;">成績單模式（對: - / 錯: 原作答）</th>
+                            <th class="col-nowrap" style="min-width: 84px; text-align: center;">成績</th>
                         </tr>
                     </thead>
                     <tbody id="resultTableBody">
@@ -950,7 +963,7 @@
     });
 
     /**
-     * 處理單張學生作答卡并更新統計數據
+     * 處理單張學生作答卡並更新統計數據
      */
     function 閱卷單張學生卡(file, totalQ) {
         return new Promise((resolve) => {
@@ -995,7 +1008,8 @@
 
                         學生作答.serialNo = 學生卡流水序號;
                         學生作答.reportModeString = 成績單模式陣列.join('');
-                        學生作答.scoreString = `${答對題數} / ${totalQ}`;
+                        // 使用緊湊半形格式（無空格）顯示成績，節省橫向欄位寬度
+                        學生作答.scoreString = `${答對題數}/${totalQ}`;
                         學生作答.correctCount = 答對題數;
                         學生作答.totalCount = totalQ;
 
@@ -1289,12 +1303,12 @@
             : 'color: #1E293B; font-weight: 700;';
 
         tr.innerHTML = `
-            <td style="text-align: center; font-weight: 700;">${data.serialNo}</td>
-            <td><span class="txt-mono-code" style="color: #1E468A; font-weight: 700;">${data.studentID}</span></td>
-            <td><span style="${nameStyle}">${data.studentName}</span></td>
+            <td class="col-nowrap" style="text-align: center; font-weight: 700;">${data.serialNo}</td>
+            <td class="col-nowrap"><span class="txt-mono-code" style="color: #1E468A; font-weight: 700;">${data.studentID}</span></td>
+            <td class="col-nowrap"><span style="${nameStyle}">${data.studentName}</span></td>
             <td><div class="txt-mono-code" style="color: #334155;">${格式化答案顯示HTML(data.answers)}</div></td>
             <td><div class="txt-mono-code" style="color: #64748B; font-weight: 600;">${格式化答案顯示HTML(data.reportModeString)}</div></td>
-            <td style="text-align: center;"><span class="txt-mono-code" style="color: #EF4444; font-weight: 800; font-size: 15px;">${data.scoreString}</span></td>
+            <td class="col-nowrap" style="text-align: center;"><span class="txt-score-compact">${data.scoreString}</span></td>
         `;
         tableBody.appendChild(tr);
     }
@@ -1304,9 +1318,9 @@
         const tr = document.createElement('tr');
         tr.className = 'row-scan-error';
         tr.innerHTML = `
-            <td style="text-align: center; font-weight: 700;">${serialNo}</td>
-            <td style="color: #EF4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation mr-1"></i>辨識失敗</td>
-            <td style="color: #EF4444; font-weight: 700;">-</td>
+            <td class="col-nowrap" style="text-align: center; font-weight: 700;">${serialNo}</td>
+            <td class="col-nowrap" style="color: #EF4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation mr-1"></i>辨識失敗</td>
+            <td class="col-nowrap" style="color: #EF4444; font-weight: 700;">-</td>
             <td colspan="3" style="color: #64748B;">檔案「${fileName}」定位異常，請確認考卷四周黑框完整且無反光。</td>
         `;
         tableBody.appendChild(tr);
