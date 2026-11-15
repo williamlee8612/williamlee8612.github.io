@@ -100,7 +100,7 @@
             transform: none;
         }
 
-        /* ── 主內容寬螢幕自適應容器 (.main-container，放寬至 98%) ── */
+        /* ── 主內容寬螢幕自適應容器 (.main-container，98% 寬螢幕展開) ── */
         .main-container {
             width: 98%;
             max-width: 1920px;
@@ -145,30 +145,38 @@
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
-            padding: 20px 24px;
+            padding: 18px 24px;
             margin-bottom: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
-        /* 雙欄對齊網格：確保 步驟1/步驟3 上下對齊、步驟2/步驟4 上下對齊 */
+        /* 2×2 對齊網格：步驟1/步驟3 垂直對齊，步驟2/步驟4 垂直對齊 */
         .omr-steps-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px 32px;
+            gap: 14px 36px;
             align-items: center;
         }
 
         @media (min-width: 1180px) {
             .omr-steps-grid {
-                grid-template-columns: 1.05fr 1fr;
+                grid-template-columns: 1fr 1fr;
             }
         }
 
         .omr-step-cell {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            gap: 12px 16px;
+            gap: 14px;
+            min-height: 40px;
+            flex-wrap: wrap;
+        }
+
+        /* 寬螢幕下鎖定單行不換行，徹底防止上傳檔案或狀態更新時推擠跑版 */
+        @media (min-width: 1180px) {
+            .omr-step-cell {
+                flex-wrap: nowrap;
+            }
         }
 
         .omr-step-cell-bottom {
@@ -176,7 +184,7 @@
             border-top: 1px solid #E2E8F0;
         }
 
-        /* 步驟區塊標題徽章 */
+        /* 步驟區塊標題徽章（固定寬度感，兼作該步驟主標籤） */
         .step-badge-title {
             font-size: 13px;
             font-weight: 700;
@@ -184,14 +192,15 @@
             background-color: #EFF6FF;
             border: 1px solid #BFDBFE;
             border-radius: 6px;
-            padding: 4px 10px;
+            padding: 5px 11px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        /* 控制項統一標籤 */
+        /* 控制項精簡標籤 */
         .control-item-label {
             font-size: 14px;
             font-weight: 600;
@@ -200,12 +209,13 @@
             align-items: center;
             gap: 6px;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* ── 數字與前綴輸入框 (.omr-number-input) ── */
         .omr-number-input {
-            width: 82px;
-            padding: 7px 10px;
+            width: 76px;
+            padding: 6px 8px;
             font-size: 15px;
             font-weight: 700;
             color: #1E293B;
@@ -222,18 +232,23 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        /* ── 檔案上傳元件 (.omr-file-input) ── */
+        /* ── 檔案上傳元件 (.omr-file-input，限制寬度避免長檔名推擠右側狀態) ── */
         .omr-file-input {
             font-size: 13px;
             color: #64748B;
-            max-width: 245px;
+            width: 185px;
+            max-width: 185px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .omr-file-input::file-selector-button {
             background-color: #F8FAFC;
             border: 1px solid #CBD5E1;
             border-radius: 8px;
-            padding: 7px 12px;
+            padding: 6px 12px;
             font-size: 13px;
             font-weight: 600;
             color: #1E293B;
@@ -250,6 +265,17 @@
         .omr-file-input:disabled::file-selector-button {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        /* 步驟狀態文字（鎖定單行不折行） */
+        .step-status-inline {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
         }
 
         /* ── 標準答案預覽框 (.omr-preview-box) ── */
@@ -272,14 +298,15 @@
             color: #FFFFFF;
             border: none;
             border-radius: 8px;
-            padding: 8px 18px;
+            padding: 7px 16px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
             white-space: nowrap;
+            flex-shrink: 0;
             transition: all 0.2s ease;
         }
 
@@ -302,14 +329,15 @@
             color: #475569;
             border: 1px solid #CBD5E1;
             border-radius: 8px;
-            padding: 7px 16px;
+            padding: 6px 14px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             white-space: nowrap;
+            flex-shrink: 0;
             transition: all 0.2s ease;
         }
 
@@ -443,7 +471,7 @@
             </h1>
             <span id="systemReadyBadge" class="header-status-pill hidden sm:inline-flex">
                 <i class="fa-solid fa-spinner fa-spin"></i>
-                <span>系統準備中</span>
+                <span>準備中</span>
             </span>
         </div>
 
@@ -468,13 +496,13 @@
         </div>
     </header>
 
-    <!-- 主內容區（自適應寬螢幕容器 98%） -->
+    <!-- 主內容區（寬螢幕 98% 自適應容器） -->
     <main class="main-container">
 
         <!-- 靜態系統訊息提示區（預設隱藏，依狀態顯示成功或警告 Alert） -->
         <div id="systemAlertContainer" style="display: none;"></div>
 
-        <!-- 閱卷控制台卡片（四步驟上下對齊網格） -->
+        <!-- 閱卷控制台卡片（精簡 2×2 對齊網格，操作全程不換行跑版） -->
         <section class="omr-control-card">
             <div class="omr-steps-grid">
 
@@ -488,7 +516,7 @@
                     <div class="flex items-center gap-2">
                         <label for="totalQuestionsInput" class="control-item-label">
                             <i class="fa-solid fa-list-ol text-[#1E468A]"></i>
-                            <span>考試題數：</span>
+                            <span>題數</span>
                         </label>
                         <input type="number" id="totalQuestionsInput" class="omr-number-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                         <span class="text-[13px] font-semibold text-[#64748B]">題</span>
@@ -497,32 +525,28 @@
                     <div class="flex items-center gap-2">
                         <label for="idPrefixInput" class="control-item-label">
                             <i class="fa-solid fa-id-badge text-[#1E468A]"></i>
-                            <span>學號前綴 (2碼)：</span>
+                            <span>學號前綴</span>
                         </label>
                         <input type="text" id="idPrefixInput" class="omr-number-input" maxlength="2" placeholder="00" value="00" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                     </div>
                 </div>
 
-                <!-- 右上：步驟 2（標準答案，與下方步驟 4 垂直對齊） -->
+                <!-- 右上：步驟 2（標準答案，去除重複贅字，與下方步驟 4 垂直對齊） -->
                 <div class="omr-step-cell">
                     <span class="step-badge-title">
                         <i class="fa-solid fa-key"></i>
                         <span>步驟 2｜標準答案</span>
                     </span>
 
-                    <label for="answerKeyInput" class="control-item-label">
-                        <i class="fa-solid fa-file-arrow-up text-[#1E468A]"></i>
-                        <span>上傳答案卡：</span>
-                    </label>
                     <input type="file" id="answerKeyInput" class="omr-file-input" accept="image/*" disabled>
-                    <span id="ansStatusTxt" class="text-[13px] font-semibold text-[#64748B]">請稍候...</span>
+                    <span id="ansStatusTxt" class="step-status-inline" style="color: #64748B;">載入中...</span>
                 </div>
 
-                <!-- 中間橫跨列：標準答案預覽（讀取成功後自動展開，採每 10 題間隔、50 題換行排版） -->
+                <!-- 中間橫跨列：標準答案預覽（讀取成功後自動展開，每 10 題間隔、50 題換行） -->
                 <div id="answerPreviewRow" class="col-span-full flex flex-col sm:flex-row sm:items-center gap-3 pt-3 border-t border-dashed border-[#E2E8F0]" style="display: none;">
                     <span class="control-item-label" style="color: #047857;">
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>標準答案預覽：</span>
+                        <span>標準答案：</span>
                     </span>
                     <div id="answerKeyPreview" class="omr-preview-box">尚未讀取標準答案</div>
                 </div>
@@ -534,12 +558,8 @@
                         <span>步驟 3｜學生閱卷</span>
                     </span>
 
-                    <label for="studentFileInput" class="control-item-label">
-                        <i class="fa-solid fa-images text-[#1E468A]"></i>
-                        <span>批量上傳作答卡：</span>
-                    </label>
                     <input type="file" id="studentFileInput" class="omr-file-input" accept="image/*" multiple disabled>
-                    <span id="importProgressTxt" class="text-[13px] font-bold text-[#047857]" style="display: none;"></span>
+                    <span id="importProgressTxt" class="step-status-inline" style="color: #64748B;">請先讀答案卡</span>
                 </div>
 
                 <!-- 右下：步驟 4（報表操作，與上方步驟 2 垂直對齊） -->
@@ -551,7 +571,7 @@
 
                     <button id="btnExport" type="button" class="btn-omr-primary" onclick="匯出成績單CSV()" disabled>
                         <i class="fa-solid fa-file-csv"></i>
-                        <span>匯出成績單 (CSV)</span>
+                        <span>匯出 CSV</span>
                     </button>
 
                     <button id="btnResetAll" type="button" class="btn-omr-secondary" onclick="清空重設系統()" title="清除目前答案卡與所有閱卷結果並恢復預設值">
@@ -602,7 +622,7 @@
                     <tbody id="resultTableBody">
                         <tr>
                             <td colspan="6" style="text-align: center; color: #64748B; padding: 48px 16px;">
-                                尚無閱卷資料，請依序完成「上傳標準答案卡」與「批量上傳作答卡」。
+                                尚無閱卷資料，請依序完成「步驟 2 標準答案」與「步驟 3 學生閱卷」。
                             </td>
                         </tr>
                     </tbody>
@@ -698,18 +718,18 @@
     });
 
     /**
-     * 視覺引擎就緒後解鎖答案卡上傳功能
+     * 視覺引擎就緒後解鎖答案卡上傳功能（保持精簡短字串防跑版）
      */
     function 啟動視覺引擎就緒狀態() {
         if (視覺引擎已就緒) return;
         視覺引擎已就緒 = true;
 
         const badge = document.getElementById('systemReadyBadge');
-        badge.innerHTML = '<i class="fa-solid fa-circle-check text-[#10B981]"></i><span>系統就緒</span>';
+        badge.innerHTML = '<i class="fa-solid fa-circle-check text-[#10B981]"></i><span>就緒</span>';
 
         document.getElementById('answerKeyInput').disabled = false;
         const ansStatus = document.getElementById('ansStatusTxt');
-        ansStatus.innerText = '請選擇標準答案卡圖檔';
+        ansStatus.innerText = '未上傳';
         ansStatus.style.color = '#64748B';
     }
 
@@ -798,7 +818,7 @@
     }
 
     // =========================================================================
-    // 四、 學生名冊同步與查詢（使用者視角精簡文案）
+    // 四、 學生名冊同步與查詢
     // =========================================================================
     async function 載入學生名冊(isManualRefresh = false) {
         const statusIcon = document.getElementById('dbStatusIcon');
@@ -887,7 +907,6 @@
         const tableBody = document.getElementById('resultTableBody');
         tableBody.innerHTML = '';
 
-        // 保留原有的辨識失敗列數，重新計算正常與異常筆數
         const scanFailCount = 統計數據.total - 全域成績資料庫.length;
         統計數據.normal = 0;
         統計數據.error = scanFailCount;
@@ -909,12 +928,12 @@
     }
 
     // =========================================================================
-    // 五、 步驟 2 & 步驟 3：答案卡讀取與批量學生卡閱卷
+    // 五、 步驟 2 & 步驟 3：答案卡讀取與批量學生卡閱卷（精簡單行狀態提示）
     // =========================================================================
     document.getElementById('answerKeyInput').addEventListener('change', function(e) {
         if (e.target.files.length === 0) return;
         const ansStatus = document.getElementById('ansStatusTxt');
-        ansStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>讀取分析中...';
+        ansStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>讀取中...';
         ansStatus.style.color = '#1E468A';
 
         const 檔案 = e.target.files[0];
@@ -929,12 +948,18 @@
                     標準答案字串 = 識別結果.answers;
                     document.getElementById('answerPreviewRow').style.display = 'flex';
                     document.getElementById('answerKeyPreview').innerHTML = 格式化答案顯示HTML(標準答案字串);
-                    ansStatus.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>讀取成功';
+                    ansStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i>已讀取';
                     ansStatus.style.color = '#047857';
+
+                    // 解鎖步驟 3 批量作答卡上傳
                     document.getElementById('studentFileInput').disabled = false;
+                    const stuProgress = document.getElementById('importProgressTxt');
+                    stuProgress.innerText = '待上傳';
+                    stuProgress.style.color = '#64748B';
+
                     播放提示音效('success');
                 } else {
-                    ansStatus.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i>定位失敗';
+                    ansStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>定位失敗';
                     ansStatus.style.color = '#EF4444';
                     顯示系統訊息('error', '標準答案卡定位失敗，請確認考卷四周黑框完整且無反光。');
                     播放提示音效('error');
@@ -958,17 +983,17 @@
 
         const 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value, 10) || 100;
         const 進度文字 = document.getElementById('importProgressTxt');
-        進度文字.style.display = 'inline';
-        進度文字.innerText = `批改中：0 / ${檔案列表.length} 張`;
+        進度文字.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>批改 0/${檔案列表.length}`;
         進度文字.style.color = '#F59E0B';
 
         for (let i = 0; i < 檔案列表.length; i++) {
             const 檔案 = 檔案列表[i];
             await 閱卷單張學生卡(檔案, 目標題數);
-            進度文字.innerText = `批改中：${i + 1} / ${檔案列表.length} 張`;
+            進度文字.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>批改 ${i + 1}/${檔案列表.length}`;
         }
 
-        進度文字.innerText = `批改完成（共 ${檔案列表.length} 張）`;
+        // 保持與批改中相同的字數長度，確保單行穩定不折行
+        進度文字.innerHTML = `<i class="fa-solid fa-circle-check"></i>完成 ${檔案列表.length} 張`;
         進度文字.style.color = '#047857';
         播放提示音效('success');
 
@@ -1023,7 +1048,6 @@
 
                         學生作答.serialNo = 學生卡流水序號;
                         學生作答.reportModeString = 成績單模式陣列.join('');
-                        // 使用緊湊半形格式（無空格）顯示成績，節省橫向欄位寬度
                         學生作答.scoreString = `${答對題數}/${totalQ}`;
                         學生作答.correctCount = 答對題數;
                         學生作答.totalCount = totalQ;
@@ -1070,13 +1094,13 @@
         document.getElementById('answerKeyPreview').innerHTML = '尚未讀取標準答案';
 
         const ansStatus = document.getElementById('ansStatusTxt');
-        ansStatus.innerText = 視覺引擎已就緒 ? '請選擇標準答案卡圖檔' : '請稍候...';
+        ansStatus.innerText = 視覺引擎已就緒 ? '未上傳' : '載入中...';
         ansStatus.style.color = '#64748B';
 
-        // 3. 清除進度文字、匯出按鈕與提示訊息
+        // 3. 還原步驟 3 狀態文字、鎖定匯出按鈕並隱藏提示橫幅
         const 進度文字 = document.getElementById('importProgressTxt');
-        進度文字.style.display = 'none';
-        進度文字.innerText = '';
+        進度文字.innerText = '請先讀答案卡';
+        進度文字.style.color = '#64748B';
 
         document.getElementById('btnExport').disabled = true;
         document.getElementById('systemAlertContainer').style.display = 'none';
@@ -1090,7 +1114,7 @@
         document.getElementById('resultTableBody').innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; color: #64748B; padding: 48px 16px;">
-                    尚無閱卷資料，請依序完成「上傳標準答案卡」與「批量上傳作答卡」。
+                    尚無閱卷資料，請依序完成「步驟 2 標準答案」與「步驟 3 學生閱卷」。
                 </td>
             </tr>
         `;
