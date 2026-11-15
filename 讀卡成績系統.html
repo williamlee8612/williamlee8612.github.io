@@ -236,8 +236,8 @@
         .omr-file-input {
             font-size: 13px;
             color: #64748B;
-            width: 185px;
-            max-width: 185px;
+            width: 400px;
+            max-width: 400px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -513,16 +513,16 @@
                         <span>步驟 1｜考試設定</span>
                     </span>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-3">
                         <label for="totalQuestionsInput" class="control-item-label">
                             <i class="fa-solid fa-list-ol text-[#1E468A]"></i>
-                            <span>題數</span>
+                            <span>考試題數</span>
                         </label>
                         <input type="number" id="totalQuestionsInput" class="omr-number-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                         <span class="text-[13px] font-semibold text-[#64748B]">題</span>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-3">
                         <label for="idPrefixInput" class="control-item-label">
                             <i class="fa-solid fa-id-badge text-[#1E468A]"></i>
                             <span>學號前綴</span>
@@ -559,7 +559,7 @@
                     </span>
 
                     <input type="file" id="studentFileInput" class="omr-file-input" accept="image/*" multiple disabled>
-                    <span id="importProgressTxt" class="step-status-inline" style="color: #64748B;">請先讀答案卡</span>
+                    <span id="importProgressTxt" class="step-status-inline" style="color: #64748B;">請先上傳標準答案卡</span>
                 </div>
 
                 <!-- 右下：步驟 4（報表操作，與上方步驟 2 垂直對齊） -->
@@ -614,15 +614,15 @@
                             <th class="col-nowrap" style="min-width: 54px; text-align: center;">序號</th>
                             <th class="col-nowrap" style="min-width: 82px;">學號</th>
                             <th class="col-nowrap" style="min-width: 112px;">姓名</th>
-                            <th style="width: 39%;">原始作答明細（每10題間隔 / 50題換行）</th>
-                            <th style="width: 39%;">成績單模式（對: - / 錯: 原作答）</th>
+                            <th style="width: 39%;">原始作答明細</th>
+                            <th style="width: 39%;">成績單模式（對：- / 錯：原作答）</th>
                             <th class="col-nowrap" style="min-width: 84px; text-align: center;">成績</th>
                         </tr>
                     </thead>
                     <tbody id="resultTableBody">
                         <tr>
                             <td colspan="6" style="text-align: center; color: #64748B; padding: 48px 16px;">
-                                尚無閱卷資料，請依序完成「步驟 2 標準答案」與「步驟 3 學生閱卷」。
+                                尚無閱卷資料
                             </td>
                         </tr>
                     </tbody>
@@ -1114,7 +1114,7 @@
         document.getElementById('resultTableBody').innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; color: #64748B; padding: 48px 16px;">
-                    尚無閱卷資料，請依序完成「步驟 2 標準答案」與「步驟 3 學生閱卷」。
+                    尚無閱卷資料
                 </td>
             </tr>
         `;
