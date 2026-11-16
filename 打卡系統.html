@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承智教育 | 打卡系統</title>
+
+  <!-- 1. 引入 Google Fonts Noto Sans TC（防止跨作業系統中文字體顯示異常） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- 2. 引入 FontAwesome 6.5.1 圖示庫 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  <!-- 3. 引入 Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 4. 獨立元件樣式表（禁用 :root 全域變數，所有尺寸、顏色、間距皆明確宣告於各自 Class） -->
+  <style>
+    /* 全局基礎設定 */
+    * {
+      box-sizing: border-box;
+    }
+
+    body.page-body-shell {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F1F5F9;
+      color: #1E293B;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ── 頂部導覽列 (Header Bar：高 64px、深藍底白字) ── */
+    .sys-header-bar {
+      background-color: #1E468A;
+      color: #FFFFFF;
+      height: 64px;
+      padding-left: 16px;
+      padding-right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 640px) {
+      .sys-header-bar {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+    }
+
+    .sys-header-brand {
+      font-size: 24px;
+      font-weight: 600;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .sys-header-brand-icon {
+      color: #BFDBFE;
+      font-size: 22px;
+    }
+
+    .sys-header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* 系統連線狀態燈號膠囊 */
+    .sys-conn-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background-color: rgba(255, 255, 255, 0.12);
+      color: #BFDBFE;
+    }
+
+    .sys-conn-badge.status-loading {
+      color: #F59E0B;
+    }
+
+    .sys-conn-badge.status-ready {
+      color: #34D399;
+    }
+
+    .sys-conn-badge.status-error {
+      color: #FCA5A5;
+    }
+
+    /* Header 功能操作按鈕（音效開關 / 重新測試連線） */
+    .sys-header-action-btn {
+      background-color: rgba(255, 255, 255, 0.12);
+      color: #BFDBFE;
+      border: 1px solid rgba(191, 219, 254, 0.25);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .sys-header-action-btn:hover {
+      background-color: #1E3A8A;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .sys-header-clock {
+      font-size: 15px;
+      font-weight: 600;
+      color: #BFDBFE;
+      letter-spacing: 0.5px;
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .sys-header-clock {
+        display: block;
+      }
+    }
+
+    /* ── 主內容外框容器 (RWD 支援，桌機維持一屏舒適高度) ── */
+    .main-workspace-container {
+      width: 100%;
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 24px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 640px) {
+      .main-workspace-container {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+    }
+
+    .workspace-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    @media (min-width: 1024px) {
+      .workspace-grid-layout {
+        grid-template-columns: 5fr 7fr;
+        height: calc(100vh - 112px);
+      }
+    }
+
+    .left-operation-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .right-record-stack {
+      display: flex;
+      flex-direction: column;
+      min-height: 420px;
+    }
+
+    @media (min-width: 1024px) {
+      .right-record-stack {
+        height: 100%;
+        min-height: 0;
+      }
+    }
+
+    /* ── 獨立模組 1：大型數位時鐘卡片 ── */
+    .clock-display-card {
+      background-color: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .clock-date-label {
+      font-size: 17px;
+      font-weight: 700;
+      color: #64748B;
+      margin-bottom: 4px;
+    }
+
+    .clock-digits-label {
+      font-size: 44px;
+      font-weight: 800;
+      color: #1E293B;
+      line-height: 1.1;
+      letter-spacing: 1.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .clock-colon-blink {
+      animation: colonPulseAnim 1s step-end infinite;
+    }
+
+    @keyframes colonPulseAnim {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+
+    /* ── 獨立模組 2：今日數據統計卡片 ── */
+    .stats-overview-card {
+      background-color: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 14px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .stat-metric-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat-metric-number {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1E293B;
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-metric-number.metric-in {
+      color: #047857;
+    }
+
+    .stat-metric-number.metric-out {
+      color: #B91C1C;
+    }
+
+    .stat-metric-caption {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748B;
+      margin-top: 2px;
+    }
+
+    .stat-metric-divider {
+      width: 1px;
+      height: 36px;
+      background-color: #E2E8F0;
+    }
+
+    /* ── 獨立模組 3：打卡操作主卡片 ── */
+    .checkin-action-card {
+      background-color: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+      flex: 1;
+    }
+
+    /* 進班 / 離班 切換按鈕組 */
+    .mode-toggle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mode-toggle-btn {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 2px solid #E2E8F0;
+      background-color: #F8FAFC;
+      color: #64748B;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .mode-toggle-btn:hover {
+      border-color: #CBD5E1;
+      color: #1E293B;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    .mode-toggle-btn.is-active-in {
+      background-color: #ECFDF5;
+      border-color: #10B981;
+      color: #047857;
+    }
+
+    .mode-toggle-btn.is-active-out {
+      background-color: #FEF2F2;
+      border-color: #EF4444;
+      color: #B91C1C;
+    }
+
+    /* 學號輸入與送出區塊 */
+    .student-id-form-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .student-id-label {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1E293B;
+      white-space: nowrap;
+    }
+
+    .student-id-input {
+      flex: 1;
+      width: 100%;
+      background-color: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1E293B;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Focus 亮主色邊框光暈 (#3B82F6) */
+    .student-id-input:focus {
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+
+    .student-id-input::placeholder {
+      font-size: 15px;
+      font-weight: 500;
+      color: #94A3B8;
+    }
+
+    .student-id-input.input-error-shake {
+      border-color: #EF4444;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.18);
+    }
+
+    /* 確認打卡送出按鈕 */
+    .checkin-submit-btn {
+      background-color: #1E468A;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .checkin-submit-btn:hover:not(:disabled) {
+      background-color: #1E3A8A;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(30, 70, 138, 0.25);
+    }
+
+    .checkin-submit-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    /* 打卡狀態回饋 Alert 區域 */
+    .feedback-status-section {
+      border-top: 1px solid #E2E8F0;
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 58px;
+    }
+
+    .feedback-prefix-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: #64748B;
+      white-space: nowrap;
+    }
+
+    .feedback-alert-slot {
+      flex: 1;
+    }
+
+    .feedback-idle-hint {
+      font-size: 15px;
+      font-weight: 600;
+      color: #64748B;
+    }
+
+    .feedback-loading-hint {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1E468A;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 規範指定圓角 Alert 色票（成功 #ECFDF5/#047857、失敗 #FEF2F2/#B91C1C） */
+    .feedback-alert-pill {
+      width: 100%;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: alertSlideIn 0.2s ease-out;
+    }
+
+    @keyframes alertSlideIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feedback-alert-pill.alert-success {
+      background-color: #ECFDF5;
+      color: #047857;
+      border: 1px solid #A7F3D0;
+    }
+
+    .feedback-alert-pill.alert-error {
+      background-color: #FEF2F2;
+      color: #B91C1C;
+      border: 1px solid #FECACA;
+    }
+
+    .feedback-alert-pill.alert-warning {
+      background-color: #FFFBEB;
+      color: #B45309;
+      border: 1px solid #FDE68A;
+    }
+
+    /* ── 獨立模組 4：右側即時打卡紀錄面板 ── */
+    .record-board-card {
+      background-color: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: 100%;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .record-board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .record-board-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1E293B;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .record-board-title-icon {
+      color: #1E468A;
+    }
+
+    .clear-session-btn {
+      background-color: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      color: #64748B;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .clear-session-btn:hover {
+      border-color: #EF4444;
+      color: #B91C1C;
+      background-color: #FEF2F2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    /* 進班 / 離班 雙欄資料表容器 */
+    .record-split-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    @media (min-width: 640px) {
+      .record-split-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .record-stream-col {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background-color: #FFFFFF;
+      min-height: 180px;
+    }
+
+    .record-stream-col.col-divider-right {
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    @media (min-width: 640px) {
+      .record-stream-col.col-divider-right {
+        border-bottom: none;
+        border-right: 1px solid #E2E8F0;
+      }
+    }
+
+    .record-col-sticky-head {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      background-color: #F8FAFC;
+      border-bottom: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .record-col-sticky-head.head-in-style {
+      color: #047857;
+    }
+
+    .record-col-sticky-head.head-out-style {
+      color: #B91C1C;
+    }
+
+    /* 資料列（規範：奇數列白底 / 偶數列 #F8FAFC） */
+    .record-data-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid #E2E8F0;
+      background-color: #FFFFFF;
+      font-size: 14px;
+    }
+
+    .record-data-row:nth-child(odd) {
+      background-color: #F8FAFC;
+    }
+
+    .record-row-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .record-row-time {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748B;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .record-row-sep {
+      color: #CBD5E1;
+      font-size: 12px;
+    }
+
+    .record-row-student {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1E293B;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .record-row-id-tag {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748B;
+      background-color: #F1F5F9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* 無資料純文字提示 */
+    .record-empty-placeholder {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #64748B;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="page-body-shell">
+
+  <!-- ── 頂部列 (Header Bar：64px 深藍專業風格) ── -->
+  <header class="sys-header-bar">
+    <h1 class="sys-header-brand">
+      <i class="fa-solid fa-address-card sys-header-brand-icon"></i>
+      <span>承智教育 | 打卡系統</span>
+    </h1>
+
+    <div class="sys-header-controls">
+      <!-- 後端 API 連線狀態燈號 -->
+      <div class="sys-conn-badge status-loading" id="header-conn-status">
+        <i class="fa-solid fa-circle-notch fa-spin" id="header-conn-icon"></i>
+        <span id="header-conn-text">系統連線中</span>
+      </div>
+
+      <!-- 手動重新測試連線按鈕 -->
+      <button type="button" class="sys-header-action-btn" onclick="checkApiHealth()" title="重新檢查後端連線">
+        <i class="fa-solid fa-rotate"></i>
+        <span class="hidden sm:inline">重整連線</span>
+      </button>
+
+      <!-- 提示音效開關按鈕 -->
+      <button type="button" class="sys-header-action-btn" id="btn-sound-toggle" onclick="toggleSound()" title="切換打卡提示音效">
+        <i class="fa-solid fa-volume-high" id="icon-sound-state"></i>
+        <span class="hidden sm:inline" id="text-sound-state">音效開</span>
+      </button>
+
+      <!-- 右上角即時時間 -->
+      <div class="sys-header-clock" id="header-live-clock">00:00:00</div>
+    </div>
+  </header>
+
+  <!-- ── 主內容區 (RWD Max-W-7XL 容器) ── -->
+  <main class="main-workspace-container">
+    <div class="workspace-grid-layout">
+
+      <!-- 左側欄位：時鐘、數據統計、打卡操作區 -->
+      <section class="left-operation-stack">
+
+        <!-- 1. 即時日期與數位時鐘卡片 -->
+        <div class="clock-display-card">
+          <div class="clock-date-label" id="main-clock-date">載入日期中...</div>
+          <div class="clock-digits-label">
+            <span id="clock-hh">00</span><span class="clock-colon-blink">:</span><span id="clock-mm">00</span><span class="clock-colon-blink">:</span><span id="clock-ss">00</span>
+          </div>
+        </div>
+
+        <!-- 2. 本次開啟期間統計數據卡片 -->
+        <div class="stats-overview-card">
+          <div class="stat-metric-item">
+            <div class="stat-metric-number" id="metric-total-count">0</div>
+            <div class="stat-metric-caption">累計總打卡</div>
+          </div>
+          <div class="stat-metric-divider"></div>
+          <div class="stat-metric-item">
+            <div class="stat-metric-number metric-in" id="metric-in-count">0</div>
+            <div class="stat-metric-caption">進班次數</div>
+          </div>
+          <div class="stat-metric-divider"></div>
+          <div class="stat-metric-item">
+            <div class="stat-metric-number metric-out" id="metric-out-count">0</div>
+            <div class="stat-metric-caption">離班次數</div>
+          </div>
+        </div>
+
+        <!-- 3. 打卡操作與狀態回饋卡片 -->
+        <div class="checkin-action-card">
+          <!-- 進班 / 離班 切換按鈕 -->
+          <div class="mode-toggle-grid">
+            <button type="button" class="mode-toggle-btn is-active-in" id="btn-mode-in" onclick="switchCheckinMode('進班')">
+              <i class="fa-solid fa-right-to-bracket"></i>
+              <span>進班</span>
+            </button>
+            <button type="button" class="mode-toggle-btn" id="btn-mode-out" onclick="switchCheckinMode('離班')">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>離班</span>
+            </button>
+          </div>
+
+          <!-- 學號輸入框與送出按鈕 -->
+          <div class="student-id-form-row">
+            <label for="input-student-id" class="student-id-label">學號：</label>
+            <input
+              type="text"
+              id="input-student-id"
+              class="student-id-input"
+              inputmode="numeric"
+              placeholder="請輸入或刷入學號後按 Enter"
+              autocomplete="off"
+            >
+            <button type="button" id="btn-submit-checkin" class="checkin-submit-btn" onclick="submitCheckin()">
+              <i class="fa-solid fa-paper-plane" id="icon-submit-btn"></i>
+              <span id="text-submit-btn">打卡</span>
+            </button>
+          </div>
+
+          <!-- 打卡結果回饋狀態列 -->
+          <div class="feedback-status-section">
+            <span class="feedback-prefix-label">狀態：</span>
+            <div class="feedback-alert-slot" id="feedback-alert-slot">
+              <span class="feedback-idle-hint">請輸入學號進行打卡</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 右側欄位：即時打卡紀錄（頁面暫存，重新整理即清空） -->
+      <section class="right-record-stack">
+        <div class="record-board-card">
+          <div class="record-board-header">
+            <h2 class="record-board-title">
+              <i class="fa-solid fa-list-check record-board-title-icon"></i>
+              <span>即時打卡紀錄（頁面暫存）</span>
+            </h2>
+            <button type="button" class="clear-session-btn" onclick="clearSessionLogs()">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>清除畫面紀錄</span>
+            </button>
+          </div>
+
+          <!-- 進班 / 離班 雙欄列表 -->
+          <div class="record-split-grid">
+            <!-- 左欄：進班紀錄 -->
+            <div class="record-stream-col col-divider-right" id="list-col-in">
+              <div class="record-col-sticky-head head-in-style">
+                <span><i class="fa-solid fa-circle-arrow-right mr-1"></i>進班紀錄</span>
+                <span id="badge-in-count">0 筆</span>
+              </div>
+              <div class="record-empty-placeholder">尚無進班紀錄</div>
+            </div>
+
+            <!-- 右欄：離班紀錄 -->
+            <div class="record-stream-col" id="list-col-out">
+              <div class="record-col-sticky-head head-out-style">
+                <span><i class="fa-solid fa-circle-arrow-left mr-1"></i>離班紀錄</span>
+                <span id="badge-out-count">0 筆</span>
+              </div>
+              <div class="record-empty-placeholder">尚無離班紀錄</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ── 前端業務邏輯與 API 串接腳本 ── -->
+  <script>
+    /**
+     * 集中管理之 GAS Web App API 網址
+     */
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec';
+
+    /**
+     * 系統執行期狀態變數（頁面重整即重置，不使用 localStorage）
+     */
+    let currentCheckinType = '進班';   // 當前打卡模式：'進班' 或 '離班'
+    let isSubmitting = false;          // 防止連點重複送出鎖定旗標
+    let isSoundEnabled = true;         // 提示音效開關狀態
+    let statusResetTimer = null;       // 狀態提示自動恢復計時器
+    let sessionLogs = [];              // 頁面暫存打卡紀錄陣列
+
+    const WEEKDAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+
+    /**
+     * 數字補零工具函式
+     * @param {number} num - 欲補零的整數
+     * @returns {string} 兩位數字串
+     */
+    function padZero(num) {
+      return num < 10 ? '0' + num : String(num);
+    }
+
+    /**
+     * HTML 特殊字元跳脫（防止 XSS 注入）
+     * @param {string} str - 原始字串
+     * @returns {string} 安全字串
+     */
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /**
+     * 即時數位時鐘更新器（每秒執行一次）
+     */
+    function updateLiveClock() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+      const dayStr = WEEKDAY_NAMES[now.getDay()];
+
+      const hh = padZero(now.getHours());
+      const mm = padZero(now.getMinutes());
+      const ss = padZero(now.getSeconds());
+
+      document.getElementById('main-clock-date').textContent = `${year} 年 ${month} 月 ${date} 日（週${dayStr}）`;
+      document.getElementById('clock-hh').textContent = hh;
+      document.getElementById('clock-mm').textContent = mm;
+      document.getElementById('clock-ss').textContent = ss;
+      document.getElementById('header-live-clock').textContent = `${hh}:${mm}:${ss}`;
+    }
+
+    /**
+     * Web Audio API 提示音效產生器（無需外部音檔即可跨平台發聲）
+     * @param {'success'|'error'} type - 音效類型
+     */
+    function playBeepSound(type) {
+      if (!isSoundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'success') {
+          // 打卡成功：清脆雙音階上升提示音
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime);       // D5
+          osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.1); // A5
+          gain.gain.setValueAtTime(0.18, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.28);
+        } else {
+          // 查無學號或錯誤：低沉警示雙短音
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(240, ctx.currentTime);
+          osc.frequency.setValueAtTime(190, ctx.currentTime + 0.14);
+          gain.gain.setValueAtTime(0.22, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.32);
+        }
+      } catch (e) {
+        // 忽略瀏覽器未互動前之音訊限制例外
+      }
+    }
+
+    /**
+     * 切換音效開關
+     */
+    function toggleSound() {
+      isSoundEnabled = !isSoundEnabled;
+      const iconEl = document.getElementById('icon-sound-state');
+      const textEl = document.getElementById('text-sound-state');
+      if (isSoundEnabled) {
+        iconEl.className = 'fa-solid fa-volume-high';
+        textEl.textContent = '音效開';
+        playBeepSound('success');
+      } else {
+        iconEl.className = 'fa-solid fa-volume-xmark';
+        textEl.textContent = '靜音中';
+      }
+      document.getElementById('input-student-id').focus();
+    }
+
+    /**
+     * 更新頂部 Header 系統連線狀態燈號
+     * @param {'loading'|'ready'|'error'} state - 狀態類別
+     * @param {string} label - 顯示文字
+     */
+    function updateHeaderConnStatus(state, label) {
+      const badge = document.getElementById('header-conn-status');
+      const icon = document.getElementById('header-conn-icon');
+      const text = document.getElementById('header-conn-text');
+
+      badge.className = 'sys-conn-badge status-' + state;
+      text.textContent = label;
+
+      if (state === 'loading') {
+        icon.className = 'fa-solid fa-circle-notch fa-spin';
+      } else if (state === 'ready') {
+        icon.className = 'fa-solid fa-circle-check';
+      } else {
+        icon.className = 'fa-solid fa-circle-xmark';
+      }
+    }
+
+    /**
+     * 呼叫後端 doGet 執行健康檢查與預熱連線
+     */
+    async function checkApiHealth() {
+      updateHeaderConnStatus('loading', '系統連線中');
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'GET',
+          redirect: 'follow'
+        });
+        const result = await response.json();
+        if (result && result.success) {
+          updateHeaderConnStatus('ready', '系統已連線');
+          document.getElementById('input-student-id').focus();
+        } else {
+          updateHeaderConnStatus('error', '後端回應異常');
+        }
+      } catch (error) {
+        updateHeaderConnStatus('error', '網路連線失敗');
+      }
+    }
+
+    /**
+     * 切換「進班」與「離班」模式
+     * @param {'進班'|'離班'} mode - 目標模式
+     */
+    function switchCheckinMode(mode) {
+      currentCheckinType = mode;
+      const btnIn = document.getElementById('btn-mode-in');
+      const btnOut = document.getElementById('btn-mode-out');
+
+      btnIn.className = 'mode-toggle-btn' + (mode === '進班' ? ' is-active-in' : '');
+      btnOut.className = 'mode-toggle-btn' + (mode === '離班' ? ' is-active-out' : '');
+
+      // 切換後立即將焦點放回學號輸入框，方便連續刷卡/輸入
+      document.getElementById('input-student-id').focus();
+    }
+
+    /**
+     * 設定操作卡片底部的狀態回饋 Alert
+     * @param {'idle'|'loading'|'success'|'error'|'warning'} type - 提示等級
+     * @param {string} message - 提示文字內容
+     */
+    function renderFeedbackStatus(type, message) {
+      const slot = document.getElementById('feedback-alert-slot');
+      if (statusResetTimer) {
+        clearTimeout(statusResetTimer);
+        statusResetTimer = null;
+      }
+
+      if (type === 'idle') {
+        slot.innerHTML = '<span class="feedback-idle-hint">請輸入學號進行打卡</span>';
+        return;
+      }
+
+      if (type === 'loading') {
+        slot.innerHTML = '<span class="feedback-loading-hint"><i class="fa-solid fa-spinner fa-spin"></i>資料比對與寫入中...</span>';
+        return;
+      }
+
+      const iconMap = {
+        success: 'fa-circle-check',
+        error: 'fa-circle-xmark',
+        warning: 'fa-triangle-exclamation'
+      };
+
+      slot.innerHTML = `
+        <div class="feedback-alert-pill alert-${type}">
+          <i class="fa-solid ${iconMap[type]}"></i>
+          <span>${escapeHtml(message)}</span>
+        </div>
+      `;
+
+      // 4 秒後自動恢復為待命提示
+      statusResetTimer = setTimeout(() => {
+        renderFeedbackStatus('idle');
+      }, 4000);
+    }
+
+    /**
+     * 切換送出按鈕與輸入框的 Loading 鎖定狀態
+     * @param {boolean} loading - 是否正在請求中
+     */
+    function setSubmitLoadingState(loading) {
+      isSubmitting = loading;
+      const btn = document.getElementById('btn-submit-checkin');
+      const icon = document.getElementById('icon-submit-btn');
+      const text = document.getElementById('text-submit-btn');
+
+      btn.disabled = loading;
+      if (loading) {
+        icon.className = 'fa-solid fa-spinner fa-spin';
+        text.textContent = '處理中';
+      } else {
+        icon.className = 'fa-solid fa-paper-plane';
+        text.textContent = '打卡';
+      }
+    }
+
+    /**
+     * 觸發輸入框空白紅框閃爍提醒
+     */
+    function triggerInputShake() {
+      const inputEl = document.getElementById('input-student-id');
+      inputEl.classList.add('input-error-shake');
+      inputEl.focus();
+      setTimeout(() => {
+        inputEl.classList.remove('input-error-shake');
+      }, 800);
+    }
+
+    /**
+     * 送出學生打卡請求（依規範使用 text/plain;charset=utf-8 避開 CORS 預檢）
+     */
+    async function submitCheckin() {
+      if (isSubmitting) return;
+
+      const inputEl = document.getElementById('input-student-id');
+      const studentId = inputEl.value.trim();
+
+      if (!studentId) {
+        triggerInputShake();
+        renderFeedbackStatus('warning', '請先輸入學號再送出');
+        return;
+      }
+
+      setSubmitLoadingState(true);
+      renderFeedbackStatus('loading');
+
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          redirect: 'follow',
+          body: JSON.stringify({
+            action: 'checkin',
+            data: {
+              studentId: studentId,
+              type: currentCheckinType
+            }
+          })
+        });
+
+        const result = await response.json();
+
+        // 依開發規範之狀態碼分流處理
+        if (result.code === 200 && result.success) {
+          // 200：成功，顯示成功 Alert、播放音效並加入頁面暫存列表
+          playBeepSound('success');
+          updateHeaderConnStatus('ready', '系統已連線');
+          renderFeedbackStatus('success', `${result.data.name}（${result.data.studentId}）${result.data.type}成功！`);
+          appendSessionLog({
+            studentId: result.data.studentId,
+            name: result.data.name,
+            type: result.data.type,
+            time: result.data.shortTime
+          });
+        } else if (result.code === 400 || result.code === 404) {
+          // 400 / 404：學號不存在或參數缺漏，顯示靜態警告 Alert
+          playBeepSound('error');
+          renderFeedbackStatus('error', result.message || '查無此學號，請確認後重新輸入');
+        } else {
+          // 500 或其他後端嚴重錯誤：跳出 alert() 視窗並更新 Header 燈號
+          playBeepSound('error');
+          updateHeaderConnStatus('error', '伺服器異常');
+          renderFeedbackStatus('error', result.message || '系統發生內部錯誤');
+          alert('【系統異常通知】\n' + (result.message || '後端資料庫寫入失敗，請聯繫管理員。'));
+        }
+      } catch (error) {
+        // 網路異常或無法連線至 GAS：依規範彈出 alert() 並更新 Header 狀態燈號
+        playBeepSound('error');
+        updateHeaderConnStatus('error', '網路連線異常');
+        renderFeedbackStatus('error', '無法連線至後端伺服器');
+        alert('【網路連線異常】\n無法連接至打卡伺服器，請檢查網路狀態後再試一次。');
+      } finally {
+        // 送出後自動清空輸入框並重新 Focus，方便下一位學生連續打卡
+        setSubmitLoadingState(false);
+        inputEl.value = '';
+        inputEl.focus();
+      }
+    }
+
+    /**
+     * 新增一筆紀錄至頁面暫存陣列並重繪畫面
+     * @param {{studentId: string, name: string, type: string, time: string}} record - 打卡紀錄物件
+     */
+    function appendSessionLog(record) {
+      sessionLogs.unshift(record);
+      renderSessionLogs();
+    }
+
+    /**
+     * 手動清除目前頁面上的暫存紀錄（不影響已寫入 Google Sheet 之資料）
+     */
+    function clearSessionLogs() {
+      if (sessionLogs.length === 0) return;
+      if (!confirm('確定要清除目前畫面上的暫存打卡紀錄嗎？（Google 試算表中的正式紀錄不會被刪除）')) {
+        return;
+      }
+      sessionLogs = [];
+      renderSessionLogs();
+      document.getElementById('input-student-id').focus();
+    }
+
+    /**
+     * 渲染統計數據與左右雙欄打卡紀錄列表
+     */
+    function renderSessionLogs() {
+      const inLogs = sessionLogs.filter(item => item.type === '進班');
+      const outLogs = sessionLogs.filter(item => item.type === '離班');
+
+      // 更新左側統計數字
+      document.getElementById('metric-total-count').textContent = sessionLogs.length;
+      document.getElementById('metric-in-count').textContent = inLogs.length;
+      document.getElementById('metric-out-count').textContent = outLogs.length;
+
+      // 產生單欄 HTML 結構
+      const buildColumnRows = (list, emptyMessage) => {
+        if (list.length === 0) {
+          return `<div class="record-empty-placeholder">${escapeHtml(emptyMessage)}</div>`;
+        }
+        return list.map(item => `
+          <div class="record-data-row">
+            <div class="record-row-left">
+              <span class="record-row-time">${escapeHtml(item.time)}</span>
+              <span class="record-row-sep">|</span>
+              <span class="record-row-student">${escapeHtml(item.name)}</span>
+            </div>
+            <span class="record-row-id-tag">${escapeHtml(item.studentId)}</span>
+          </div>
+        `).join('');
+      };
+
+      const colIn = document.getElementById('list-col-in');
+      const colOut = document.getElementById('list-col-out');
+
+      colIn.innerHTML = `
+        <div class="record-col-sticky-head head-in-style">
+          <span><i class="fa-solid fa-circle-arrow-right mr-1"></i>進班紀錄</span>
+          <span>${inLogs.length} 筆</span>
+        </div>
+        ${buildColumnRows(inLogs, '尚無進班紀錄')}
+      `;
+
+      colOut.innerHTML = `
+        <div class="record-col-sticky-head head-out-style">
+          <span><i class="fa-solid fa-circle-arrow-left mr-1"></i>離班紀錄</span>
+          <span>${outLogs.length} 筆</span>
+        </div>
+        ${buildColumnRows(outLogs, '尚無離班紀錄')}
+      `;
+    }
+
+    /**
+     * 綁定學號輸入框 Enter 鍵送出事件
+     */
+    document.getElementById('input-student-id').addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        submitCheckin();
+      }
+    });
+
+    /**
+     * 頁面初始化程序
+     */
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
+    renderSessionLogs();
+    checkApiHealth();
+  </script>
+</body>
+</html>
