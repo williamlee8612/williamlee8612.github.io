@@ -1,8 +1,11 @@
 # 承智教育 CHANGE EDUCATION
 ## 補習班相關系統  
 ### 老師端
+https://williamlee8612.github.io/打卡系統  
+備註：串聯Appsheet的資料頁：學生資料、打卡紀錄
+
 https://williamlee8612.github.io/讀卡成績系統  
-備註：串聯Appsheet的學生資料
+備註：串聯Appsheet的資料頁：學生資料
 
 https://williamlee8612.github.io/模擬考考程系統  
 備註：純網站
@@ -12,4 +15,4 @@ https://williamlee8612.github.io/洞洞樂抽獎程式
 
 ### 家長端  
 https://williamlee8612.github.io/線上補課系統  
-備註：串連Appsheet的補課系統設定
+備註：串連Appsheet的輔助頁：補課系統設定
