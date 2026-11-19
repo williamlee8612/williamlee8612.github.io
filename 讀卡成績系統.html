@@ -88,16 +88,10 @@
             transition: all 0.2s ease;
         }
 
-        .header-action-btn:hover:not(:disabled) {
+        .header-action-btn:hover {
             background-color: #1E3A8A;
             border-color: #BFDBFE;
             transform: translateY(-1px);
-        }
-
-        .header-action-btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            transform: none;
         }
 
         /* ── 主內容寬螢幕自適應容器 (.main-container，98% 寬螢幕展開) ── */
@@ -105,7 +99,7 @@
             width: 98%;
             max-width: 1920px;
             margin: 0 auto;
-            padding: 20px 4px;
+            padding: 18px 4px;
             flex: 1;
         }
 
@@ -115,8 +109,8 @@
             color: #047857;
             border: 1px solid #A7F3D0;
             border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 18px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
             font-size: 14px;
             font-weight: 600;
             display: flex;
@@ -130,8 +124,8 @@
             color: #B91C1C;
             border: 1px solid #FECACA;
             border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 18px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
             font-size: 14px;
             font-weight: 600;
             display: flex;
@@ -145,46 +139,65 @@
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
-            padding: 18px 24px;
-            margin-bottom: 20px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
-        /* 2×2 對齊網格：步驟1/步驟3 垂直對齊，步驟2/步驟4 垂直對齊 */
-        .omr-steps-grid {
+        /* 3 直欄 × 4 橫列網格佈局 */
+        .omr-grid-3x4 {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 14px 36px;
+            gap: 12px 24px;
             align-items: center;
         }
 
-        @media (min-width: 1180px) {
-            .omr-steps-grid {
-                grid-template-columns: 1fr 1fr;
+        @media (min-width: 1200px) {
+            .omr-grid-3x4 {
+                grid-template-columns: 1.15fr 1fr 1.05fr;
             }
         }
 
-        .omr-step-cell {
+        /* 網格儲存格通用樣式 */
+        .grid-cell-box {
             display: flex;
             align-items: center;
-            gap: 14px;
-            min-height: 40px;
+            gap: 10px;
+            min-height: 38px;
             flex-wrap: wrap;
         }
 
-        /* 寬螢幕下鎖定單行不換行，徹底防止上傳檔案或狀態更新時推擠跑版 */
-        @media (min-width: 1180px) {
-            .omr-step-cell {
+        @media (min-width: 1200px) {
+            .grid-cell-box {
                 flex-wrap: nowrap;
             }
         }
 
-        .omr-step-cell-bottom {
-            padding-top: 14px;
+        /* 第 4 橫列上方分隔線 */
+        .grid-row-4-divider {
+            padding-top: 12px;
             border-top: 1px solid #E2E8F0;
         }
 
-        /* 步驟區塊標題徽章（固定寬度感，兼作該步驟主標籤） */
+        /* 第 2 列第 2~3 直欄合併：標準答案預覽區 */
+        .grid-preview-span {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 8px 14px;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @media (min-width: 1200px) {
+            .grid-preview-span {
+                grid-column: 2 / 4;
+            }
+        }
+
+        /* 步驟／配分標籤徽章 */
         .step-badge-title {
             font-size: 13px;
             font-weight: 700;
@@ -192,7 +205,7 @@
             background-color: #EFF6FF;
             border: 1px solid #BFDBFE;
             border-radius: 6px;
-            padding: 5px 11px;
+            padding: 4px 10px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -200,23 +213,46 @@
             flex-shrink: 0;
         }
 
-        /* 控制項精簡標籤 */
         .control-item-label {
             font-size: 14px;
             font-weight: 600;
             color: #1E293B;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
-        /* ── 數字與前綴輸入框 (.omr-number-input) ── */
-        .omr-number-input {
-            width: 76px;
+        /* ── 純數字輸入框 (.omr-score-input / .omr-prefix-input) ── */
+        .omr-score-input {
+            width: 58px;
+            padding: 5px 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1E293B;
+            background-color: #FFFFFF;
+            border: 1px solid #CBD5E1;
+            border-radius: 7px;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .omr-score-input:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .omr-score-input.input-error {
+            border-color: #EF4444;
+            background-color: #FEF2F2;
+        }
+
+        .omr-prefix-input {
+            width: 64px;
             padding: 6px 8px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: #1E293B;
             background-color: #FFFFFF;
@@ -227,17 +263,17 @@
             transition: all 0.2s ease;
         }
 
-        .omr-number-input:focus {
+        .omr-prefix-input:focus {
             border-color: #3B82F6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        /* ── 檔案上傳元件 (.omr-file-input，限制寬度避免長檔名推擠右側狀態) ── */
+        /* ── 檔案上傳元件 (.omr-file-input) ── */
         .omr-file-input {
             font-size: 13px;
             color: #64748B;
-            width: 400px;
-            max-width: 400px;
+            width: 195px;
+            max-width: 195px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -267,44 +303,40 @@
             cursor: not-allowed;
         }
 
-        /* 步驟狀態文字（鎖定單行不折行） */
-        .step-status-inline {
+        /* 第 3 直欄狀態文字 */
+        .col3-status-text {
             font-size: 13px;
             font-weight: 600;
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            flex-shrink: 0;
+            gap: 6px;
         }
 
-        /* ── 標準答案預覽框 (.omr-preview-box) ── */
-        .omr-preview-box {
-            background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 10px 14px;
+        /* 標準答案預覽等寬字區 */
+        .omr-preview-content {
             font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #1E293B;
-            line-height: 1.65;
+            line-height: 1.55;
             flex: 1;
+            overflow-x: auto;
         }
 
-        /* ── 主操作按鈕：匯出 CSV (.btn-omr-primary) ── */
+        /* ── 按鈕樣式 (.btn-omr-primary / .btn-omr-secondary) ── */
         .btn-omr-primary {
             background-color: #1E468A;
             color: #FFFFFF;
             border: none;
             border-radius: 8px;
-            padding: 7px 16px;
-            font-size: 14px;
+            padding: 7px 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             white-space: nowrap;
             flex-shrink: 0;
             transition: all 0.2s ease;
@@ -323,14 +355,13 @@
             box-shadow: none;
         }
 
-        /* ── 次要操作按鈕：清空重設 (.btn-omr-secondary) ── */
         .btn-omr-secondary {
             background-color: #FFFFFF;
             color: #475569;
             border: 1px solid #CBD5E1;
             border-radius: 8px;
-            padding: 6px 14px;
-            font-size: 14px;
+            padding: 6px 13px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
@@ -348,26 +379,27 @@
             transform: translateY(-1px);
         }
 
-        /* ── 成績報表卡片與統計徽章 (.omr-table-card, .stats-summary-bar) ── */
+        /* ── 統計數據膠囊 (.stats-summary-bar) ── */
+        .stats-summary-bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* ── 成績報表卡片與表格 (.omr-table-card, .omr-data-table) ── */
         .omr-table-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 10px;
-            padding: 20px 24px;
+            padding: 18px 22px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        }
-
-        .stats-summary-bar {
-            display: inline-flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 6px 14px;
-            font-size: 13px;
-            font-weight: 600;
         }
 
         .omr-table-wrapper {
@@ -401,7 +433,7 @@
             vertical-align: middle;
         }
 
-        /* 短欄位鎖定單行不換行，避免窄螢幕擠成直排 */
+        /* 短欄位鎖定單行不換行 */
         .col-nowrap {
             white-space: nowrap;
         }
@@ -430,7 +462,7 @@
             letter-spacing: 0.4px;
         }
 
-        /* 成績欄位專屬緊湊樣式（半形無空格，節省橫向寬度） */
+        /* 成績欄位專屬緊湊樣式（半形無空格） */
         .txt-score-compact {
             font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             letter-spacing: 0;
@@ -462,7 +494,7 @@
 </head>
 <body>
 
-    <!-- 頂部導覽列 (高 64px / 深藍專業底色) -->
+    <!-- 頂部導覽列 (高 64px / 深藍專業底色；網頁開啟不自動連線名單，落實資料零留存) -->
     <header class="header-bar">
         <div class="flex items-center gap-3">
             <h1 class="header-title-text">
@@ -476,18 +508,6 @@
         </div>
 
         <div class="flex items-center gap-3">
-            <!-- 學生名冊連線狀態燈號 -->
-            <div class="flex items-center gap-2 text-[14px] text-[#BFDBFE]">
-                <i id="dbStatusIcon" class="fa-solid fa-spinner fa-spin text-[#F59E0B]"></i>
-                <span id="dbStatusTxt" class="hidden md:inline">名冊連線中</span>
-            </div>
-
-            <!-- 重整名冊按鈕 -->
-            <button id="btnRefreshRoster" type="button" class="header-action-btn" onclick="載入學生名冊(true)" title="重新同步最新學生名冊">
-                <i id="refreshIcon" class="fa-solid fa-rotate"></i>
-                <span>重整名冊</span>
-            </button>
-
             <!-- 音效開關按鈕 -->
             <button id="btnToggleSound" type="button" class="header-action-btn" onclick="切換提示音效()" title="切換批改完成提示音效">
                 <i id="soundIcon" class="fa-solid fa-volume-high"></i>
@@ -499,82 +519,140 @@
     <!-- 主內容區（寬螢幕 98% 自適應容器） -->
     <main class="main-container">
 
-        <!-- 靜態系統訊息提示區（預設隱藏，依狀態顯示成功或警告 Alert） -->
+        <!-- 靜態系統訊息提示區（顯示配分重疊錯誤、名單查詢結果等 Alert） -->
         <div id="systemAlertContainer" style="display: none;"></div>
 
-        <!-- 閱卷控制台卡片（精簡 2×2 對齊網格，操作全程不換行跑版） -->
+        <!-- 閱卷控制台卡片（3 直欄 × 4 橫列精準配置） -->
         <section class="omr-control-card">
-            <div class="omr-steps-grid">
+            <div class="omr-grid-3x4">
 
-                <!-- 左上：步驟 1（考試設定） -->
-                <div class="omr-step-cell">
+                <!-- ==================== 第 1 橫列 ==================== -->
+                <!-- 第1列・第1欄：配分設定 1 -->
+                <div class="grid-cell-box">
                     <span class="step-badge-title">
-                        <i class="fa-solid fa-sliders"></i>
-                        <span>步驟 1｜考試設定</span>
+                        <i class="fa-solid fa-1"></i>
+                        <span>配分 1</span>
                     </span>
-
-                    <div class="flex items-center gap-3">
-                        <label for="totalQuestionsInput" class="control-item-label">
-                            <i class="fa-solid fa-list-ol text-[#1E468A]"></i>
-                            <span>考試題數</span>
-                        </label>
-                        <input type="number" id="totalQuestionsInput" class="omr-number-input" min="1" max="100" value="100" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                        <span class="text-[13px] font-semibold text-[#64748B]">題</span>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        <label for="idPrefixInput" class="control-item-label">
-                            <i class="fa-solid fa-id-badge text-[#1E468A]"></i>
-                            <span>學號前綴</span>
-                        </label>
-                        <input type="text" id="idPrefixInput" class="omr-number-input" maxlength="2" placeholder="00" value="00" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                    </div>
+                    <span class="control-item-label">第</span>
+                    <input type="text" inputmode="numeric" id="qStart1" class="omr-score-input" maxlength="3" placeholder="1" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">～</span>
+                    <input type="text" inputmode="numeric" id="qEnd1" class="omr-score-input" maxlength="3" placeholder="100" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">題，每題</span>
+                    <input type="text" inputmode="numeric" id="qPoints1" class="omr-score-input" maxlength="3" placeholder="1" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">分</span>
                 </div>
 
-                <!-- 右上：步驟 2（標準答案，去除重複贅字，與下方步驟 4 垂直對齊） -->
-                <div class="omr-step-cell">
+                <!-- 第1列・第2欄：步驟 1 上傳標準答案卡 -->
+                <div class="grid-cell-box">
                     <span class="step-badge-title">
                         <i class="fa-solid fa-key"></i>
-                        <span>步驟 2｜標準答案</span>
+                        <span>標準答案</span>
                     </span>
-
                     <input type="file" id="answerKeyInput" class="omr-file-input" accept="image/*" disabled>
-                    <span id="ansStatusTxt" class="step-status-inline" style="color: #64748B;">載入中...</span>
                 </div>
 
-                <!-- 中間橫跨列：標準答案預覽（讀取成功後自動展開，每 10 題間隔、50 題換行） -->
-                <div id="answerPreviewRow" class="col-span-full flex flex-col sm:flex-row sm:items-center gap-3 pt-3 border-t border-dashed border-[#E2E8F0]" style="display: none;">
-                    <span class="control-item-label" style="color: #047857;">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>標準答案：</span>
+                <!-- 第1列・第3欄：標準答案卡狀態與滿分試算 -->
+                <div class="grid-cell-box">
+                    <span id="ansStatusTxt" class="col3-status-text" style="color: #64748B;">請先設定配分</span>
+                </div>
+
+                <!-- ==================== 第 2 橫列 ==================== -->
+                <!-- 第2列・第1欄：配分設定 2 -->
+                <div class="grid-cell-box">
+                    <span class="step-badge-title">
+                        <i class="fa-solid fa-2"></i>
+                        <span>配分 2</span>
                     </span>
-                    <div id="answerKeyPreview" class="omr-preview-box">尚未讀取標準答案</div>
+                    <span class="control-item-label">第</span>
+                    <input type="text" inputmode="numeric" id="qStart2" class="omr-score-input" maxlength="3" placeholder="-" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">～</span>
+                    <input type="text" inputmode="numeric" id="qEnd2" class="omr-score-input" maxlength="3" placeholder="-" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">題，每題</span>
+                    <input type="text" inputmode="numeric" id="qPoints2" class="omr-score-input" maxlength="3" placeholder="-" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">分</span>
                 </div>
 
-                <!-- 左下：步驟 3（學生閱卷，與上方步驟 1 垂直對齊） -->
-                <div class="omr-step-cell omr-step-cell-bottom">
+                <!-- 第2列・第2~3欄合併：標準答案卡預覽區 -->
+                <div class="grid-preview-span">
+                    <span class="control-item-label" style="color: #1E468A;">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>答案預覽：</span>
+                    </span>
+                    <div id="answerKeyPreview" class="omr-preview-content" style="color: #94A3B8;">
+                        尚未上傳標準答案卡
+                    </div>
+                </div>
+
+                <!-- ==================== 第 3 橫列 ==================== -->
+                <!-- 第3列・第1欄：配分設定 3 -->
+                <div class="grid-cell-box">
+                    <span class="step-badge-title">
+                        <i class="fa-solid fa-3"></i>
+                        <span>配分 3</span>
+                    </span>
+                    <span class="control-item-label">第</span>
+                    <input type="text" inputmode="numeric" id="qStart3" class="omr-score-input" maxlength="3" placeholder="-" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">～</span>
+                    <input type="text" inputmode="numeric" id="qEnd3" class="omr-score-input" maxlength="3" placeholder="-" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">題，每題</span>
+                    <input type="text" inputmode="numeric" id="qPoints3" class="omr-score-input" maxlength="3" placeholder="-" oninput="處理配分輸入(this)">
+                    <span class="control-item-label">分</span>
+                </div>
+
+                <!-- 第3列・第2欄：步驟 2 批量上傳學生作答卡 -->
+                <div class="grid-cell-box">
                     <span class="step-badge-title">
                         <i class="fa-solid fa-copy"></i>
-                        <span>步驟 3｜學生閱卷</span>
+                        <span>學生作答</span>
                     </span>
-
                     <input type="file" id="studentFileInput" class="omr-file-input" accept="image/*" multiple disabled>
-                    <span id="importProgressTxt" class="step-status-inline" style="color: #64748B;">請先上傳標準答案卡</span>
                 </div>
 
-                <!-- 右下：步驟 4（報表操作，與上方步驟 2 垂直對齊） -->
-                <div class="omr-step-cell omr-step-cell-bottom">
-                    <span class="step-badge-title">
-                        <i class="fa-solid fa-file-export"></i>
-                        <span>步驟 4｜報表操作</span>
-                    </span>
+                <!-- 第3列・第3欄：學生作答卡上傳與批改狀態 -->
+                <div class="grid-cell-box">
+                    <span id="importProgressTxt" class="col3-status-text" style="color: #64748B;">請先讀答案卡</span>
+                </div>
 
+                <!-- ==================== 第 4 橫列 ==================== -->
+                <!-- 第4列・第1欄：學號前綴 + 查詢名單按鈕（按下才連線 GAS 比對） -->
+                <div class="grid-cell-box grid-row-4-divider">
+                    <label for="idPrefixInput" class="control-item-label">
+                        <i class="fa-solid fa-id-badge text-[#1E468A]"></i>
+                        <span>學號前綴</span>
+                    </label>
+                    <input type="text" inputmode="numeric" id="idPrefixInput" class="omr-prefix-input" maxlength="2" placeholder="00" value="00" oninput="處理學號前綴變更(this)">
+
+                    <button id="btnQueryRoster" type="button" class="btn-omr-primary" onclick="查詢學生名單()" disabled>
+                        <i id="queryIcon" class="fa-solid fa-magnifying-glass"></i>
+                        <span id="queryBtnTxt">查詢名單</span>
+                    </button>
+                </div>
+
+                <!-- 第4列・第2欄：即時統計數據 -->
+                <div class="grid-cell-box grid-row-4-divider">
+                    <div class="stats-summary-bar">
+                        <span class="text-[#1E293B]">
+                            <i class="fa-solid fa-layer-group text-[#1E468A] mr-1"></i>總匯入：<strong id="statTotalCount">0</strong> 張
+                        </span>
+                        <span class="text-[#CBD5E1]">|</span>
+                        <span class="text-[#047857]">
+                            <i class="fa-solid fa-circle-check mr-1"></i>正常：<strong id="statNormalCount">0</strong> 張
+                        </span>
+                        <span class="text-[#CBD5E1]">|</span>
+                        <span class="text-[#EF4444]">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i>異常：<strong id="statErrorCount">0</strong> 張
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 第4列・第3欄：匯出 CSV 與 清空重設 -->
+                <div class="grid-cell-box grid-row-4-divider">
                     <button id="btnExport" type="button" class="btn-omr-primary" onclick="匯出成績單CSV()" disabled>
                         <i class="fa-solid fa-file-csv"></i>
                         <span>匯出 CSV</span>
                     </button>
 
-                    <button id="btnResetAll" type="button" class="btn-omr-secondary" onclick="清空重設系統()" title="清除目前答案卡與所有閱卷結果並恢復預設值">
+                    <button id="btnResetAll" type="button" class="btn-omr-secondary" onclick="清空重設系統()" title="清除目前配分、答案卡與所有閱卷結果並恢復預設值">
                         <i class="fa-solid fa-trash-can-arrow-up"></i>
                         <span>清空重設</span>
                     </button>
@@ -585,26 +663,14 @@
 
         <!-- 成績報表表格區 -->
         <section class="omr-table-card">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div class="flex items-center gap-2 text-[18px] font-bold text-[#1E293B]">
                     <i class="fa-solid fa-table-list text-[#1E468A]"></i>
                     <span>學生閱卷計分報表</span>
                 </div>
-
-                <!-- 閱卷統計數據列 -->
-                <div class="stats-summary-bar">
-                    <span class="text-[#1E293B]">
-                        <i class="fa-solid fa-layer-group text-[#1E468A] mr-1"></i>總匯入：<strong id="statTotalCount">0</strong> 張
-                    </span>
-                    <span class="text-[#CBD5E1]">|</span>
-                    <span class="text-[#047857]">
-                        <i class="fa-solid fa-circle-check mr-1"></i>正常：<strong id="statNormalCount">0</strong> 張
-                    </span>
-                    <span class="text-[#CBD5E1]">|</span>
-                    <span class="text-[#EF4444]">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>異常：<strong id="statErrorCount">0</strong> 張
-                    </span>
-                </div>
+                <span class="text-[13px] text-[#64748B]">
+                    批改完成後，請於上方輸入「學號前綴」並點擊「查詢名單」帶入學生姓名
+                </span>
             </div>
 
             <div class="omr-table-wrapper">
@@ -614,15 +680,15 @@
                             <th class="col-nowrap" style="min-width: 54px; text-align: center;">序號</th>
                             <th class="col-nowrap" style="min-width: 82px;">學號</th>
                             <th class="col-nowrap" style="min-width: 112px;">姓名</th>
-                            <th style="width: 39%;">原始作答明細</th>
-                            <th style="width: 39%;">成績單模式（對：- / 錯：原作答）</th>
-                            <th class="col-nowrap" style="min-width: 84px; text-align: center;">成績</th>
+                            <th style="width: 39%;">原始作答明細（每10題間隔 / 50題換行）</th>
+                            <th style="width: 39%;">成績單模式（對: - / 錯: 原作答）</th>
+                            <th class="col-nowrap" style="min-width: 88px; text-align: center;">成績</th>
                         </tr>
                     </thead>
                     <tbody id="resultTableBody">
                         <tr>
                             <td colspan="6" style="text-align: center; color: #64748B; padding: 48px 16px;">
-                                尚無閱卷資料
+                                尚無閱卷資料，請先於上方設定「配分規則」，再依序上傳「標準答案」與「學生作答」。
                             </td>
                         </tr>
                     </tbody>
@@ -647,16 +713,28 @@
 
     <script>
     // =========================================================================
-    // 一、 後端 API 連線設定與全域狀態變數
+    // 一、 後端 API 連線設定與全域狀態變數（不留存全班名冊於記憶體）
     // =========================================================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzGAHgtncmlUEllkPl_CwRzsVcVg1z_d8r17XPXWjU6zLSoKXd6z5XTR9Gz6nC7lZkTvQ/exec";
 
-    let 學生名冊Map = {};          // 格式：{ "001234": "王小明", ... }
-    let 名冊已載入 = false;
     let 音效已開啟 = true;
     let 視覺引擎已就緒 = false;
 
-    // 閱卷統計數據物件
+    // 配分規則狀態（由 3 組區間即時解析產生）
+    let 目前配分狀態 = {
+        isValid: false,        // 是否有至少一組完整配分且無重疊/順序錯誤
+        maxQuestion: 0,        // 本次考試最大題號（即總題數）
+        totalPossibleScore: 0, // 依配分計算出的本次滿分
+        questionPointsMap: {}, // 題號(1~100) -> 該題分數
+        missingQuestions: []   // 1 ~ maxQuestion 之間未設定配分的題號（溫和提醒用）
+    };
+
+    // 閱卷資料狀態（底層完整保留 100 題辨識結果，方便修改配分時免重傳圖檔即時重算）
+    let 標準答案完整100題 = "";
+    let 全域成績資料庫 = [];
+    let 學生卡流水序號 = 0;
+
+    // 統計數據物件
     let 統計數據 = {
         total: 0,
         normal: 0,
@@ -668,10 +746,6 @@
     // =========================================================================
     const 標準寬 = 1000;
     const 標準高 = 1414;
-
-    let 標準答案字串 = "";
-    let 全域成績資料庫 = [];
-    let 學生卡流水序號 = 0;
 
     const 辨識門檻設定 = {
         學號門檻百分比: 0.45,
@@ -694,9 +768,6 @@
     // 三、 頁面初始化與 Web Audio 音效機制
     // =========================================================================
     window.addEventListener('DOMContentLoaded', () => {
-        // 自動向後端同步學生名冊
-        載入學生名冊(false);
-
         // 雙重檢查 OpenCV 引擎是否已就緒
         const checkCvTimer = setInterval(() => {
             if (typeof cv !== 'undefined' && cv.Mat) {
@@ -705,20 +776,18 @@
             }
         }, 300);
 
-        // 在題數與前綴輸入框按 Enter 鍵可直接開啟標準答案卡選擇視窗
-        ['totalQuestionsInput', 'idPrefixInput'].forEach(inputId => {
-            document.getElementById(inputId).addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const ansInput = document.getElementById('answerKeyInput');
-                    if (!ansInput.disabled) ansInput.click();
-                }
-            });
+        // 在學號前綴輸入框按 Enter 鍵可直接觸發「查詢名單」
+        document.getElementById('idPrefixInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const queryBtn = document.getElementById('btnQueryRoster');
+                if (!queryBtn.disabled) queryBtn.click();
+            }
         });
     });
 
     /**
-     * 視覺引擎就緒後解鎖答案卡上傳功能（保持精簡短字串防跑版）
+     * 視覺引擎就緒後更新頂部狀態，並依據配分狀態決定是否解鎖答案卡上傳
      */
     function 啟動視覺引擎就緒狀態() {
         if (視覺引擎已就緒) return;
@@ -727,14 +796,11 @@
         const badge = document.getElementById('systemReadyBadge');
         badge.innerHTML = '<i class="fa-solid fa-circle-check text-[#10B981]"></i><span>就緒</span>';
 
-        document.getElementById('answerKeyInput').disabled = false;
-        const ansStatus = document.getElementById('ansStatusTxt');
-        ansStatus.innerText = '未上傳';
-        ansStatus.style.color = '#64748B';
+        驗證並更新配分設定();
     }
 
     /**
-     * Web Audio 提示音效播放（批改完成或異常提醒）
+     * Web Audio 提示音效播放
      */
     function 播放提示音效(type = 'success') {
         if (!音效已開啟) return;
@@ -786,7 +852,7 @@
     }
 
     /**
-     * 顯示規範化圓角 Alert 提示訊息
+     * 顯示或隱藏頂部 Alert 提示橫幅
      */
     function 顯示系統訊息(type, message) {
         const container = document.getElementById('systemAlertContainer');
@@ -808,8 +874,14 @@
         `;
     }
 
+    function 隱藏系統訊息() {
+        const container = document.getElementById('systemAlertContainer');
+        container.style.display = 'none';
+        container.innerHTML = '';
+    }
+
     /**
-     * 更新報表右上角統計數據顯示（總匯入 / 正常 / 異常）
+     * 更新第 4 列第 2 欄統計數據顯示（總匯入 / 正常 / 異常）
      */
     function 更新統計數據顯示() {
         document.getElementById('statTotalCount').innerText = 統計數據.total;
@@ -818,122 +890,206 @@
     }
 
     // =========================================================================
-    // 四、 學生名冊同步與查詢
+    // 四、 配分設定驗證、重疊檢查與即時重算引擎
     // =========================================================================
-    async function 載入學生名冊(isManualRefresh = false) {
-        const statusIcon = document.getElementById('dbStatusIcon');
-        const statusTxt = document.getElementById('dbStatusTxt');
-        const refreshBtn = document.getElementById('btnRefreshRoster');
-        const refreshIcon = document.getElementById('refreshIcon');
+    /**
+     * 過濾非數字輸入並觸發配分檢查
+     */
+    function 處理配分輸入(inputEl) {
+        inputEl.value = inputEl.value.replace(/[^0-9]/g, '');
+        驗證並更新配分設定();
+    }
 
-        statusIcon.className = 'fa-solid fa-spinner fa-spin text-[#F59E0B]';
-        statusTxt.innerText = '名冊同步中';
-        refreshBtn.disabled = true;
-        refreshIcon.classList.add('fa-spin');
+    /**
+     * 檢查 3 組配分區間是否有重疊、超限或漏題，並連動讀卡按鈕與成績重算
+     */
+    function 驗證並更新配分設定() {
+        const ranges = [];
+        let hasPartialRow = false;
+        let validationError = '';
 
-        try {
-            const response = await fetch(GAS_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                redirect: 'follow',
-                body: JSON.stringify({
-                    action: 'getStudentMap',
-                    data: {}
-                })
-            });
+        // 清除所有輸入框紅框樣式
+        for (let r = 1; r <= 3; r++) {
+            document.getElementById(`qStart${r}`).classList.remove('input-error');
+            document.getElementById(`qEnd${r}`).classList.remove('input-error');
+            document.getElementById(`qPoints${r}`).classList.remove('input-error');
+        }
 
-            const resData = await response.json();
+        // 讀取 3 組配分輸入
+        for (let r = 1; r <= 3; r++) {
+            const sStr = document.getElementById(`qStart${r}`).value.trim();
+            const eStr = document.getElementById(`qEnd${r}`).value.trim();
+            const pStr = document.getElementById(`qPoints${r}`).value.trim();
 
-            if (resData.code === 200 && resData.success) {
-                學生名冊Map = resData.data || {};
-                名冊已載入 = true;
-                const totalCount = Object.keys(學生名冊Map).length;
-
-                statusIcon.className = 'fa-solid fa-circle-check text-[#10B981]';
-                statusTxt.innerText = `名冊已同步 (${totalCount} 人)`;
-
-                // 若畫面上已有閱卷資料，重整名冊後自動重新比對姓名與統計
-                if (全域成績資料庫.length > 0) {
-                    重新整理現有報表();
-                }
-
-                if (isManualRefresh) {
-                    顯示系統訊息('success', `學生名冊已更新（共 ${totalCount} 位學生）。`);
-                    播放提示音效('success');
-                }
-            } else if (resData.code === 400 || resData.code === 404) {
-                statusIcon.className = 'fa-solid fa-triangle-exclamation text-[#F59E0B]';
-                statusTxt.innerText = '名冊資料異常';
-                顯示系統訊息('error', '找不到學生名冊資料，請確認雲端試算表設定。');
-                播放提示音效('error');
-            } else {
-                statusIcon.className = 'fa-solid fa-circle-xmark text-[#EF4444]';
-                statusTxt.innerText = '名冊連線異常';
-                alert('學生名冊連線發生異常，請稍後再試或聯絡系統管理員。');
+            // 三格皆空白則跳過此組
+            if (sStr === '' && eStr === '' && pStr === '') {
+                continue;
             }
-        } catch (err) {
-            console.error('載入學生名冊失敗:', err);
-            statusIcon.className = 'fa-solid fa-circle-xmark text-[#EF4444]';
-            statusTxt.innerText = '名冊連線失敗';
-            alert('無法連線至學生名冊資料庫，請檢查網路狀態後點擊「重整名冊」。');
-        } finally {
-            refreshBtn.disabled = false;
-            refreshIcon.classList.remove('fa-spin');
+
+            // 若只填寫部分欄位，標記為未填寫完整
+            if (sStr === '' || eStr === '' || pStr === '') {
+                hasPartialRow = true;
+                continue;
+            }
+
+            const start = parseInt(sStr, 10);
+            const end = parseInt(eStr, 10);
+            const points = parseInt(pStr, 10);
+
+            if (start < 1 || end > 100) {
+                validationError = `配分 ${r} 題號必須介於 1 ～ 100 之間。`;
+                document.getElementById(`qStart${r}`).classList.add('input-error');
+                document.getElementById(`qEnd${r}`).classList.add('input-error');
+                break;
+            }
+
+            if (start > end) {
+                validationError = `配分 ${r} 起始題號 (${start}) 不可大於結束題號 (${end})。`;
+                document.getElementById(`qStart${r}`).classList.add('input-error');
+                document.getElementById(`qEnd${r}`).classList.add('input-error');
+                break;
+            }
+
+            ranges.push({ row: r, start, end, points });
+        }
+
+        // 檢查題號區間是否重疊
+        const questionPointsMap = {};
+        let maxQuestion = 0;
+
+        if (!validationError) {
+            for (const item of ranges) {
+                if (item.end > maxQuestion) {
+                    maxQuestion = item.end;
+                }
+                for (let q = item.start; q <= item.end; q++) {
+                    if (questionPointsMap[q] !== undefined) {
+                        validationError = `配分題號重疊（第 ${q} 題重複設定），請修正後再進行讀卡。`;
+                        document.getElementById(`qStart${item.row}`).classList.add('input-error');
+                        document.getElementById(`qEnd${item.row}`).classList.add('input-error');
+                        break;
+                    }
+                    questionPointsMap[q] = item.points;
+                }
+                if (validationError) break;
+            }
+        }
+
+        const ansInput = document.getElementById('answerKeyInput');
+        const stuInput = document.getElementById('studentFileInput');
+        const ansStatus = document.getElementById('ansStatusTxt');
+
+        // 若有嚴重驗證錯誤（重疊或順序錯誤），顯示紅色錯誤提示並鎖定讀卡
+        if (validationError) {
+            目前配分狀態.isValid = false;
+            ansInput.disabled = true;
+            stuInput.disabled = true;
+            顯示系統訊息('error', validationError);
+            ansStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>配分設定有誤';
+            ansStatus.style.color = '#EF4444';
+            return;
+        }
+
+        隱藏系統訊息();
+
+        // 若尚未有任何一組完整配分，維持鎖定讀卡
+        if (ranges.length === 0 || maxQuestion === 0) {
+            目前配分狀態.isValid = false;
+            ansInput.disabled = true;
+            stuInput.disabled = true;
+            ansStatus.innerText = hasPartialRow ? '請填完配分欄位' : '請先設定配分';
+            ansStatus.style.color = '#64748B';
+            return;
+        }
+
+        // 計算總滿分與檢查 1 ~ maxQuestion 之間是否有跳號未配分
+        let totalPossibleScore = 0;
+        const missingQuestions = [];
+        for (let q = 1; q <= maxQuestion; q++) {
+            if (questionPointsMap[q] !== undefined) {
+                totalPossibleScore += questionPointsMap[q];
+            } else {
+                missingQuestions.push(q);
+            }
+        }
+
+        目前配分狀態 = {
+            isValid: true,
+            maxQuestion: maxQuestion,
+            totalPossibleScore: totalPossibleScore,
+            questionPointsMap: questionPointsMap,
+            missingQuestions: missingQuestions
+        };
+
+        // 視覺引擎就緒後解鎖標準答案卡上傳
+        if (視覺引擎已就緒) {
+            ansInput.disabled = false;
+        }
+
+        // 若標準答案卡尚未上傳，顯示目前配分試算提示
+        if (!標準答案完整100題) {
+            if (missingQuestions.length > 0) {
+                ansStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>共 ${maxQuestion} 題・滿分 ${totalPossibleScore} 分（第 ${missingQuestions.slice(0, 3).join(',')} 題未配分）`;
+                ansStatus.style.color = '#D97706';
+            } else {
+                ansStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i>共 ${maxQuestion} 題・滿分 ${totalPossibleScore} 分（待上傳）`;
+                ansStatus.style.color = '#1E468A';
+            }
+        } else {
+            // 若標準答案卡已上傳，則自動更新預覽與重算滿分及全班分數（優化點 1）
+            stuInput.disabled = false;
+            更新標準答案顯示與滿分檢查();
+            if (全域成績資料庫.length > 0) {
+                重新計算所有學生分數並重繪表格();
+            }
         }
     }
 
     /**
-     * 根據完整學號查詢學生姓名與異常狀態
-     * @returns {{ name: string, isAbnormal: boolean }}
+     * 依據目前配分狀態，裁剪標準答案長度、檢查答案卡空白/複選並顯示滿分
      */
-    function 查詢學生名冊狀態(fullStudentId) {
-        if (!fullStudentId || fullStudentId.includes('#') || fullStudentId.includes('*')) {
-            return { name: '學號劃記異常', isAbnormal: true };
-        }
-        if (!名冊已載入) {
-            return { name: '名冊未連線', isAbnormal: true };
-        }
-        const matchedName = 學生名冊Map[fullStudentId];
-        if (!matchedName) {
-            return { name: '查無此人', isAbnormal: true };
-        }
-        return { name: matchedName, isAbnormal: false };
-    }
+    function 更新標準答案顯示與滿分檢查() {
+        const maxQ = 目前配分狀態.maxQuestion;
+        const fullScore = 目前配分狀態.totalPossibleScore;
+        const activeAnsStr = 標準答案完整100題.slice(0, maxQ);
 
-    /**
-     * 重整名冊後，重新刷新現有表格姓名與統計數字
-     */
-    function 重新整理現有報表() {
-        const tableBody = document.getElementById('resultTableBody');
-        tableBody.innerHTML = '';
+        // 更新第 2 列預覽區
+        const previewEl = document.getElementById('answerKeyPreview');
+        previewEl.style.color = '#1E293B';
+        previewEl.innerHTML = 格式化答案顯示HTML(activeAnsStr);
 
-        const scanFailCount = 統計數據.total - 全域成績資料庫.length;
-        統計數據.normal = 0;
-        統計數據.error = scanFailCount;
-
-        全域成績資料庫.forEach(item => {
-            const checkRes = 查詢學生名冊狀態(item.studentID);
-            item.studentName = checkRes.name;
-            item.isAbnormal = checkRes.isAbnormal;
-
-            if (checkRes.isAbnormal) {
-                統計數據.error++;
-            } else {
-                統計數據.normal++;
+        // 檢查有配分的題目中，標準答案卡是否有空白(#)或複選(*)
+        const invalidAnsList = [];
+        for (let q = 1; q <= maxQ; q++) {
+            if (目前配分狀態.questionPointsMap[q] !== undefined) {
+                const ch = activeAnsStr[q - 1];
+                if (ch === '#' || ch === '*') {
+                    invalidAnsList.push(q);
+                }
             }
-            新增列到成績表格(item);
-        });
+        }
 
-        更新統計數據顯示();
+        const ansStatus = document.getElementById('ansStatusTxt');
+        if (invalidAnsList.length > 0) {
+            ansStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>已讀取｜滿分 ${fullScore} 分（第 ${invalidAnsList.slice(0, 3).join(',')} 題答案異常）`;
+            ansStatus.style.color = '#EF4444';
+        } else if (目前配分狀態.missingQuestions.length > 0) {
+            ansStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>已讀取｜滿分 ${fullScore} 分（第 ${目前配分狀態.missingQuestions.slice(0, 3).join(',')} 題未配分）`;
+            ansStatus.style.color = '#D97706';
+        } else {
+            ansStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i>已讀取｜共 ${maxQ} 題，滿分 ${fullScore} 分`;
+            ansStatus.style.color = '#047857';
+        }
     }
 
     // =========================================================================
-    // 五、 步驟 2 & 步驟 3：答案卡讀取與批量學生卡閱卷（精簡單行狀態提示）
+    // 五、 步驟 1 & 步驟 2：標準答案卡與學生作答卡讀取
     // =========================================================================
     document.getElementById('answerKeyInput').addEventListener('change', function(e) {
-        if (e.target.files.length === 0) return;
+        if (e.target.files.length === 0 || !目前配分狀態.isValid) return;
+
         const ansStatus = document.getElementById('ansStatusTxt');
-        ansStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>讀取中...';
+        ansStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>讀取分析中...';
         ansStatus.style.color = '#1E468A';
 
         const 檔案 = e.target.files[0];
@@ -941,24 +1097,27 @@
         讀取器.onload = function(event) {
             const img = new Image();
             img.onload = function() {
-                const 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value, 10) || 100;
-                const 識別結果 = 核心閱卷處理流程(img, 檔案.name, 目標題數);
+                // 底層完整辨識 100 題格位，方便後續調整配分範圍時免重傳圖檔
+                const 識別結果 = 核心閱卷處理流程(img, 檔案.name);
 
                 if (識別結果) {
-                    標準答案字串 = 識別結果.answers;
-                    document.getElementById('answerPreviewRow').style.display = 'flex';
-                    document.getElementById('answerKeyPreview').innerHTML = 格式化答案顯示HTML(標準答案字串);
-                    ansStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i>已讀取';
-                    ansStatus.style.color = '#047857';
+                    標準答案完整100題 = 識別結果.answers100;
+                    更新標準答案顯示與滿分檢查();
 
-                    // 解鎖步驟 3 批量作答卡上傳
+                    // 解鎖步驟 2 學生作答卡上傳
                     document.getElementById('studentFileInput').disabled = false;
                     const stuProgress = document.getElementById('importProgressTxt');
-                    stuProgress.innerText = '待上傳';
+                    stuProgress.innerText = '待上傳作答卡';
                     stuProgress.style.color = '#64748B';
+
+                    // 若畫面上已有學生考卷，同步依新標準答案重算
+                    if (全域成績資料庫.length > 0) {
+                        重新計算所有學生分數並重繪表格();
+                    }
 
                     播放提示音效('success');
                 } else {
+                    標準答案完整100題 = '';
                     ansStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>定位失敗';
                     ansStatus.style.color = '#EF4444';
                     顯示系統訊息('error', '標準答案卡定位失敗，請確認考卷四周黑框完整且無反光。');
@@ -972,7 +1131,7 @@
 
     document.getElementById('studentFileInput').addEventListener('change', async function(e) {
         const 檔案列表 = e.target.files;
-        if (檔案列表.length === 0) return;
+        if (檔案列表.length === 0 || !目前配分狀態.isValid || !標準答案完整100題) return;
 
         // 重置本次閱卷資料與統計數據
         document.getElementById('resultTableBody').innerHTML = '';
@@ -981,79 +1140,102 @@
         統計數據 = { total: 0, normal: 0, error: 0 };
         更新統計數據顯示();
 
-        const 目標題數 = parseInt(document.getElementById('totalQuestionsInput').value, 10) || 100;
         const 進度文字 = document.getElementById('importProgressTxt');
         進度文字.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>批改 0/${檔案列表.length}`;
         進度文字.style.color = '#F59E0B';
 
         for (let i = 0; i < 檔案列表.length; i++) {
             const 檔案 = 檔案列表[i];
-            await 閱卷單張學生卡(檔案, 目標題數);
+            await 閱卷單張學生卡(檔案);
             進度文字.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>批改 ${i + 1}/${檔案列表.length}`;
         }
 
-        // 保持與批改中相同的字數長度，確保單行穩定不折行
         進度文字.innerHTML = `<i class="fa-solid fa-circle-check"></i>完成 ${檔案列表.length} 張`;
         進度文字.style.color = '#047857';
         播放提示音效('success');
 
         if (全域成績資料庫.length > 0) {
+            document.getElementById('btnQueryRoster').disabled = false;
             document.getElementById('btnExport').disabled = false;
         }
     });
 
     /**
-     * 處理單張學生作答卡並更新統計數據
+     * 計算單筆學生資料的分數與明細（支援初次批改與修改配分後重算）
      */
-    function 閱卷單張學生卡(file, totalQ) {
+    function 計算單筆學生成績(record) {
+        const maxQ = 目前配分狀態.maxQuestion;
+        const fullScore = 目前配分狀態.totalPossibleScore;
+        const pointsMap = 目前配分狀態.questionPointsMap;
+        const activeAns = 標準答案完整100題.slice(0, maxQ);
+        const stuAns = record.answers100.slice(0, maxQ);
+
+        let 學生得分 = 0;
+        let 答對題數 = 0;
+        const 成績單模式陣列 = [];
+
+        for (let q = 0; q < maxQ; q++) {
+            const sChar = stuAns[q];
+            const kChar = activeAns[q];
+            const qNum = q + 1;
+            const qPoint = pointsMap[qNum] || 0;
+
+            if (sChar !== '#' && sChar !== '*' && sChar === kChar) {
+                答對題數++;
+                學生得分 += qPoint;
+                成績單模式陣列.push('-');
+            } else {
+                成績單模式陣列.push(sChar);
+            }
+        }
+
+        const 前綴碼 = document.getElementById('idPrefixInput').value.padStart(2, '0');
+        record.studentID = 前綴碼 + record.rawStudentID4;
+        record.activeAnswers = stuAns;
+        record.reportModeString = 成績單模式陣列.join('');
+        record.earnedScore = 學生得分;
+        record.fullScore = fullScore;
+        record.scoreString = `${學生得分}/${fullScore}`;
+        record.correctCount = 答對題數;
+        record.totalCount = maxQ;
+    }
+
+    /**
+     * 處理單張學生作答卡（初始姓名標記為「待查詢」，不留存名冊）
+     */
+    function 閱卷單張學生卡(file) {
         return new Promise((resolve) => {
             const 讀取器 = new FileReader();
             讀取器.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
-                    const 學生作答 = 核心閱卷處理流程(img, file.name, totalQ);
+                    const 辨識結果 = 核心閱卷處理流程(img, file.name);
                     學生卡流水序號++;
                     統計數據.total++;
 
-                    if (學生作答) {
-                        let 答對題數 = 0;
-                        const 成績單模式陣列 = [];
+                    if (辨識結果) {
+                        const isIdInvalid = 辨識結果.studentID4.includes('#') || 辨識結果.studentID4.includes('*');
+                        const record = {
+                            serialNo: 學生卡流水序號,
+                            fileName: file.name,
+                            rawStudentID4: 辨識結果.studentID4,
+                            studentID: '',
+                            answers100: 辨識結果.answers100,
+                            studentName: isIdInvalid ? '學號劃記異常' : '待查詢',
+                            isIdInvalid: isIdInvalid,
+                            isNotFound: false
+                        };
 
-                        for (let q = 0; q < totalQ; q++) {
-                            const 學生單題答案 = 學生作答.answers[q];
-                            const 標準單題答案 = 標準答案字串[q];
+                        計算單筆學生成績(record);
 
-                            if (學生單題答案 !== '#' && 學生單題答案 !== '*' && 學生單題答案 === 標準單題答案) {
-                                答對題數++;
-                                成績單模式陣列.push('-');
-                            } else {
-                                成績單模式陣列.push(學生單題答案);
-                            }
-                        }
-
-                        // 組合前綴與讀卡學號
-                        const 前綴碼 = document.getElementById('idPrefixInput').value.padStart(2, '0');
-                        學生作答.studentID = 前綴碼 + 學生作答.studentID;
-
-                        // 查詢學生姓名與判斷是否異常
-                        const checkRes = 查詢學生名冊狀態(學生作答.studentID);
-                        學生作答.studentName = checkRes.name;
-                        學生作答.isAbnormal = checkRes.isAbnormal;
-
-                        if (checkRes.isAbnormal) {
+                        if (isIdInvalid) {
                             統計數據.error++;
                         } else {
                             統計數據.normal++;
                         }
 
-                        學生作答.serialNo = 學生卡流水序號;
-                        學生作答.reportModeString = 成績單模式陣列.join('');
-                        學生作答.scoreString = `${答對題數}/${totalQ}`;
-                        學生作答.correctCount = 答對題數;
-                        學生作答.totalCount = totalQ;
-
-                        全域成績資料庫.push(學生作答);
-                        新增列到成績表格(學生作答);
+                        全域成績資料庫.push(record);
+                        新增列到成績表格(record);
                     } else {
                         統計數據.error++;
                         新增錯誤列到成績表格(學生卡流水序號, file.name);
@@ -1068,44 +1250,206 @@
         });
     }
 
+    /**
+     * 修改配分設定後，自動重新計算全班分數並重繪報表（保留已查詢到的姓名）
+     */
+    function 重新計算所有學生分數並重繪表格() {
+        const tableBody = document.getElementById('resultTableBody');
+        tableBody.innerHTML = '';
+
+        // 暫存既有的錯誤列（透過重建整個序列確保序號連續）
+        let 辨識失敗數 = 統計數據.total - 全域成績資料庫.length;
+        // 簡化重繪：若無辨識失敗列直接重繪；若有辨識失敗列則保留原提示並刷新成功列
+        全域成績資料庫.forEach(record => {
+            計算單筆學生成績(record);
+            新增列到成績表格(record);
+        });
+        if (辨識失敗數 > 0) {
+            顯示系統訊息('error', `提醒：本次批次中有 ${辨識失敗數} 張考卷影像定位失敗（已計入異常張數）。`);
+        }
+    }
+
+    /**
+     * 修改學號前綴時，即時更新表格內 6 碼學號並將姓名重設為「待查詢」（優化點 2）
+     */
+    function 處理學號前綴變更(inputEl) {
+        inputEl.value = inputEl.value.replace(/[^0-9]/g, '');
+        if (全域成績資料庫.length === 0) return;
+
+        const 前綴碼 = inputEl.value.padStart(2, '0');
+        const scanFailCount = 統計數據.total - 全域成績資料庫.length;
+        統計數據.normal = 0;
+        統計數據.error = scanFailCount;
+
+        const tableBody = document.getElementById('resultTableBody');
+        tableBody.innerHTML = '';
+
+        全域成績資料庫.forEach(record => {
+            record.studentID = 前綴碼 + record.rawStudentID4;
+            record.isNotFound = false;
+            if (record.isIdInvalid) {
+                record.studentName = '學號劃記異常';
+                統計數據.error++;
+            } else {
+                record.studentName = '待查詢';
+                統計數據.normal++;
+            }
+            新增列到成績表格(record);
+        });
+
+        更新統計數據顯示();
+    }
+
     // =========================================================================
-    // 六、 清空重設功能（全部恢復預設值、清除已上傳卡片，保留名冊快取）
+    // 六、 按下「查詢名單」才連線 GAS 比對（名冊資料不留存在網頁記憶體中）
+    // =========================================================================
+    async function 查詢學生名單() {
+        if (全域成績資料庫.length === 0) return;
+
+        // 僅篩選出學號劃記正常的 6 碼學號清單（去重複）傳給後端
+        const validIdsSet = new Set();
+        全域成績資料庫.forEach(rec => {
+            if (!rec.isIdInvalid) {
+                validIdsSet.add(rec.studentID);
+            }
+        });
+
+        const idList = Array.from(validIdsSet);
+        if (idList.length === 0) {
+            顯示系統訊息('error', '目前所有考卷的學號皆劃記異常，無可查詢的有效學號。');
+            播放提示音效('error');
+            return;
+        }
+
+        const btn = document.getElementById('btnQueryRoster');
+        const icon = document.getElementById('queryIcon');
+        const btnTxt = document.getElementById('queryBtnTxt');
+
+        // 切換按鈕為 Loading 轉圈並鎖定防止重複點擊
+        btn.disabled = true;
+        icon.className = 'fa-solid fa-spinner fa-spin';
+        btnTxt.innerText = '查詢中...';
+
+        try {
+            const response = await fetch(GAS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                redirect: 'follow',
+                body: JSON.stringify({
+                    action: 'queryStudentsByIds',
+                    data: { ids: idList }
+                })
+            });
+
+            const resData = await response.json();
+
+            if (resData.code === 200 && resData.success) {
+                // 僅在區域變數內使用回傳結果，函式結束後即自動釋放，不留存於網頁全域變數
+                const matchedDict = resData.data || {};
+                const scanFailCount = 統計數據.total - 全域成績資料庫.length;
+                統計數據.normal = 0;
+                統計數據.error = scanFailCount;
+
+                const tableBody = document.getElementById('resultTableBody');
+                tableBody.innerHTML = '';
+
+                全域成績資料庫.forEach(record => {
+                    if (record.isIdInvalid) {
+                        record.studentName = '學號劃記異常';
+                        record.isNotFound = false;
+                        統計數據.error++;
+                    } else if (matchedDict[record.studentID]) {
+                        record.studentName = matchedDict[record.studentID];
+                        record.isNotFound = false;
+                        統計數據.normal++;
+                    } else {
+                        record.studentName = '查無此人';
+                        record.isNotFound = true;
+                        統計數據.error++;
+                    }
+                    新增列到成績表格(record);
+                });
+
+                更新統計數據顯示();
+                顯示系統訊息('success', `名單比對完成（正常 ${統計數據.normal} 張、異常 ${統計數據.error} 張）。`);
+                播放提示音效('success');
+            } else if (resData.code === 400 || resData.code === 404) {
+                顯示系統訊息('error', '找不到學生名冊資料表，請確認雲端試算表設定。');
+                播放提示音效('error');
+            } else {
+                alert('名單查詢服務發生異常，請稍後再試或聯絡系統管理員。');
+            }
+        } catch (err) {
+            console.error('查詢學生名單失敗:', err);
+            alert('無法連線至雲端資料庫，請檢查網路狀態後再試。');
+        } finally {
+            btn.disabled = false;
+            icon.className = 'fa-solid fa-magnifying-glass';
+            btnTxt.innerText = '查詢名單';
+        }
+    }
+
+    // =========================================================================
+    // 七、 清空重設功能（全部恢復預設值、清除已上傳卡片與配分）
     // =========================================================================
     function 清空重設系統() {
-        const hasData = 標準答案字串 !== '' || 全域成績資料庫.length > 0 || 統計數據.total > 0;
-        if (hasData) {
-            const confirmed = confirm('確定要清空目前的標準答案與所有閱卷紀錄，並恢復預設值嗎？');
+        const hasAnyInput = 標準答案完整100題 !== '' || 全域成績資料庫.length > 0 || 統計數據.total > 0 ||
+            document.getElementById('qStart1').value !== '' || document.getElementById('qEnd1').value !== '';
+
+        if (hasAnyInput) {
+            const confirmed = confirm('確定要清空所有配分設定、標準答案與閱卷紀錄，並恢復預設值嗎？');
             if (!confirmed) return;
         }
 
-        // 1. 恢復步驟 1 輸入框預設值
-        document.getElementById('totalQuestionsInput').value = '100';
-        document.getElementById('idPrefixInput').value = '00';
+        // 1. 清空 3 組配分輸入框並移除錯誤紅框
+        for (let r = 1; r <= 3; r++) {
+            const sEl = document.getElementById(`qStart${r}`);
+            const eEl = document.getElementById(`qEnd${r}`);
+            const pEl = document.getElementById(`qPoints${r}`);
+            sEl.value = '';
+            eEl.value = '';
+            pEl.value = '';
+            sEl.classList.remove('input-error');
+            eEl.classList.remove('input-error');
+            pEl.classList.remove('input-error');
+        }
 
-        // 2. 清空檔案上傳元件與預覽區
+        目前配分狀態 = {
+            isValid: false,
+            maxQuestion: 0,
+            totalPossibleScore: 0,
+            questionPointsMap: {},
+            missingQuestions: []
+        };
+
+        // 2. 恢復學號前綴預設值 00 並鎖定查詢與匯出按鈕
+        document.getElementById('idPrefixInput').value = '00';
+        document.getElementById('btnQueryRoster').disabled = true;
+        document.getElementById('btnExport').disabled = true;
+
+        // 3. 清空檔案上傳元件與預覽區
         const ansInput = document.getElementById('answerKeyInput');
         const stuInput = document.getElementById('studentFileInput');
         ansInput.value = '';
+        ansInput.disabled = true;
         stuInput.value = '';
         stuInput.disabled = true;
 
-        標準答案字串 = '';
-        document.getElementById('answerPreviewRow').style.display = 'none';
-        document.getElementById('answerKeyPreview').innerHTML = '尚未讀取標準答案';
+        標準答案完整100題 = '';
+        const previewEl = document.getElementById('answerKeyPreview');
+        previewEl.style.color = '#94A3B8';
+        previewEl.innerText = '尚未上傳標準答案卡';
 
         const ansStatus = document.getElementById('ansStatusTxt');
-        ansStatus.innerText = 視覺引擎已就緒 ? '未上傳' : '載入中...';
+        ansStatus.innerText = '請先設定配分';
         ansStatus.style.color = '#64748B';
 
-        // 3. 還原步驟 3 狀態文字、鎖定匯出按鈕並隱藏提示橫幅
-        const 進度文字 = document.getElementById('importProgressTxt');
-        進度文字.innerText = '請先讀答案卡';
-        進度文字.style.color = '#64748B';
+        const stuProgress = document.getElementById('importProgressTxt');
+        stuProgress.innerText = '請先讀答案卡';
+        stuProgress.style.color = '#64748B';
 
-        document.getElementById('btnExport').disabled = true;
-        document.getElementById('systemAlertContainer').style.display = 'none';
-
-        // 4. 清空暫存成績、歸零統計數據並還原空白表格
+        // 4. 隱藏提示橫幅、清空暫存成績、歸零統計數據並還原空白表格
+        隱藏系統訊息();
         全域成績資料庫 = [];
         學生卡流水序號 = 0;
         統計數據 = { total: 0, normal: 0, error: 0 };
@@ -1114,14 +1458,14 @@
         document.getElementById('resultTableBody').innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; color: #64748B; padding: 48px 16px;">
-                    尚無閱卷資料
+                    尚無閱卷資料，請先於上方設定「配分規則」，再依序上傳「標準答案」與「學生作答」。
                 </td>
             </tr>
         `;
     }
 
     // =========================================================================
-    // 七、 OMR 影像視覺辨識演算法（完整保留原版已驗證邏輯）
+    // 八、 OMR 影像視覺辨識演算法（完整保留原版已驗證邏輯，底層完整讀取 100 題）
     // =========================================================================
     function 強制瀏覽器底層轉灰階(imgElement) {
         const bufferCanvas = document.getElementById('grayBufferCanvas');
@@ -1146,7 +1490,7 @@
         return bufferCanvas;
     }
 
-    function 核心閱卷處理流程(imgElement, fileName, totalQ) {
+    function 核心閱卷處理流程(imgElement, fileName) {
         try {
             const 灰階畫布 = 強制瀏覽器底層轉灰階(imgElement);
 
@@ -1260,18 +1604,14 @@
 
             const 最終學號字串 = 學號碼陣列.join('');
 
-            // 讀取 4 欄 x 25 題作答區
+            // 完整讀取 4 欄 x 25 題 = 100 題作答區
             const 題目Y步 = (參數.作答區.最後一題Y - 參數.作答區.第一題Y) * 標準高 / 24;
             const 選項代號 = ['', 'A', 'B', 'C', 'D'];
             const 答案字串陣列 = [];
-            let 累計題數 = 0;
 
             for (let 欄 = 0; 欄 < 4; 欄++) {
                 const 題號X = 參數.作答區.直欄題號X[欄] * 標準寬;
                 for (let 題 = 0; 題 < 25; 題++) {
-                    累計題數++;
-                    if (累計題數 > totalQ) break;
-
                     const cy = Math.round(參數.作答區.第一題Y * 標準高 + 題 * 題目Y步);
                     const 本題答案暫存 = [];
 
@@ -1294,7 +1634,6 @@
                         答案字串陣列.push('*');
                     }
                 }
-                if (累計題數 > totalQ) break;
             }
 
             src.delete(); 灰階.delete(); 模糊.delete(); 二值化.delete(); 輪廓集.delete(); 層級.delete();
@@ -1302,8 +1641,8 @@
 
             return {
                 fileName: fileName,
-                studentID: 最終學號字串,
-                answers: 答案字串陣列.join('')
+                studentID4: 最終學號字串,
+                answers100: 答案字串陣列.join('')
             };
         } catch (err) {
             console.error('影像辨識錯誤:', err);
@@ -1312,7 +1651,7 @@
     }
 
     // =========================================================================
-    // 八、 答案雙行格式化與表格渲染、CSV 匯出
+    // 九、 答案雙行格式化與表格渲染、CSV 匯出
     // =========================================================================
     /**
      * 將作答字串格式化為：每 10 題微間隔、滿 50 題換行（100題最多顯示兩行）
@@ -1320,11 +1659,9 @@
     function 格式化答案顯示HTML(rawStr) {
         if (!rawStr) return '';
         const lines = [];
-        // 每 50 字元切為一行
         for (let i = 0; i < rawStr.length; i += 50) {
             const lineSlice = rawStr.slice(i, i + 50);
             const chunks = [];
-            // 每 10 字元切為一組微間隔區塊
             for (let j = 0; j < lineSlice.length; j += 10) {
                 chunks.push(`<span class="ans-chunk-10">${lineSlice.slice(j, j + 10)}</span>`);
             }
@@ -1337,15 +1674,18 @@
         const tableBody = document.getElementById('resultTableBody');
         const tr = document.createElement('tr');
 
-        const nameStyle = data.isAbnormal
-            ? 'color: #EF4444; font-weight: 700;'
-            : 'color: #1E293B; font-weight: 700;';
+        let nameStyle = 'color: #1E293B; font-weight: 700;';
+        if (data.isIdInvalid || data.isNotFound) {
+            nameStyle = 'color: #EF4444; font-weight: 700;';
+        } else if (data.studentName === '待查詢') {
+            nameStyle = 'color: #64748B; font-weight: 600;';
+        }
 
         tr.innerHTML = `
             <td class="col-nowrap" style="text-align: center; font-weight: 700;">${data.serialNo}</td>
             <td class="col-nowrap"><span class="txt-mono-code" style="color: #1E468A; font-weight: 700;">${data.studentID}</span></td>
             <td class="col-nowrap"><span style="${nameStyle}">${data.studentName}</span></td>
-            <td><div class="txt-mono-code" style="color: #334155;">${格式化答案顯示HTML(data.answers)}</div></td>
+            <td><div class="txt-mono-code" style="color: #334155;">${格式化答案顯示HTML(data.activeAnswers)}</div></td>
             <td><div class="txt-mono-code" style="color: #64748B; font-weight: 600;">${格式化答案顯示HTML(data.reportModeString)}</div></td>
             <td class="col-nowrap" style="text-align: center;"><span class="txt-score-compact">${data.scoreString}</span></td>
         `;
@@ -1368,12 +1708,12 @@
     function 匯出成績單CSV() {
         if (全域成績資料庫.length === 0) return;
 
-        // 加入 UTF-8 BOM 確保 Excel 開啟中文不亂碼，答案維持純連續字串方便後續彙整
+        // 加入 UTF-8 BOM 確保 Excel 開啟中文不亂碼，包含學生得分、滿分與答對題數
         let csvContent = '\uFEFF';
-        csvContent += '序號,原始檔名,學生學號,學生姓名,原始作答明細,成績單對照模式,答對題數,總題數\n';
+        csvContent += '序號,原始檔名,學生學號,學生姓名,原始作答明細,成績單對照模式,學生得分,滿分,答對題數,總題數\n';
 
         全域成績資料庫.forEach(row => {
-            csvContent += `${row.serialNo},"${row.fileName}","${row.studentID}","${row.studentName}","${row.answers}","${row.reportModeString}",${row.correctCount},${row.totalCount}\n`;
+            csvContent += `${row.serialNo},"${row.fileName}","${row.studentID}","${row.studentName}","${row.activeAnswers}","${row.reportModeString}",${row.earnedScore},${row.fullScore},${row.correctCount},${row.totalCount}\n`;
         });
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
